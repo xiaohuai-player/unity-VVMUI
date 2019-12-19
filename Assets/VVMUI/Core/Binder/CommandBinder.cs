@@ -47,38 +47,40 @@ namespace VVMUI.Core.Binder {
                 }
 
                 Type componentType = item.Component.GetType ();
-                Type eventType = null;
-                object eventObj = null;
-                FieldInfo eventFieldInfo = componentType.GetField (item.Event);
-                PropertyInfo eventPropertyInfo = componentType.GetProperty (item.Event);
-                if (eventFieldInfo != null) {
-                    eventType = eventFieldInfo.FieldType.BaseType;
-                    eventObj = eventFieldInfo.GetValue (item.Component);
+                Type sourceEventType = null;
+                object sourceEventObj = null;
+
+                // UGUI 组件的 event 有的是 property，有的不是，所以 field 和 property 都判断
+                FieldInfo sourceEventFieldInfo = componentType.GetField (item.Event);
+                PropertyInfo sourceEventPropertyInfo = componentType.GetProperty (item.Event);
+                if (sourceEventFieldInfo != null) {
+                    sourceEventType = sourceEventFieldInfo.FieldType.BaseType;
+                    sourceEventObj = sourceEventFieldInfo.GetValue (item.Component);
                 }
-                if (eventPropertyInfo != null) {
-                    eventType = eventPropertyInfo.PropertyType.BaseType;
-                    eventObj = eventPropertyInfo.GetValue (item.Component, null);
+                if (sourceEventPropertyInfo != null) {
+                    sourceEventType = sourceEventPropertyInfo.PropertyType.BaseType;
+                    sourceEventObj = sourceEventPropertyInfo.GetValue (item.Component, null);
                 }
-                if (eventType == null) {
+                if (sourceEventType == null) {
                     Debugger.LogError ("CommandBinder", this.name + " event null.");
                     continue;
                 }
-                if (!eventType.FullName.StartsWith ("UnityEngine.Events.UnityEvent")) {
+                if (!sourceEventType.FullName.StartsWith ("UnityEngine.Events.UnityEvent")) {
                     Debugger.LogError ("CommandBinder", this.name + " event type error.");
                     continue;
                 }
 
                 bool genericTypeExplicit = true;
-                if (eventType.IsGenericType != commandType.IsGenericType) {
+                if (sourceEventType.IsGenericType != commandType.IsGenericType) {
                     genericTypeExplicit = false;
                 }
-                Type[] eventGenericTypes = eventType.GetGenericArguments ();
+                Type[] sourceEventGenericTypes = sourceEventType.GetGenericArguments ();
                 Type[] commandGenericTypes = commandType.GetGenericArguments ();
-                if (eventGenericTypes.Length != commandGenericTypes.Length) {
+                if (sourceEventGenericTypes.Length != commandGenericTypes.Length) {
                     genericTypeExplicit = false;
                 }
-                for (int j = 0; j < eventGenericTypes.Length; j++) {
-                    if (eventGenericTypes[j] != commandGenericTypes[j]) {
+                for (int j = 0; j < sourceEventGenericTypes.Length; j++) {
+                    if (sourceEventGenericTypes[j] != commandGenericTypes[j]) {
                         genericTypeExplicit = false;
                     }
                 }
@@ -87,15 +89,17 @@ namespace VVMUI.Core.Binder {
                     continue;
                 }
 
-                Type executeDelegateType = command.GetExecuteDelegateType ();
+                command.SetParameter (null);
+
+                Type executeDelegateType = command.GetEventDelegateType ();
                 MethodInfo executeMethod = null;
-                if (eventType.IsGenericType) {
+                if (sourceEventType.IsGenericType) {
                     executeMethod = commandType.GetMethod ("GenericExecute");
                 } else {
                     executeMethod = commandType.GetMethod ("Execute");
                 }
                 Delegate executeDelegate = Delegate.CreateDelegate (executeDelegateType, command, executeMethod);
-                eventType.GetMethod ("AddListener").Invoke (eventObj, new object[] { executeDelegate });
+                sourceEventType.GetMethod ("AddListener").Invoke (sourceEventObj, new object[] { executeDelegate });
 
                 command.CanExecuteChanged += new Action<bool> (delegate (bool f) {
                     item.Component.interactable = f;

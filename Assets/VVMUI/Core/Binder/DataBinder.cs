@@ -35,6 +35,7 @@ namespace VVMUI.Core.Binder {
                 }
 
                 Type componentType = this.Component.GetType ();
+                // TODO 性能优化：Type.GetProperty
                 PropertyInfo propertyInfo = componentType.GetProperty (this.Property);
                 if (propertyInfo == null || propertyInfo.GetSetMethod () == null) {
                     Debugger.LogError ("DataBinder", obj.name + " property null or not support.");
@@ -55,6 +56,7 @@ namespace VVMUI.Core.Binder {
                     bindData = true;
                 }
 
+                // TODO 性能优化：Type.GetGenericArguments
                 if (dataBaseType.IsGenericType && dataBaseType.GetGenericArguments () [0] == propertyType) {
                     bindData = true;
                 }
@@ -64,12 +66,15 @@ namespace VVMUI.Core.Binder {
                     return;
                 }
 
+                // TODO 性能优化：Type.GetMethod
                 MethodInfo getMethod = dataType.GetMethod ("Get");
                 this.SetValueHandler = delegate () {
+                    // TODO 性能优化：MethodInfo.Invoke
                     object value = getMethod.Invoke (this.Source, null);
                     if (this.Converter != null) {
                         value = this.Converter.Convert (value, propertyType, this.Definer.ConverterParameter, vm);
                     }
+                    // TODO 性能优化：PropertyInfo.SetValue
                     propertyInfo.SetValue (this.Component, value, null);
                 };
                 this.Source.ValueChanged += this.SetValueHandler;

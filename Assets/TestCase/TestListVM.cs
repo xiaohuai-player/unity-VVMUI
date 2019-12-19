@@ -8,81 +8,77 @@ using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
 
 public class TestListVM : VMBehaviour {
-    public ListData<StringData> lstTest = new ListData<StringData> () {
-        "aaa",
-        "bbb",
-        "ccc"
-    };
+    public ListData<StringData> lstTest = new ListData<StringData> ();
 
     public ButtonCommand btnAdd;
-    private bool btnAdd_CanExecute () {
+    private bool btnAdd_CanExecute (object parameter) {
         return true;
     }
-    private void btnAdd_Execute () {
+    private void btnAdd_Execute (object parameter) {
         this.lstTest.Add ("add");
     }
 
     public ButtonCommand btnAddRange;
-    private bool btnAddRange_CanExecute () {
+    private bool btnAddRange_CanExecute (object parameter) {
         return true;
     }
-    private void btnAddRange_Execute () {
+    private void btnAddRange_Execute (object parameter) {
         this.lstTest.AddRange (new List<StringData> () { "add range 1", "add range 2", "add range 3" });
     }
 
     public ButtonCommand btnRemove;
-    private bool btnRemove_CanExecute () {
+    private bool btnRemove_CanExecute (object parameter) {
         return true;
     }
-    private void btnRemove_Execute () {
+    private void btnRemove_Execute (object parameter) {
         this.lstTest.RemoveAt (UnityEngine.Random.Range (0, this.lstTest.Count));
     }
 
     public ButtonCommand btnClear;
-    private bool btnClear_CanExecute () {
+    private bool btnClear_CanExecute (object parameter) {
         return true;
     }
-    private void btnClear_Execute () {
+    private void btnClear_Execute (object parameter) {
         this.lstTest.Clear ();
     }
 
     public ButtonCommand btnInsert;
-    private bool btnInsert_CanExecute () {
+    private bool btnInsert_CanExecute (object parameter) {
         return true;
     }
-    private void btnInsert_Execute () {
+    private void btnInsert_Execute (object parameter) {
         this.lstTest.Insert (UnityEngine.Random.Range (0, this.lstTest.Count), new StringData ("insert"));
     }
 
     public ButtonCommand btnInsertRange;
-    private bool btnInsertRange_CanExecute () {
+    private bool btnInsertRange_CanExecute (object parameter) {
         return true;
     }
-    private void btnInsertRange_Execute () {
+    private void btnInsertRange_Execute (object parameter) {
         this.lstTest.InsertRange (UnityEngine.Random.Range (0, this.lstTest.Count), new List<StringData> () { "insert range 1", "isnert range 2", "insert range 3" });
     }
 
     public ButtonCommand btnReverse;
-    private bool btnReverse_CanExecute () {
+    private bool btnReverse_CanExecute (object parameter) {
         return true;
     }
-    private void btnReverse_Execute () {
+    private void btnReverse_Execute (object parameter) {
         this.lstTest.Reverse ();
     }
 
     public ButtonCommand btnUpdate;
-    private bool btnUpdate_CanExecute () {
+    private bool btnUpdate_CanExecute (object parameter) {
         return true;
     }
-    private void btnUpdate_Execute () {
+    private void btnUpdate_Execute (object parameter) {
         this.lstTest[UnityEngine.Random.Range (0, this.lstTest.Count)].Set ("update");
     }
 
     public ButtonCommand btnSet;
-    private bool btnSet_CanExecute () {
+    private bool btnSet_CanExecute (object parameter) {
         return true;
     }
-    private void btnSet_Execute () {
+    private void btnSet_Execute (object parameter) {
         this.lstTest[UnityEngine.Random.Range (0, this.lstTest.Count)] = "set";
     }
 

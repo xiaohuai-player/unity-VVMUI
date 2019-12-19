@@ -13,23 +13,26 @@ namespace VVMUI.Core.Binder {
         public GameObject Template;
 
         private IListData sourceData;
+        private VMBehaviour vm;
 
-        public override void Bind (VMBehaviour behaviour) {
-            IData data = behaviour.GetData (SourceKey);
+        public override void Bind (VMBehaviour vm) {
+            IData data = vm.GetData (SourceKey);
             if (data == null) {
                 return;
             }
 
-            sourceData = data as IListData;
-            if (sourceData == null) {
+            this.sourceData = data as IListData;
+            if (this.sourceData == null) {
                 return;
             }
+
+            this.vm = vm;
 
             for (int i = 0; i < this.transform.childCount; i++) {
                 Destroy (this.transform.GetChild (i).gameObject);
             }
 
-            (sourceData as IData).ValueChanged += Arrange;
+            (this.sourceData as IData).ValueChanged += Arrange;
 
             Arrange ();
         }
@@ -39,22 +42,24 @@ namespace VVMUI.Core.Binder {
                 return;
             }
 
-            sourceData = data as IListData;
-            if (sourceData == null) {
+            this.sourceData = data as IListData;
+            if (this.sourceData == null) {
                 return;
             }
+
+            this.vm = vm;
 
             for (int i = 0; i < this.transform.childCount; i++) {
                 Destroy (this.transform.GetChild (i).gameObject);
             }
 
-            (sourceData as IData).ValueChanged += Arrange;
+            (this.sourceData as IData).ValueChanged += Arrange;
 
             Arrange ();
         }
 
         public override void UnBind () {
-            (sourceData as IData).ValueChanged -= Arrange;
+            (this.sourceData as IData).ValueChanged -= Arrange;
         }
 
         private void Arrange () {
@@ -66,7 +71,11 @@ namespace VVMUI.Core.Binder {
             int dataCount = (sourceData as IList).Count;
             if (childCount < dataCount) {
                 for (int i = childCount; i < dataCount; i++) {
-                    GameObject.Instantiate (Template.gameObject, this.transform);
+                    GameObject obj = GameObject.Instantiate (Template.gameObject, this.transform);
+                    ListItemBinder binder = obj.GetComponent<ListItemBinder> ();
+                    if (binder != null) {
+                        binder.Bind (this.vm, i, this.sourceData);
+                    }
                 }
             } else if (childCount > dataCount) {
                 for (int i = dataCount; i < childCount; i++) {

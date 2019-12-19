@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace VVMUI.Core.Data {
     public interface IListData {
+        IData GetAt (int index);
         void InvokeItemValueChanged (int i);
         void AddItemValueChangedListener (int i, Action h);
         void RemoveItemValueChangedListener (int i, Action h);
@@ -53,6 +54,10 @@ namespace VVMUI.Core.Data {
                 base[index] = value;
                 InvokeItemValueChanged (index);
             }
+        }
+
+        public IData GetAt (int index) {
+            return this [index];
         }
 
         public new void Add (T item) {
