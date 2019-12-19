@@ -1,0 +1,10 @@
+{
+    "name": "VVMUI.Editor",
+    "references": [
+        "VVMUI.Core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
