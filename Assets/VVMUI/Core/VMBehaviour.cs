@@ -94,9 +94,9 @@ namespace VVMUI.Core {
 			}
 		}
 
-		protected void RefreshCommandsCanExecute () {
+		public void NotifyCommandsCanExecute () {
 			foreach (KeyValuePair<string, ICommand> kv in _allCommands) {
-				kv.Value.RefreshCanExecute ();
+				kv.Value.NotifyCanExecute ();
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace VVMUI.Core {
 		private void OnEnable () {
 			BeforeActive ();
 
-			RefreshCommandsCanExecute ();
+			NotifyCommandsCanExecute ();
 
 			AfterActive ();
 		}
@@ -137,7 +137,7 @@ namespace VVMUI.Core {
 		}
 
 		public virtual void Refresh () {
-			RefreshCommandsCanExecute ();
+			NotifyCommandsCanExecute ();
 		}
 
 		protected virtual void BeforeDestroy () { }

@@ -5,55 +5,64 @@ using UnityEngine.Events;
 
 namespace VVMUI.Core.Command {
     public abstract class BaseCommand : ICommand {
-        protected object _parameter;
         protected Func<object, bool> _canExecuteHandler;
         protected Action<object> _noArgExecuteHandler;
+        protected VMBehaviour _vm;
 
-        public event Action<bool> CanExecuteChanged;
+        public event Action CanExecuteChanged;
 
-        public void SetParameter (object parameter) {
-            this._parameter = parameter;
+        public void NotifyCanExecute () {
+            if (CanExecuteChanged != null) {
+                CanExecuteChanged.Invoke ();
+            }
         }
 
-        private bool _canExecute;
-        public bool CanExecute () {
-            return _canExecute;
+        public void BindVM (VMBehaviour vm) {
+            _vm = vm;
         }
 
-        public void RefreshCanExecute () {
+        public bool CanExecute (object parameter) {
             if (_canExecuteHandler != null) {
-                bool f = _canExecuteHandler.Invoke (this._parameter);
-                if (_canExecute != f) {
-                    if (CanExecuteChanged != null) {
-                        CanExecuteChanged.Invoke (f);
-                    }
-                    _canExecute = f;
-                }
+                return _canExecuteHandler.Invoke (parameter);
+            } else {
+                return true;
             }
         }
 
-        public void Execute () {
+        public void Execute (object parameter) {
             if (_noArgExecuteHandler != null) {
-                _noArgExecuteHandler.Invoke (this._parameter);
+                _noArgExecuteHandler.Invoke (parameter);
+            }
+            if (this._vm != null) {
+                this._vm.NotifyCommandsCanExecute ();
             }
         }
 
-        public virtual Type GetEventDelegateType () {
-            return typeof (UnityAction);
+        public virtual object GetEventDelegate (object parameter) {
+            UnityAction act = new UnityAction (delegate () {
+                this.Execute (parameter);
+            });
+            return act;
         }
     }
 
     public abstract class BaseCommand<T> : BaseCommand, ICommand<T> {
         protected Action<T, object> _executeHandler;
 
-        public void GenericExecute (T arg) {
+        public void Execute (T arg, object parameter) {
             if (_executeHandler != null) {
-                _executeHandler.Invoke (arg, this._parameter);
+                _executeHandler.Invoke (arg, parameter);
+            }
+            if (this._vm != null) {
+                this._vm.NotifyCommandsCanExecute ();
             }
         }
 
-        public override Type GetEventDelegateType () {
-            return typeof (UnityAction<T>);
+        public override object GetEventDelegate (object parameter) {
+            UnityAction<T> act = new UnityAction<T> (delegate (T arg) {
+                this.Execute (arg, parameter);
+            });
+            return act;
         }
     }
 }

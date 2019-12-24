@@ -82,6 +82,15 @@ public class TestListVM : VMBehaviour {
         this.lstTest[UnityEngine.Random.Range (0, this.lstTest.Count)] = "set";
     }
 
+    public ButtonCommand btnListTest;
+    private bool btnListTest_CanExecute (object index) {
+        return (int) index < 5;
+    }
+    private void btnListTest_Execute (object index) {
+        int i = (int) index;
+        Debug.Log ("btnListTest_Execute " + i + " " + this.lstTest[i].Get ());
+    }
+
     protected override void BeforeAwake () {
         btnAdd = new ButtonCommand (btnAdd_CanExecute, btnAdd_Execute);
         btnAddRange = new ButtonCommand (btnAddRange_CanExecute, btnAddRange_Execute);
@@ -92,5 +101,6 @@ public class TestListVM : VMBehaviour {
         btnReverse = new ButtonCommand (btnReverse_CanExecute, btnReverse_Execute);
         btnSet = new ButtonCommand (btnSet_CanExecute, btnSet_Execute);
         btnUpdate = new ButtonCommand (btnUpdate_CanExecute, btnUpdate_Execute);
+        btnListTest = new ButtonCommand (btnListTest_CanExecute, btnListTest_Execute);
     }
 }

@@ -14,60 +14,59 @@ namespace VVMUI.Core.Binder {
             public Selectable Component;
             public string Event;
             public string Command;
-        }
 
-        public List<CommandBinderItem> BindItems = new List<CommandBinderItem> ();
+            private ICommand command;
+            private Type sourceEventType;
+            private object sourceEventObj;
+            private object executeDelegate;
+            private Action canExecuteHandler;
 
-        public override void Bind (VMBehaviour vm) {
-            for (int i = 0; i < BindItems.Count; i++) {
-                CommandBinderItem item = BindItems[i];
-                if (item.Component == null) {
-                    Debugger.LogError ("CommandBinder", this.name + " component null.");
-                    continue;
+            public void DoBind (VMBehaviour vm, object parameter, GameObject obj) {
+                if (this.Component == null) {
+                    Debugger.LogError ("CommandBinder", obj.name + " component null.");
+                    return;
                 }
-                if (string.IsNullOrEmpty (item.Command)) {
-                    Debugger.LogError ("CommandBinder", this.name + " command key empty.");
-                    continue;
+                if (string.IsNullOrEmpty (this.Command)) {
+                    Debugger.LogError ("CommandBinder", obj.name + " command key empty.");
+                    return;
                 }
-                if (string.IsNullOrEmpty (item.Event)) {
-                    Debugger.LogError ("CommandBinder", this.name + " event key empty.");
-                    continue;
+                if (string.IsNullOrEmpty (this.Event)) {
+                    Debugger.LogError ("CommandBinder", obj.name + " event key empty.");
+                    return;
                 }
 
-                ICommand command = vm.GetCommand (item.Command);
+                command = vm.GetCommand (this.Command);
                 if (command == null) {
-                    Debugger.LogError ("CommandBinder", this.name + " command null.");
-                    continue;
+                    Debugger.LogError ("CommandBinder", obj.name + " command null.");
+                    return;
                 }
 
                 Type commandType = command.GetType ().BaseType;
                 if (!commandType.FullName.StartsWith ("VVMUI.Core.Command.BaseCommand")) {
-                    Debugger.LogError ("CommandBinder", this.name + " command type error.");
-                    continue;
+                    Debugger.LogError ("CommandBinder", obj.name + " command type error.");
+                    return;
                 }
 
-                Type componentType = item.Component.GetType ();
-                Type sourceEventType = null;
-                object sourceEventObj = null;
+                Type componentType = this.Component.GetType ();
 
                 // UGUI 组件的 event 有的是 property，有的不是，所以 field 和 property 都判断
-                FieldInfo sourceEventFieldInfo = componentType.GetField (item.Event);
-                PropertyInfo sourceEventPropertyInfo = componentType.GetProperty (item.Event);
+                FieldInfo sourceEventFieldInfo = componentType.GetField (this.Event);
+                PropertyInfo sourceEventPropertyInfo = componentType.GetProperty (this.Event);
                 if (sourceEventFieldInfo != null) {
                     sourceEventType = sourceEventFieldInfo.FieldType.BaseType;
-                    sourceEventObj = sourceEventFieldInfo.GetValue (item.Component);
+                    sourceEventObj = sourceEventFieldInfo.GetValue (this.Component);
                 }
                 if (sourceEventPropertyInfo != null) {
                     sourceEventType = sourceEventPropertyInfo.PropertyType.BaseType;
-                    sourceEventObj = sourceEventPropertyInfo.GetValue (item.Component, null);
+                    sourceEventObj = sourceEventPropertyInfo.GetValue (this.Component, null);
                 }
                 if (sourceEventType == null) {
-                    Debugger.LogError ("CommandBinder", this.name + " event null.");
-                    continue;
+                    Debugger.LogError ("CommandBinder", obj.name + " event null.");
+                    return;
                 }
                 if (!sourceEventType.FullName.StartsWith ("UnityEngine.Events.UnityEvent")) {
-                    Debugger.LogError ("CommandBinder", this.name + " event type error.");
-                    continue;
+                    Debugger.LogError ("CommandBinder", obj.name + " event type error.");
+                    return;
                 }
 
                 bool genericTypeExplicit = true;
@@ -85,27 +84,50 @@ namespace VVMUI.Core.Binder {
                     }
                 }
                 if (!genericTypeExplicit) {
-                    Debugger.LogError ("CommandBinder", this.name + " event type and command type not explicit.");
-                    continue;
+                    Debugger.LogError ("CommandBinder", obj.name + " event type and command type not explicit.");
+                    return;
                 }
 
-                command.SetParameter (null);
+                command.BindVM (vm);
 
-                Type executeDelegateType = command.GetEventDelegateType ();
-                MethodInfo executeMethod = null;
-                if (sourceEventType.IsGenericType) {
-                    executeMethod = commandType.GetMethod ("GenericExecute");
-                } else {
-                    executeMethod = commandType.GetMethod ("Execute");
-                }
-                Delegate executeDelegate = Delegate.CreateDelegate (executeDelegateType, command, executeMethod);
+                executeDelegate = command.GetEventDelegate (parameter);
                 sourceEventType.GetMethod ("AddListener").Invoke (sourceEventObj, new object[] { executeDelegate });
 
-                command.CanExecuteChanged += new Action<bool> (delegate (bool f) {
-                    item.Component.interactable = f;
+                canExecuteHandler = new Action (delegate {
+                    this.Component.interactable = command.CanExecute (parameter);
                 });
-                command.RefreshCanExecute ();
-                item.Component.interactable = command.CanExecute ();
+                command.CanExecuteChanged += canExecuteHandler;
+                this.Component.interactable = command.CanExecute (parameter);
+            }
+
+            public void DoUnBind () {
+                if (command != null && sourceEventType != null && sourceEventObj != null && executeDelegate != null && canExecuteHandler != null) {
+                    sourceEventType.GetMethod ("RemoveListener").Invoke (sourceEventObj, new object[] { executeDelegate });
+                    command.CanExecuteChanged -= canExecuteHandler;
+                }
+            }
+        }
+
+        public List<CommandBinderItem> BindItems = new List<CommandBinderItem> ();
+
+        public override void Bind (VMBehaviour vm) {
+            for (int i = 0; i < BindItems.Count; i++) {
+                CommandBinderItem item = BindItems[i];
+                item.DoBind (vm, null, this.gameObject);
+            }
+        }
+
+        public override void BindListItem (VMBehaviour vm, int index) {
+            for (int i = 0; i < BindItems.Count; i++) {
+                CommandBinderItem item = BindItems[i];
+                item.DoBind (vm, index, this.gameObject);
+            }
+        }
+
+        public override void UnBind () {
+            for (int i = 0; i < BindItems.Count; i++) {
+                CommandBinderItem item = BindItems[i];
+                item.DoUnBind ();
             }
         }
     }

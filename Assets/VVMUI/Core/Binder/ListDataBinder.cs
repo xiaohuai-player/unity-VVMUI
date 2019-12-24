@@ -79,7 +79,12 @@ namespace VVMUI.Core.Binder {
                 }
             } else if (childCount > dataCount) {
                 for (int i = dataCount; i < childCount; i++) {
-                    GameObject.Destroy (this.transform.GetChild (i).gameObject);
+                    GameObject obj = this.transform.GetChild (i).gameObject;
+                    ListItemBinder binder = obj.GetComponent<ListItemBinder> ();
+                    if (binder != null) {
+                        binder.UnBind ();
+                    }
+                    GameObject.Destroy (obj);
                 }
             }
         }

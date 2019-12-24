@@ -2,15 +2,15 @@
 
 namespace VVMUI.Core.Command {
 	public interface ICommand {
-		event Action<bool> CanExecuteChanged;
-		bool CanExecute ();
-		void RefreshCanExecute ();
-		void SetParameter (object parameter);
-		void Execute ();
-		Type GetEventDelegateType ();
+		event Action CanExecuteChanged;
+		void NotifyCanExecute ();
+		void BindVM (VMBehaviour vm);
+		bool CanExecute (object parameter);
+		void Execute (object parameter);
+		object GetEventDelegate (object parameter);
 	}
 
 	public interface ICommand<T> {
-		void GenericExecute (T arg);
+		void Execute (T arg, object parameter);
 	}
 }
