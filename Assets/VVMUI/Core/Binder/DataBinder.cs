@@ -7,7 +7,6 @@ using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
 
 namespace VVMUI.Core.Binder {
-    [ExecuteInEditMode]
     public class DataBinder : BaseDataBinder {
         [Serializable]
         public class DataBinderItem {

@@ -7,13 +7,13 @@ using UnityEngine.UI;
 using VVMUI.Core.Command;
 
 namespace VVMUI.Core.Binder {
-    [ExecuteInEditMode]
     public class CommandBinder : BaseCommandBinder {
         [Serializable]
         public class CommandBinderItem {
             public Selectable Component;
             public string Event;
             public string Command;
+            public string Parameter;
 
             private ICommand command;
             private Type sourceEventType;
@@ -113,7 +113,7 @@ namespace VVMUI.Core.Binder {
         public override void Bind (VMBehaviour vm) {
             for (int i = 0; i < BindItems.Count; i++) {
                 CommandBinderItem item = BindItems[i];
-                item.DoBind (vm, null, this.gameObject);
+                item.DoBind (vm, item.Parameter, this.gameObject);
             }
         }
 

@@ -86,11 +86,14 @@ namespace VVMUI.Core.Binder {
                     DefinerKey dk = keyChain[i];
                     if (t.IsGenericType && t.GetGenericTypeDefinition () == typeof (ListData<>) && dk.IsIndex) {
                         IList ld = (data as IList);
-                        if (dk.Index >= 0 && dk.Index < ld.Count) {
+                        if (ld != null && dk.Index >= 0 && dk.Index < ld.Count) {
                             data = (IData) ld[dk.Index];
                         }
-                    } else if (t == typeof (StructData) && !dk.IsIndex) {
-                        data = (data as StructData) [dk.Key];
+                    } else if (t.BaseType == typeof (StructData) && !dk.IsIndex) {
+                        StructData sd = data as StructData;
+                        if (sd != null) {
+                            data = sd[dk.Key];
+                        }
                     } else {
                         break;
                     }
@@ -126,12 +129,15 @@ namespace VVMUI.Core.Binder {
                     Type t = data.GetType ();
                     DefinerKey dk = keyChain[i];
                     if (t.IsGenericType && t.GetGenericTypeDefinition () == typeof (ListData<>) && dk.IsIndex) {
-                        IList ld = (data as IList);
-                        if (dk.Index >= 0 && dk.Index < ld.Count) {
+                        IList ld = data as IList;
+                        if (ld != null && dk.Index >= 0 && dk.Index < ld.Count) {
                             data = (IData) ld[dk.Index];
                         }
-                    } else if (t == typeof (StructData) && !dk.IsIndex) {
-                        data = (data as StructData) [dk.Key];
+                    } else if (t.BaseType == typeof (StructData) && !dk.IsIndex) {
+                        StructData sd = data as StructData;
+                        if (sd != null) {
+                            data = sd[dk.Key];
+                        }
                     } else {
                         break;
                     }

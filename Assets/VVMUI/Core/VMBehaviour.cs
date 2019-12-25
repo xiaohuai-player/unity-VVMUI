@@ -9,7 +9,6 @@ using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
 
 namespace VVMUI.Core {
-	[ExecuteInEditMode]
 	public class VMBehaviour : MonoBehaviour {
 		private Dictionary<string, IData> _allData = new Dictionary<string, IData> ();
 		private Dictionary<string, ICommand> _allCommands = new Dictionary<string, ICommand> ();
@@ -57,22 +56,24 @@ namespace VVMUI.Core {
 			Type type = this.GetType ();
 			FieldInfo[] fields = type.GetFields ();
 			for (int i = 0; i < fields.Length; i++) {
-				if (fields[i].FieldType.GetInterface ("IData") != null) {
-					IData data = fields[i].GetValue (this) as IData;
+				FieldInfo fi = fields[i];
+				Type t = fi.FieldType;
+				if (t.GetInterface ("IData") != null || t.BaseType == typeof (StructData)) {
+					IData data = fi.GetValue (this) as IData;
 					if (data != null) {
-						_allData[fields[i].Name] = data;
+						_allData[fi.Name] = data;
 					}
 				}
-				if (fields[i].FieldType.GetInterface ("ICommand") != null) {
-					ICommand cmd = fields[i].GetValue (this) as ICommand;
+				if (t.GetInterface ("ICommand") != null) {
+					ICommand cmd = fi.GetValue (this) as ICommand;
 					if (cmd != null) {
-						_allCommands[fields[i].Name] = cmd;
+						_allCommands[fi.Name] = cmd;
 					}
 				}
-				if (fields[i].FieldType.GetInterface ("IConverter") != null) {
-					IConverter cvt = fields[i].GetValue (this) as IConverter;
+				if (t.GetInterface ("IConverter") != null) {
+					IConverter cvt = fi.GetValue (this) as IConverter;
 					if (cvt != null) {
-						_allConverters[fields[i].Name] = cvt;
+						_allConverters[fi.Name] = cvt;
 					}
 				}
 			}
