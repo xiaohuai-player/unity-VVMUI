@@ -82,20 +82,20 @@ namespace VVMUI.Core.Binder {
             IData data = vm.GetData (keyChain[0].Key);
             if (data != null) {
                 for (int i = 1; i < keyChain.Count; i++) {
-                    Type t = data.GetType ();
+                    if (data == null) {
+                        break;
+                    }
                     DefinerKey dk = keyChain[i];
-                    if (t.IsGenericType && t.GetGenericTypeDefinition () == typeof (ListData<>) && dk.IsIndex) {
+                    if (dk.IsIndex) {
                         IList ld = (data as IList);
                         if (ld != null && dk.Index >= 0 && dk.Index < ld.Count) {
                             data = (IData) ld[dk.Index];
                         }
-                    } else if (t.BaseType == typeof (StructData) && !dk.IsIndex) {
+                    } else {
                         StructData sd = data as StructData;
                         if (sd != null) {
                             data = sd[dk.Key];
                         }
-                    } else {
-                        break;
                     }
                 }
             }
@@ -126,20 +126,20 @@ namespace VVMUI.Core.Binder {
             IData data = structSource[keyChain[0].Key];
             if (data != null) {
                 for (int i = 1; i < keyChain.Count; i++) {
-                    Type t = data.GetType ();
+                    if (data == null) {
+                        break;
+                    }
                     DefinerKey dk = keyChain[i];
-                    if (t.IsGenericType && t.GetGenericTypeDefinition () == typeof (ListData<>) && dk.IsIndex) {
+                    if (dk.IsIndex) {
                         IList ld = data as IList;
                         if (ld != null && dk.Index >= 0 && dk.Index < ld.Count) {
                             data = (IData) ld[dk.Index];
                         }
-                    } else if (t.BaseType == typeof (StructData) && !dk.IsIndex) {
+                    } else {
                         StructData sd = data as StructData;
                         if (sd != null) {
                             data = sd[dk.Key];
                         }
-                    } else {
-                        break;
                     }
                 }
             }
