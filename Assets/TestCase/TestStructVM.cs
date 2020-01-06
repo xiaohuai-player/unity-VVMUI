@@ -8,6 +8,16 @@ using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
 
 public class TestStructVM : VMBehaviour {
+    public class IntToStringConverter : IConverter {
+        public object Convert (object value, Type targetType, object parameter, VMBehaviour context) {
+            return System.Convert.ToString (value);
+        }
+
+        public object ConvertBack (object value, Type targetType, object parameter, VMBehaviour context) {
+            return System.Convert.ToInt32 (value);
+        }
+    }
+
     public class FriendData : StructData {
         public StringData Name;
         public IntData Age;
@@ -27,6 +37,8 @@ public class TestStructVM : VMBehaviour {
     public void btnAddAge_Execute (object parameter) {
         testFriend.Age.Set (testFriend.Age.Get () + 1);
     }
+
+    public IntToStringConverter cvtIntToString = new IntToStringConverter ();
 
     protected override void BeforeAwake () {
         btnAddAge = new ButtonCommand (btnAddAge_CanExecute, btnAddAge_Execute);

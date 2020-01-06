@@ -64,8 +64,7 @@ namespace VVMUI.Core.Binder {
                     bindData = true;
                 }
 
-                // TODO 性能优化：Type.GetGenericArguments
-                if (dataBaseType.IsGenericType && dataBaseType.GetGenericArguments () [0] == propertyType) {
+                if (this.Source.GetDataType () == propertyType) {
                     bindData = true;
                 }
 
@@ -133,27 +132,53 @@ namespace VVMUI.Core.Binder {
                 this.SetValueHandler.Invoke ();
 
                 // 可交互组件的双向绑定
+                // TODO 性能优化：Type.GetMethod
+                MethodInfo setMethod = dataType.GetMethod ("Set");
                 if (componentType == typeof (Toggle) && this.Property.Equals ("isOn")) {
                     this.ValueChangedHandler = new UnityAction<bool> (delegate (bool arg) {
-                        (this.Source as BoolData).Set (arg);
+                        if (this.Converter != null) {
+                            object value = this.Converter.ConvertBack (arg, this.Source.GetDataType (), this.Definer.ConverterParameter, vm);
+                            // TODO 性能优化：MethodInfo.Invoke
+                            setMethod.Invoke (this.Source, new object[] { value });
+                        } else {
+                            (this.Source as BoolData).Set (arg);
+                        }
                     });
                     (this.Component as Toggle).onValueChanged.AddListener ((UnityAction<bool>) this.ValueChangedHandler);
                 }
                 if (componentType == typeof (InputField) && this.Property.Equals ("text")) {
                     this.ValueChangedHandler = new UnityAction<string> (delegate (string arg) {
-                        (this.Source as StringData).Set (arg);
+                        if (this.Converter != null) {
+                            object value = this.Converter.ConvertBack (arg, this.Source.GetDataType (), this.Definer.ConverterParameter, vm);
+                            // TODO 性能优化：MethodInfo.Invoke
+                            setMethod.Invoke (this.Source, new object[] { value });
+                        } else {
+                            (this.Source as StringData).Set (arg);
+                        }
                     });
                     (this.Component as InputField).onValueChanged.AddListener ((UnityAction<string>) this.ValueChangedHandler);
                 }
                 if (componentType == typeof (Dropdown) && this.Property.Equals ("value")) {
                     this.ValueChangedHandler = new UnityAction<int> (delegate (int arg) {
-                        (this.Source as IntData).Set (arg);
+                        if (this.Converter != null) {
+                            object value = this.Converter.ConvertBack (arg, this.Source.GetDataType (), this.Definer.ConverterParameter, vm);
+                            // TODO 性能优化：MethodInfo.Invoke
+                            setMethod.Invoke (this.Source, new object[] { value });
+                        } else {
+                            (this.Source as IntData).Set (arg);
+                        }
                     });
                     (this.Component as Dropdown).onValueChanged.AddListener ((UnityAction<int>) this.ValueChangedHandler);
                 }
                 if (componentType == typeof (Slider) && this.Property.Equals ("value")) {
                     this.ValueChangedHandler = new UnityAction<float> (delegate (float arg) {
-                        (this.Source as FloatData).Set (arg);
+                        if (this.Converter != null) {
+                            object value = this.Converter.ConvertBack (arg, this.Source.GetDataType (), this.Definer.ConverterParameter, vm);
+                            // TODO 性能优化：MethodInfo.Invoke
+                            setMethod.Invoke (this.Source, new object[] { value });
+                        } else {
+                            (this.Source as FloatData).Set (arg);
+                        }
                     });
                     (this.Component as Slider).onValueChanged.AddListener ((UnityAction<float>) this.ValueChangedHandler);
                 }

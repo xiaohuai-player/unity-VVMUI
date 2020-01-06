@@ -41,5 +41,17 @@ namespace VVMUI.Core.Data {
                 return v;
             }
         }
+
+        public Type GetDataType () {
+            return typeof (object);
+        }
+
+        public object GetGetterDelegate () {
+            return null;
+        }
+
+        public object GetSetterDelegate () {
+            return null;
+        }
     }
 }

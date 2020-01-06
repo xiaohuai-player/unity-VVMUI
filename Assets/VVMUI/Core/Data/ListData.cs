@@ -11,6 +11,18 @@ namespace VVMUI.Core.Data {
     }
 
     public class ListData<T> : List<T>, IListData, IData where T : IData {
+        public Type GetDataType () {
+            return typeof (T);
+        }
+
+        public object GetGetterDelegate () {
+            return null;
+        }
+
+        public object GetSetterDelegate () {
+            return null;
+        }
+
         public event Action ValueChanged;
 
         public void InvokeValueChanged () {
