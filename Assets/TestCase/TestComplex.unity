@@ -846,14 +846,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 899645402}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffa6fb1bedc7f4df090ee94fc8582dc4, type: 3}
+  m_Script: {fileID: 11500000, guid: 7d4b2830006084b76b59cc08f13be245, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   BindItems:
-  - Component: {fileID: 899645404}
-    Event: onValueChanged
-    Command: iptNameChanged
-    Parameter: 
+  - Type: 0
+    Definer:
+      Key: strInputName
+      Converter: 
+      ConverterParameter: 
+    Component: {fileID: 899645404}
+    Property: text
+    GameObject: {fileID: 0}
+    Animation: {fileID: 0}
+    Animator: {fileID: 0}
+    AnimatorLayer: 0
 --- !u!1 &907876345
 GameObject:
   m_ObjectHideFlags: 0
@@ -997,14 +1004,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 907876345}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffa6fb1bedc7f4df090ee94fc8582dc4, type: 3}
+  m_Script: {fileID: 11500000, guid: 7d4b2830006084b76b59cc08f13be245, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   BindItems:
-  - Component: {fileID: 907876347}
-    Event: onValueChanged
-    Command: iptAgeChanged
-    Parameter: 
+  - Type: 0
+    Definer:
+      Key: intInputAge
+      Converter: cvtTest
+      ConverterParameter: 
+    Component: {fileID: 907876347}
+    Property: text
+    GameObject: {fileID: 0}
+    Animation: {fileID: 0}
+    Animator: {fileID: 0}
+    AnimatorLayer: 0
 --- !u!1 &944421070
 GameObject:
   m_ObjectHideFlags: 0
@@ -1063,7 +1077,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1045727157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c89c873d6a83a406b9aca2bee5204772, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ee1bae5e8ebb4ffc887ad7b8f703cca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   index: 0
@@ -1645,12 +1659,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BindItems:
-  - Component: {fileID: 1827082130}
-    Property: text
+  - Type: 0
     Definer:
       Key: Age
       Converter: StringConverter
       ConverterParameter: 
+    Component: {fileID: 1827082130}
+    Property: text
+    GameObject: {fileID: 0}
+    Animation: {fileID: 0}
+    Animator: {fileID: 0}
+    AnimatorLayer: 0
 --- !u!114 &1827082130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1877,12 +1896,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BindItems:
-  - Component: {fileID: 1989432460}
-    Property: text
+  - Type: 0
     Definer:
       Key: Name
       Converter: 
       ConverterParameter: 
+    Component: {fileID: 1989432460}
+    Property: text
+    GameObject: {fileID: 0}
+    Animation: {fileID: 0}
+    Animator: {fileID: 0}
+    AnimatorLayer: 0
 --- !u!114 &1989432460
 MonoBehaviour:
   m_ObjectHideFlags: 0
