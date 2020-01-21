@@ -71,7 +71,7 @@ namespace VVMUI.Core.Binder {
             if (childCount < dataCount) {
                 for (int i = childCount; i < dataCount; i++) {
                     GameObject obj = GameObject.Instantiate (Template.gameObject, this.transform);
-                    ListItemBinder binder = obj.GetComponent<ListItemBinder> ();
+                    ListTemplateBinder binder = obj.GetComponent<ListTemplateBinder> ();
                     if (binder != null) {
                         binder.Bind (this.vm, i, this.sourceData);
                     }
@@ -79,7 +79,7 @@ namespace VVMUI.Core.Binder {
             } else if (childCount > dataCount) {
                 for (int i = dataCount; i < childCount; i++) {
                     GameObject obj = this.transform.GetChild (i).gameObject;
-                    ListItemBinder binder = obj.GetComponent<ListItemBinder> ();
+                    ListTemplateBinder binder = obj.GetComponent<ListTemplateBinder> ();
                     if (binder != null) {
                         binder.UnBind ();
                     }

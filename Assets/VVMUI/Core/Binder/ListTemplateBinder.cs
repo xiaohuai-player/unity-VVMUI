@@ -7,7 +7,7 @@ using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
 
 namespace VVMUI.Core.Binder {
-    public class ListItemBinder : MonoBehaviour {
+    public class ListTemplateBinder : MonoBehaviour {
         [SerializeField]
         private int index;
         private IListData source;

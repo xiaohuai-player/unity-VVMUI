@@ -4,7 +4,7 @@ using VVMUI.Core.Data;
 namespace VVMUI.Core.Binder {
     public abstract class BaseDataBinder : MonoBehaviour {
         public virtual bool CanBind (VMBehaviour vm) {
-            return this.GetComponentInParent<ListItemBinder> () == null;
+            return true;
         }
 
         public virtual void Bind (VMBehaviour vm) { }
@@ -20,7 +20,7 @@ namespace VVMUI.Core.Binder {
 
     public abstract class BaseCommandBinder : MonoBehaviour {
         public virtual bool CanBind (VMBehaviour vm) {
-            return this.GetComponentInParent<ListItemBinder> () == null;
+            return true;
         }
 
         public virtual void Bind (VMBehaviour vm) { }
