@@ -20,6 +20,7 @@ namespace VVMUI.Core.Binder {
             }
 
             public BindType Type;
+            public DataDefiner Definer = new DataDefiner ();
 
             // property bind vars
             public Component Component;
@@ -34,8 +35,6 @@ namespace VVMUI.Core.Binder {
             // animator bind vars
             public Animator Animator;
             public int AnimatorLayer;
-
-            public DataDefiner Definer = new DataDefiner ();
 
             [HideInInspector]
             public IData Source;
