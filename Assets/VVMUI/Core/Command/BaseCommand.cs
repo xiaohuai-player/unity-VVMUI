@@ -33,6 +33,7 @@ namespace VVMUI.Core.Command {
             if (_noArgExecuteHandler != null) {
                 _noArgExecuteHandler.Invoke (parameter);
             }
+            // 参考 wpf 命令刷新通知机制，在执行命令时通知当前 vm 的所有命令刷新
             if (this._vm != null) {
                 this._vm.NotifyCommandsCanExecute ();
             }
@@ -56,6 +57,7 @@ namespace VVMUI.Core.Command {
             if (_executeHandler != null) {
                 _executeHandler.Invoke (arg, parameter);
             }
+            // 参考 wpf 命令刷新通知机制，在执行命令时通知当前 vm 的所有命令刷新
             if (this._vm != null) {
                 this._vm.NotifyCommandsCanExecute ();
             }

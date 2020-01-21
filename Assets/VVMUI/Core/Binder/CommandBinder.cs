@@ -69,6 +69,7 @@ namespace VVMUI.Core.Binder {
                     return;
                 }
 
+                // 判断 event 和 command 参数类型是否匹配
                 bool genericTypeExplicit = true;
                 if (sourceEventType.IsGenericType != commandType.IsGenericType) {
                     genericTypeExplicit = false;
