@@ -10,6 +10,8 @@ using VVMUI.Core.Data;
 
 namespace VVMUI.Core {
 	public class VMBehaviour : MonoBehaviour {
+		public GameObject BindRoot;
+
 		private Dictionary<string, IData> _allData = new Dictionary<string, IData> ();
 		private Dictionary<string, ICommand> _allCommands = new Dictionary<string, ICommand> ();
 		private Dictionary<string, IConverter> _allConverters = new Dictionary<string, IConverter> ();
@@ -80,14 +82,18 @@ namespace VVMUI.Core {
 		}
 
 		protected void Bind () {
-			AbstractDataBinder[] databinders = this.gameObject.GetComponentsInChildren<AbstractDataBinder> (true);
+			if (this.BindRoot == null) {
+				this.BindRoot = this.gameObject;
+			}
+
+			AbstractDataBinder[] databinders = this.BindRoot.GetComponentsInChildren<AbstractDataBinder> (true);
 			for (int i = 0; i < databinders.Length; i++) {
 				if (databinders[i].CanBind (this)) {
 					databinders[i].Bind (this);
 				}
 			}
 
-			AbstractCommandBinder[] cmdbinders = this.gameObject.GetComponentsInChildren<AbstractCommandBinder> (true);
+			AbstractCommandBinder[] cmdbinders = this.BindRoot.GetComponentsInChildren<AbstractCommandBinder> (true);
 			for (int i = 0; i < cmdbinders.Length; i++) {
 				if (cmdbinders[i].CanBind (this)) {
 					cmdbinders[i].Bind (this);
