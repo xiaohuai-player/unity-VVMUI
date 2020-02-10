@@ -70,7 +70,7 @@ namespace VVMUI.Core.Binder {
             int dataCount = (sourceData as IList).Count;
             if (childCount < dataCount) {
                 for (int i = childCount; i < dataCount; i++) {
-                    GameObject obj = GameObject.Instantiate (Template.gameObject, this.transform);
+                    GameObject obj = GameObject.Instantiate (Template, this.transform);
                     ListTemplateBinder binder = obj.GetComponent<ListTemplateBinder> ();
                     if (binder != null) {
                         binder.Bind (this.vm, i, this.sourceData);

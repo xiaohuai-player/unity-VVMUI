@@ -92,6 +92,7 @@ namespace VVMUI.Core.Binder {
                 command.BindVM (vm);
 
                 executeDelegate = command.GetEventDelegate (parameter);
+                // TODO 性能优化：Type.GetMethod, MethodInfo.Invoke
                 sourceEventType.GetMethod ("AddListener").Invoke (sourceEventObj, new object[] { executeDelegate });
 
                 canExecuteHandler = new Action (delegate {
@@ -103,6 +104,7 @@ namespace VVMUI.Core.Binder {
 
             public void DoUnBind () {
                 if (command != null && sourceEventType != null && sourceEventObj != null && executeDelegate != null && canExecuteHandler != null) {
+                    // TODO 性能优化：Type.GetMethod, MethodInfo.Invoke
                     sourceEventType.GetMethod ("RemoveListener").Invoke (sourceEventObj, new object[] { executeDelegate });
                     command.CanExecuteChanged -= canExecuteHandler;
                 }
