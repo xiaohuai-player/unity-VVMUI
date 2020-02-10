@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using VVMUI.Core.Command;
 
 namespace VVMUI.Core.Binder {
-    public class CommandBinder : BaseCommandBinder {
+    public class BaseCommandBinder : AbstractCommandBinder {
         [Serializable]
         public class CommandBinderItem {
             public Selectable Component;

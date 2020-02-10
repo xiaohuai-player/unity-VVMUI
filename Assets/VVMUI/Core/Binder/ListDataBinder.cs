@@ -7,7 +7,7 @@ using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
 
 namespace VVMUI.Core.Binder {
-    public class ListDataBinder : BaseDataBinder {
+    public class ListDataBinder : AbstractDataBinder {
         public string SourceKey;
         public GameObject Template;
 

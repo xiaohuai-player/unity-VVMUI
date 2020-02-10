@@ -9,7 +9,7 @@ using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
 
 namespace VVMUI.Core.Binder {
-    public class DataBinder : BaseDataBinder {
+    public class BaseDataBinder : AbstractDataBinder {
         [Serializable]
         public class DataBinderItem {
             public enum BindType {

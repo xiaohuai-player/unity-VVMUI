@@ -80,14 +80,14 @@ namespace VVMUI.Core {
 		}
 
 		protected void Bind () {
-			BaseDataBinder[] databinders = this.gameObject.GetComponentsInChildren<BaseDataBinder> (true);
+			AbstractDataBinder[] databinders = this.gameObject.GetComponentsInChildren<AbstractDataBinder> (true);
 			for (int i = 0; i < databinders.Length; i++) {
 				if (databinders[i].CanBind (this)) {
 					databinders[i].Bind (this);
 				}
 			}
 
-			BaseCommandBinder[] cmdbinders = this.gameObject.GetComponentsInChildren<BaseCommandBinder> (true);
+			AbstractCommandBinder[] cmdbinders = this.gameObject.GetComponentsInChildren<AbstractCommandBinder> (true);
 			for (int i = 0; i < cmdbinders.Length; i++) {
 				if (cmdbinders[i].CanBind (this)) {
 					cmdbinders[i].Bind (this);

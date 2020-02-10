@@ -13,12 +13,12 @@ namespace VVMUI.Core.Binder {
         private IListData source;
         private VMBehaviour vm;
 
-        private List<BaseDataBinder> dataBinders = new List<BaseDataBinder> ();
-        private List<BaseCommandBinder> commandBinders = new List<BaseCommandBinder> ();
+        private List<AbstractDataBinder> dataBinders = new List<AbstractDataBinder> ();
+        private List<AbstractCommandBinder> commandBinders = new List<AbstractCommandBinder> ();
 
         private void Awake () {
-            this.gameObject.GetComponentsInChildren<BaseDataBinder> (true, dataBinders);
-            this.gameObject.GetComponentsInChildren<BaseCommandBinder> (true, commandBinders);
+            this.gameObject.GetComponentsInChildren<AbstractDataBinder> (true, dataBinders);
+            this.gameObject.GetComponentsInChildren<AbstractCommandBinder> (true, commandBinders);
         }
 
         private void OnDestroy () {
