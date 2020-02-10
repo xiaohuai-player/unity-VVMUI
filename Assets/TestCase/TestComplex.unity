@@ -362,7 +362,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c194d3aeff668447ba1a162a858e56bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SourceKey: friends
+  Source:
+    Key: friends
+    Converter: 
+    ConverterParameter: 
   Template: {fileID: 1045727157}
 --- !u!114 &345249218
 MonoBehaviour:

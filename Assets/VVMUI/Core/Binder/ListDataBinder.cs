@@ -8,14 +8,18 @@ using VVMUI.Core.Data;
 
 namespace VVMUI.Core.Binder {
     public class ListDataBinder : AbstractDataBinder {
-        public string SourceKey;
+        public DataDefiner Source;
         public GameObject Template;
 
         private IListData sourceData;
         private VMBehaviour vm;
 
         public override void Bind (VMBehaviour vm) {
-            IData data = vm.GetData (SourceKey);
+            if (Source == null) {
+                return;
+            }
+
+            IData data = Source.GetData (vm);
             if (data == null) {
                 return;
             }
@@ -37,11 +41,15 @@ namespace VVMUI.Core.Binder {
         }
 
         public override void Bind (VMBehaviour vm, IData data) {
+            if (Source == null) {
+                return;
+            }
+
             if (data == null) {
                 return;
             }
 
-            this.sourceData = data as IListData;
+            this.sourceData = Source.GetData (data) as IListData;
             if (this.sourceData == null) {
                 return;
             }
