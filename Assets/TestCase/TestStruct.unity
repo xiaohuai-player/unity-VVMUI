@@ -518,21 +518,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1683535274}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d4b2830006084b76b59cc08f13be245, type: 3}
+  m_Script: {fileID: 11500000, guid: 9c2dc404e1bf44342bd44e18012dbcc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BindItems:
-  - Type: 0
-    Component: {fileID: 1683535277}
-    Property: text
-    GameObject: {fileID: 0}
-    Animation: {fileID: 0}
-    Animator: {fileID: 0}
-    AnimatorLayer: 0
-    Definer:
-      Key: testFriend.Age
-      Converter: cvtIntToString
-      ConverterParameter: 
+  BindItems: []
 --- !u!114 &1683535277
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -673,21 +662,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1888470006}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d4b2830006084b76b59cc08f13be245, type: 3}
+  m_Script: {fileID: 11500000, guid: 9c2dc404e1bf44342bd44e18012dbcc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BindItems:
-  - Type: 0
-    Component: {fileID: 1888470009}
-    Property: text
-    GameObject: {fileID: 0}
-    Animation: {fileID: 0}
-    Animator: {fileID: 0}
-    AnimatorLayer: 0
-    Definer:
-      Key: testFriend.Age
-      Converter: cvtIntToString
-      ConverterParameter: 
+  BindItems: []
 --- !u!114 &1888470009
 MonoBehaviour:
   m_ObjectHideFlags: 0
