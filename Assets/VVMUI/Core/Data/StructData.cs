@@ -42,16 +42,17 @@ namespace VVMUI.Core.Data {
             }
         }
 
+        public Dictionary<string, IData> Fields {
+            get {
+                if (!_fieldsInit) {
+                    InitFields ();
+                }
+                return _allData;
+            }
+        }
+
         public Type GetDataType () {
             return typeof (object);
-        }
-
-        public object GetGetterDelegate () {
-            return null;
-        }
-
-        public object GetSetterDelegate () {
-            return null;
         }
     }
 }

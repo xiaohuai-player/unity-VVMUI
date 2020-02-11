@@ -15,24 +15,16 @@ namespace VVMUI.Core.Data {
             return typeof (T);
         }
 
-        public object GetGetterDelegate () {
-            return null;
-        }
-
-        public object GetSetterDelegate () {
-            return null;
-        }
-
+        // 列表数据结构，在列表项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
         public event Action ValueChanged;
-
         public void InvokeValueChanged () {
             if (ValueChanged != null) {
                 ValueChanged.Invoke ();
             }
         }
 
+        // 列表数据结构，在列表项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
         public Dictionary<int, List<Action>> ItemValueChanged = new Dictionary<int, List<Action>> ();
-
         public void InvokeItemValueChanged (int i) {
             List<Action> handlers = null;
             if (ItemValueChanged.TryGetValue (i, out handlers) && handlers != null) {

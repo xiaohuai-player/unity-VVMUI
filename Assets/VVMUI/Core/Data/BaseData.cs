@@ -23,14 +23,6 @@ namespace VVMUI.Core.Data {
             return _value;
         }
 
-        private Func<T> _getterDelegate;
-        public object GetGetterDelegate () {
-            if (_getterDelegate == null) {
-                _getterDelegate = new Func<T> (this.Get);
-            }
-            return _getterDelegate;
-        }
-
         public void Set (T arg) {
             _value = arg;
             InvokeValueChanged ();
