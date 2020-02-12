@@ -91,7 +91,7 @@ namespace VVMUI.Core.Binder {
 
                 command.BindVM (vm);
 
-                executeDelegate = command.GetEventDelegate (parameter);
+                executeDelegate = command.GetExecuteDelegate (parameter);
                 // TODO 性能优化：Type.GetMethod, MethodInfo.Invoke
                 sourceEventType.GetMethod ("AddListener").Invoke (sourceEventObj, new object[] { executeDelegate });
 

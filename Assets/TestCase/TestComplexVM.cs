@@ -58,7 +58,7 @@ public class TestComplexVM : VMBehaviour {
 
     public ButtonCommand btnDelFriend;
     public bool btnDelFriend_CanExecute (object index) {
-        return true;
+        return (int) index != 1;
     }
     public void btnDelFriend_Execute (object index) {
         friends.RemoveAt ((int) index);

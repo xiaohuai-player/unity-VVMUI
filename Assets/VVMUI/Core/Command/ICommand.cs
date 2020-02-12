@@ -7,7 +7,7 @@ namespace VVMUI.Core.Command {
 		void BindVM (VMBehaviour vm);
 		bool CanExecute (object parameter);
 		void Execute (object parameter);
-		object GetEventDelegate (object parameter);
+		object GetExecuteDelegate (object parameter);
 	}
 
 	public interface ICommand<T> {

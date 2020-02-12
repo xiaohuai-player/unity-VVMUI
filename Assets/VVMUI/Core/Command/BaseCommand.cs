@@ -39,14 +39,11 @@ namespace VVMUI.Core.Command {
             }
         }
 
-        private UnityAction _eventDelegate;
-        public virtual object GetEventDelegate (object parameter) {
-            if (_eventDelegate == null) {
-                _eventDelegate = new UnityAction (delegate () {
-                    this.Execute (parameter);
-                });
-            }
-            return _eventDelegate;
+        public virtual object GetExecuteDelegate (object parameter) {
+            UnityAction executeDelegate = new UnityAction (delegate () {
+                this.Execute (parameter);
+            });
+            return executeDelegate;
         }
     }
 
@@ -63,14 +60,11 @@ namespace VVMUI.Core.Command {
             }
         }
 
-        private UnityAction<T> _eventDelegate;
-        public override object GetEventDelegate (object parameter) {
-            if (_eventDelegate == null) {
-                _eventDelegate = new UnityAction<T> (delegate (T arg) {
-                    this.Execute (arg, parameter);
-                });
-            }
-            return _eventDelegate;
+        public override object GetExecuteDelegate (object parameter) {
+            UnityAction<T> executeDelegate = new UnityAction<T> (delegate (T arg) {
+                this.Execute (arg, parameter);
+            });
+            return executeDelegate;
         }
     }
 }
