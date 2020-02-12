@@ -30,12 +30,22 @@ public class TestStructVM : VMBehaviour {
         IsOnline = false
     };
 
+    public StringData TestString = "";
+
+    private int ttt = 0;
+    private string[] bbb = new string[3] {
+        "小明",
+        "李老师",
+        "韩梅梅"
+    };
+
     public ButtonCommand btnAddAge;
     public bool btnAddAge_CanExecute (object parameter) {
         return true;
     }
     public void btnAddAge_Execute (object parameter) {
-        testFriend.Age.Set (testFriend.Age.Get () + 1);
+        ttt = (ttt + 1) % 3;
+        TestString.Set (bbb[ttt]);
     }
 
     public IntToStringConverter cvtIntToString = new IntToStringConverter ();

@@ -66,6 +66,10 @@ namespace VVMUI.Core.Binder {
         }
 
         public override void UnBind () {
+            for (int i = 0; i < this.transform.childCount; i++) {
+                Destroy (this.transform.GetChild (i).gameObject);
+            }
+
             (this.sourceData as IData).ValueChanged -= Arrange;
         }
 

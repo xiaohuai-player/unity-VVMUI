@@ -119,8 +119,11 @@ namespace VVMUI.Core.Binder {
 
                 // TODO 性能优化：Type.GetMethod
                 Type dataType = this.Source.GetType ();
+                MethodInfo setMethod = dataType.GetMethod ("Set");
                 MethodInfo getMethod = dataType.GetMethod ("Get");
+                ISetValue sourceSetter = SetterWrapper.CreateMethodSetterWrapper (setMethod);
                 IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
+                
                 this.SetValueHandler = delegate () {
                     object value = sourceGetter.Get (this.Source);
                     if (this.Converter != null) {
@@ -132,9 +135,6 @@ namespace VVMUI.Core.Binder {
                 this.SetValueHandler.Invoke ();
 
                 // 可交互组件的双向绑定
-                // TODO 性能优化：Type.GetMethod
-                MethodInfo setMethod = dataType.GetMethod ("Set");
-                ISetValue sourceSetter = SetterWrapper.CreateMethodSetterWrapper (setMethod);
                 if (componentType == typeof (Toggle) && this.Property.Equals ("isOn")) {
                     this.ValueChangedHandler = new UnityAction<bool> (delegate (bool arg) {
                         if (this.Converter != null) {
