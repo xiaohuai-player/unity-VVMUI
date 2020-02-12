@@ -15,6 +15,8 @@ namespace VVMUI.Core {
 		private Dictionary<string, IData> _allData = new Dictionary<string, IData> ();
 		private Dictionary<string, ICommand> _allCommands = new Dictionary<string, ICommand> ();
 		private Dictionary<string, IConverter> _allConverters = new Dictionary<string, IConverter> ();
+		private List<AbstractDataBinder> _allDataBinders = new List<AbstractDataBinder> ();
+		private List<AbstractCommandBinder> _allCommandBinders = new List<AbstractCommandBinder> ();
 
 		public IData GetData (string key) {
 			IData d = null;
@@ -79,24 +81,24 @@ namespace VVMUI.Core {
 					}
 				}
 			}
-		}
 
-		protected void Bind () {
 			if (this.BindRoot == null) {
 				this.BindRoot = this.gameObject;
 			}
+			this.BindRoot.GetComponentsInChildren<AbstractDataBinder> (true, _allDataBinders);
+			this.BindRoot.GetComponentsInChildren<AbstractCommandBinder> (true, _allCommandBinders);
+		}
 
-			AbstractDataBinder[] databinders = this.BindRoot.GetComponentsInChildren<AbstractDataBinder> (true);
-			for (int i = 0; i < databinders.Length; i++) {
-				if (databinders[i].CanBind (this)) {
-					databinders[i].Bind (this);
+		protected void Bind () {
+			for (int i = 0; i < this._allDataBinders.Count; i++) {
+				if (this._allDataBinders[i].CanBind (this)) {
+					this._allDataBinders[i].Bind (this);
 				}
 			}
 
-			AbstractCommandBinder[] cmdbinders = this.BindRoot.GetComponentsInChildren<AbstractCommandBinder> (true);
-			for (int i = 0; i < cmdbinders.Length; i++) {
-				if (cmdbinders[i].CanBind (this)) {
-					cmdbinders[i].Bind (this);
+			for (int i = 0; i < this._allCommandBinders.Count; i++) {
+				if (this._allCommandBinders[i].CanBind (this)) {
+					this._allCommandBinders[i].Bind (this);
 				}
 			}
 		}
