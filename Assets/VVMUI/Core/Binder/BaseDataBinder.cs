@@ -115,17 +115,18 @@ namespace VVMUI.Core.Binder {
                     return;
                 }
 
+                ISetValue propertySetter = SetterWrapper.CreatePropertySetterWrapper (propertyInfo);
+
                 // TODO 性能优化：Type.GetMethod
                 Type dataType = this.Source.GetType ();
                 MethodInfo getMethod = dataType.GetMethod ("Get");
+                IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
                 this.SetValueHandler = delegate () {
-                    // TODO 性能优化：MethodInfo.Invoke
-                    object value = getMethod.Invoke (this.Source, null);
+                    object value = sourceGetter.Get (this.Source);
                     if (this.Converter != null) {
                         value = this.Converter.Convert (value, propertyType, this.Definer.ConverterParameter, vm);
                     }
-                    // TODO 性能优化：PropertyInfo.SetValue
-                    propertyInfo.SetValue (this.Component, value, null);
+                    propertySetter.Set (this.Component, value);
                 };
                 this.Source.ValueChanged += this.SetValueHandler;
                 this.SetValueHandler.Invoke ();
@@ -133,12 +134,12 @@ namespace VVMUI.Core.Binder {
                 // 可交互组件的双向绑定
                 // TODO 性能优化：Type.GetMethod
                 MethodInfo setMethod = dataType.GetMethod ("Set");
+                ISetValue sourceSetter = SetterWrapper.CreateMethodSetterWrapper (setMethod);
                 if (componentType == typeof (Toggle) && this.Property.Equals ("isOn")) {
                     this.ValueChangedHandler = new UnityAction<bool> (delegate (bool arg) {
                         if (this.Converter != null) {
                             object value = this.Converter.ConvertBack (arg, this.Source.GetDataType (), this.Definer.ConverterParameter, vm);
-                            // TODO 性能优化：MethodInfo.Invoke
-                            setMethod.Invoke (this.Source, new object[] { value });
+                            sourceSetter.Set (this.Source, value);
                         } else {
                             (this.Source as BoolData).Set (arg);
                         }
@@ -149,8 +150,7 @@ namespace VVMUI.Core.Binder {
                     this.ValueChangedHandler = new UnityAction<string> (delegate (string arg) {
                         if (this.Converter != null) {
                             object value = this.Converter.ConvertBack (arg, this.Source.GetDataType (), this.Definer.ConverterParameter, vm);
-                            // TODO 性能优化：MethodInfo.Invoke
-                            setMethod.Invoke (this.Source, new object[] { value });
+                            sourceSetter.Set (this.Source, value);
                         } else {
                             (this.Source as StringData).Set (arg);
                         }
@@ -161,8 +161,7 @@ namespace VVMUI.Core.Binder {
                     this.ValueChangedHandler = new UnityAction<int> (delegate (int arg) {
                         if (this.Converter != null) {
                             object value = this.Converter.ConvertBack (arg, this.Source.GetDataType (), this.Definer.ConverterParameter, vm);
-                            // TODO 性能优化：MethodInfo.Invoke
-                            setMethod.Invoke (this.Source, new object[] { value });
+                            sourceSetter.Set (this.Source, value);
                         } else {
                             (this.Source as IntData).Set (arg);
                         }
@@ -173,8 +172,7 @@ namespace VVMUI.Core.Binder {
                     this.ValueChangedHandler = new UnityAction<float> (delegate (float arg) {
                         if (this.Converter != null) {
                             object value = this.Converter.ConvertBack (arg, this.Source.GetDataType (), this.Definer.ConverterParameter, vm);
-                            // TODO 性能优化：MethodInfo.Invoke
-                            setMethod.Invoke (this.Source, new object[] { value });
+                            sourceSetter.Set (this.Source, value);
                         } else {
                             (this.Source as FloatData).Set (arg);
                         }
@@ -197,9 +195,9 @@ namespace VVMUI.Core.Binder {
                 // TODO 性能优化：Type.GetMethod
                 Type dataType = this.Source.GetType ();
                 MethodInfo getMethod = dataType.GetMethod ("Get");
+                IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
                 this.SetValueHandler = delegate () {
-                    // TODO 性能优化：MethodInfo.Invoke
-                    object value = getMethod.Invoke (this.Source, null);
+                    object value = sourceGetter.Get(this.Source);
                     if (this.Converter != null) {
                         value = this.Converter.Convert (value, propertyType, this.Definer.ConverterParameter, vm);
                     }
@@ -223,9 +221,9 @@ namespace VVMUI.Core.Binder {
                 // TODO 性能优化：Type.GetMethod
                 Type dataType = this.Source.GetType ();
                 MethodInfo getMethod = dataType.GetMethod ("Get");
+                IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
                 this.SetValueHandler = delegate () {
-                    // TODO 性能优化：MethodInfo.Invoke
-                    object value = getMethod.Invoke (this.Source, null);
+                    object value = sourceGetter.Get(this.Source);
                     if (this.Converter != null) {
                         value = this.Converter.Convert (value, propertyType, this.Definer.ConverterParameter, vm);
                     }
@@ -250,9 +248,9 @@ namespace VVMUI.Core.Binder {
                 // TODO 性能优化：Type.GetMethod
                 Type dataType = this.Source.GetType ();
                 MethodInfo getMethod = dataType.GetMethod ("Get");
+                IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
                 this.SetValueHandler = delegate () {
-                    // TODO 性能优化：MethodInfo.Invoke
-                    object value = getMethod.Invoke (this.Source, null);
+                    object value = sourceGetter.Get(this.Source);
                     if (this.Converter != null) {
                         value = this.Converter.Convert (value, propertyType, this.Definer.ConverterParameter, vm);
                     }
