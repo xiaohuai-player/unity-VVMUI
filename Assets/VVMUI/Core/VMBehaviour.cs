@@ -12,7 +12,7 @@ namespace VVMUI.Core {
 	public class VMBehaviour : MonoBehaviour {
 		public GameObject BindRoot;
 
-		private Dictionary<string, IData> _allData = new Dictionary<string, IData> ();
+		private Dictionary<string, IData> _allDatas = new Dictionary<string, IData> ();
 		private Dictionary<string, ICommand> _allCommands = new Dictionary<string, ICommand> ();
 		private Dictionary<string, IConverter> _allConverters = new Dictionary<string, IConverter> ();
 		private List<AbstractDataBinder> _allDataBinders = new List<AbstractDataBinder> ();
@@ -20,12 +20,12 @@ namespace VVMUI.Core {
 
 		public IData GetData (string key) {
 			IData d = null;
-			_allData.TryGetValue (key, out d);
+			_allDatas.TryGetValue (key, out d);
 			return d;
 		}
 
 		public void AddData (string key, IData data) {
-			_allData[key] = data;
+			_allDatas[key] = data;
 		}
 
 		public ICommand GetCommand (string key) {
@@ -65,7 +65,7 @@ namespace VVMUI.Core {
 				if (t.GetInterface ("IData") != null || t.BaseType == typeof (StructData)) {
 					IData data = fi.GetValue (this) as IData;
 					if (data != null) {
-						_allData[fi.Name] = data;
+						_allDatas[fi.Name] = data;
 					}
 				}
 				if (t.GetInterface ("ICommand") != null) {
