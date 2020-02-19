@@ -26,14 +26,7 @@ namespace VVMUI.Core.Binder {
             public Component Component;
             public string Property;
 
-            // active bind vars
-            public GameObject GameObject;
-
-            // animation bind vars
-            public Animation Animation;
-
             // animator bind vars
-            public Animator Animator;
             public int AnimatorLayer;
 
             [HideInInspector]
@@ -123,7 +116,7 @@ namespace VVMUI.Core.Binder {
                 MethodInfo getMethod = dataType.GetMethod ("Get");
                 ISetValue sourceSetter = SetterWrapper.CreateMethodSetterWrapper (setMethod);
                 IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
-                
+
                 this.SetValueHandler = delegate () {
                     object value = sourceGetter.Get (this.Source);
                     if (this.Converter != null) {
@@ -182,11 +175,6 @@ namespace VVMUI.Core.Binder {
             }
 
             private void DoActiveBind (VMBehaviour vm, GameObject obj) {
-                if (this.GameObject == null) {
-                    Debugger.LogError ("DataBinder", obj.name + " gameobject null.");
-                    return;
-                }
-
                 Type propertyType = typeof (bool);
                 if (!CheckDataTypeValid (propertyType, obj)) {
                     return;
@@ -197,18 +185,19 @@ namespace VVMUI.Core.Binder {
                 MethodInfo getMethod = dataType.GetMethod ("Get");
                 IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
                 this.SetValueHandler = delegate () {
-                    object value = sourceGetter.Get(this.Source);
+                    object value = sourceGetter.Get (this.Source);
                     if (this.Converter != null) {
                         value = this.Converter.Convert (value, propertyType, this.Definer.ConverterParameter, vm);
                     }
-                    this.GameObject.SetActive ((bool) value);
+                    obj.SetActive ((bool) value);
                 };
                 this.Source.ValueChanged += this.SetValueHandler;
                 this.SetValueHandler.Invoke ();
             }
 
             private void DoAnimationBind (VMBehaviour vm, GameObject obj) {
-                if (this.Animation == null) {
+                Animation cptAnim = obj.GetComponent<Animation> ();
+                if (cptAnim == null) {
                     Debugger.LogError ("DataBinder", obj.name + " Animation null.");
                     return;
                 }
@@ -223,19 +212,20 @@ namespace VVMUI.Core.Binder {
                 MethodInfo getMethod = dataType.GetMethod ("Get");
                 IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
                 this.SetValueHandler = delegate () {
-                    object value = sourceGetter.Get(this.Source);
+                    object value = sourceGetter.Get (this.Source);
                     if (this.Converter != null) {
                         value = this.Converter.Convert (value, propertyType, this.Definer.ConverterParameter, vm);
                     }
-                    this.Animation.Stop ();
-                    this.Animation.Play ((string) value, PlayMode.StopAll);
+                    cptAnim.Stop ();
+                    cptAnim.Play ((string) value, PlayMode.StopAll);
                 };
                 this.Source.ValueChanged += this.SetValueHandler;
                 this.SetValueHandler.Invoke ();
             }
 
             private void DoAnimatorBind (VMBehaviour vm, GameObject obj) {
-                if (this.Animator == null) {
+                Animator cptAnim = obj.GetComponent<Animator> ();
+                if (cptAnim == null) {
                     Debugger.LogError ("DataBinder", obj.name + " Animator null.");
                     return;
                 }
@@ -250,11 +240,11 @@ namespace VVMUI.Core.Binder {
                 MethodInfo getMethod = dataType.GetMethod ("Get");
                 IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
                 this.SetValueHandler = delegate () {
-                    object value = sourceGetter.Get(this.Source);
+                    object value = sourceGetter.Get (this.Source);
                     if (this.Converter != null) {
                         value = this.Converter.Convert (value, propertyType, this.Definer.ConverterParameter, vm);
                     }
-                    this.Animator.Play ((string) value, this.AnimatorLayer);
+                    cptAnim.Play ((string) value, this.AnimatorLayer);
                 };
                 this.Source.ValueChanged += this.SetValueHandler;
                 this.SetValueHandler.Invoke ();
