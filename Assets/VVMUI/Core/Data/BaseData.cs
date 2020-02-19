@@ -27,13 +27,5 @@ namespace VVMUI.Core.Data {
             _value = arg;
             InvokeValueChanged ();
         }
-
-        private Action<T> _setterDelegate;
-        public object GetSetterDelegate () {
-            if (_setterDelegate == null) {
-                _setterDelegate = new Action<T> (this.Set);
-            }
-            return _setterDelegate;
-        }
     }
 }

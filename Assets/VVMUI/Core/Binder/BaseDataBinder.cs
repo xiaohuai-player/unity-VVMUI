@@ -123,6 +123,16 @@ namespace VVMUI.Core.Binder {
                         value = this.Converter.Convert (value, propertyType, this.Definer.ConverterParameter, vm);
                     }
                     propertySetter.Set (this.Component, value);
+
+                    // ToggleGroup 特殊处理
+                    if (componentType == typeof (Toggle) && this.Property.Equals ("isOn")) {
+                        Toggle t = this.Component as Toggle;
+                        if (t.group != null && t.isOn) {
+                            try {
+                                t.group.NotifyToggleOn (t);
+                            } catch (System.Exception) { }
+                        }
+                    }
                 };
                 this.Source.ValueChanged += this.SetValueHandler;
                 this.SetValueHandler.Invoke ();
@@ -130,6 +140,7 @@ namespace VVMUI.Core.Binder {
                 // 可交互组件的双向绑定
                 if (componentType == typeof (Toggle) && this.Property.Equals ("isOn")) {
                     this.ValueChangedHandler = new UnityAction<bool> (delegate (bool arg) {
+                        Debug.Log("ttt");
                         if (this.Converter != null) {
                             object value = this.Converter.ConvertBack (arg, this.Source.GetDataType (), this.Definer.ConverterParameter, vm);
                             sourceSetter.Set (this.Source, value);
