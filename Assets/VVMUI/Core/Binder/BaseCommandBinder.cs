@@ -10,11 +10,11 @@ namespace VVMUI.Core.Binder {
     public class BaseCommandBinder : AbstractCommandBinder {
         [Serializable]
         public class CommandBinderItem {
-            public Selectable Component;
             public string Event;
             public string Command;
             public string Parameter;
 
+            private Selectable component;
             private ICommand command;
             private Type sourceEventType;
             private object sourceEventObj;
@@ -22,7 +22,8 @@ namespace VVMUI.Core.Binder {
             private Action canExecuteHandler;
 
             public void DoBind (VMBehaviour vm, object parameter, GameObject obj) {
-                if (this.Component == null) {
+                this.component = obj.GetComponent<Selectable> ();
+                if (this.component == null) {
                     Debugger.LogError ("CommandBinder", obj.name + " component null.");
                     return;
                 }
@@ -47,18 +48,18 @@ namespace VVMUI.Core.Binder {
                     return;
                 }
 
-                Type componentType = this.Component.GetType ();
+                Type componentType = this.component.GetType ();
 
                 // UGUI 组件的 event 有的是 property，有的不是，所以 field 和 property 都判断
                 FieldInfo sourceEventFieldInfo = componentType.GetField (this.Event);
                 PropertyInfo sourceEventPropertyInfo = componentType.GetProperty (this.Event);
                 if (sourceEventFieldInfo != null) {
                     sourceEventType = sourceEventFieldInfo.FieldType.BaseType;
-                    sourceEventObj = sourceEventFieldInfo.GetValue (this.Component);
+                    sourceEventObj = sourceEventFieldInfo.GetValue (this.component);
                 }
                 if (sourceEventPropertyInfo != null) {
                     sourceEventType = sourceEventPropertyInfo.PropertyType.BaseType;
-                    sourceEventObj = sourceEventPropertyInfo.GetValue (this.Component, null);
+                    sourceEventObj = sourceEventPropertyInfo.GetValue (this.component, null);
                 }
                 if (sourceEventType == null) {
                     Debugger.LogError ("CommandBinder", obj.name + " event null.");
@@ -96,10 +97,10 @@ namespace VVMUI.Core.Binder {
                 sourceEventType.GetMethod ("AddListener").Invoke (sourceEventObj, new object[] { executeDelegate });
 
                 canExecuteHandler = new Action (delegate {
-                    this.Component.interactable = command.CanExecute (parameter);
+                    this.component.interactable = command.CanExecute (parameter);
                 });
                 command.CanExecuteChanged += canExecuteHandler;
-                this.Component.interactable = command.CanExecute (parameter);
+                this.component.interactable = command.CanExecute (parameter);
             }
 
             public void DoUnBind () {
