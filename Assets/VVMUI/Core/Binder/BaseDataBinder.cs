@@ -140,7 +140,6 @@ namespace VVMUI.Core.Binder {
                 // 可交互组件的双向绑定
                 if (componentType == typeof (Toggle) && this.Property.Equals ("isOn")) {
                     this.ValueChangedHandler = new UnityAction<bool> (delegate (bool arg) {
-                        Debug.Log("ttt");
                         if (this.Converter != null) {
                             object value = this.Converter.ConvertBack (arg, this.Source.GetDataType (), this.Definer.ConverterParameter, vm);
                             sourceSetter.Set (this.Source, value);
