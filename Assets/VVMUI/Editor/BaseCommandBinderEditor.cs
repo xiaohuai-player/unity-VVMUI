@@ -12,6 +12,7 @@ using VVMUI.Core.Command;
 [CustomEditor (typeof (BaseCommandBinder))]
 [CanEditMultipleObjects]
 public class BaseCommandBinderEditor : Editor {
+    private Dictionary<string, bool> componentEventsExpand = new Dictionary<string, bool> ();
     public override void OnInspectorGUI () {
         BaseCommandBinder binder = target as BaseCommandBinder;
         VMBehaviour vm = binder.GetComponentInParent<VMBehaviour> ();
@@ -76,6 +77,10 @@ public class BaseCommandBinderEditor : Editor {
                     }
                 }
                 componentEventCommands[name] = explicitCommands.ToArray ();
+
+                if (!componentEventsExpand.ContainsKey (name)) {
+                    componentEventsExpand[name] = true;
+                }
             }
         };
         for (int i = 0; i < componentFieldInfos.Length; i++) {
@@ -110,12 +115,17 @@ public class BaseCommandBinderEditor : Editor {
         EditorGUILayout.LabelField ("Events:");
         for (int i = 0; i < binderItems.Count; i++) {
             BaseCommandBinder.CommandBinderItem item = binderItems[i];
+
             string eventLabel = item.Event;
             if (componentEventParamTypes[item.Event].Length > 0) {
                 eventLabel += " (" + string.Join (",", componentEventParamTypes[item.Event]) + ")";
             }
-            bool expand = EditorGUILayout.Foldout (true, eventLabel, true, EditorStyles.foldout);
-            if (expand) {
+
+            GUIStyle style = new GUIStyle(EditorStyles.foldout);
+            style.fontStyle = FontStyle.Bold;
+            componentEventsExpand[item.Event] = EditorGUILayout.Foldout (componentEventsExpand[item.Event], eventLabel, true, style);
+            
+            if (componentEventsExpand[item.Event]) {
                 EditorGUILayout.BeginHorizontal ();
 
                 EditorGUILayout.LabelField ("Command:", GUILayout.Width (65));
