@@ -13,17 +13,19 @@ public class TestSelectable : VMBehaviour {
 		false
 	};
 
-	private int selectTabIndex = 0;
-	public ButtonCommand btnTest;
-	public bool btnTest_CanExecute (object parameter) {
-		return true;
-	}
-	public void btnText_Execute (object parameter) {
-		selectTabIndex = (selectTabIndex + 1) % 4;
-		Tabs[selectTabIndex].Set (true);
-	}
+	public ButtonCommand btnTest2;
+	public FloatCommand sliderTest;
 
 	protected override void BeforeAwake () {
-		btnTest = new ButtonCommand (btnTest_CanExecute, btnText_Execute);
+		int selectTabIndex = 0;
+		this.AddCommand ("btnTest", new ButtonCommand (
+			delegate (object parameter) {
+				return true;
+			},
+			delegate (object parameter) {
+				selectTabIndex = (selectTabIndex + 1) % 4;
+				Tabs[selectTabIndex].Set (true);
+			}
+		));
 	}
 }
