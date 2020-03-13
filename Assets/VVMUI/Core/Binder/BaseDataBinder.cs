@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using VVMUI.Core.Converter;
@@ -23,7 +24,7 @@ namespace VVMUI.Core.Binder {
             public DataDefiner Definer = new DataDefiner ();
 
             // property bind vars
-            public Component Component;
+            public UIBehaviour Component;
             public string Property;
 
             // animator bind vars
