@@ -1,6 +1,12 @@
 namespace VVMUI.Core.Data {
+    [System.Serializable]
     public class StringData : BaseData<string> {
-        public StringData () { }
+        [UnityEngine.SerializeField]
+        private string editorValue;
+
+        public StringData () {
+            this.Set (editorValue);
+        }
 
         public StringData (string v) {
             this.Set (v);

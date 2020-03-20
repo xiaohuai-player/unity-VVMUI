@@ -1,6 +1,12 @@
 namespace VVMUI.Core.Data {
+    [System.Serializable]
     public class LongData : BaseData<long> {
-        public LongData () { }
+        [UnityEngine.SerializeField]
+        private long editorValue;
+
+        public LongData () {
+            this.Set (editorValue);
+        }
 
         public LongData (long v) {
             this.Set (v);

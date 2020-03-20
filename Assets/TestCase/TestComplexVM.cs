@@ -40,6 +40,7 @@ public class TestComplexVM : VMBehaviour {
 
     public StringData strInputName = "测试输入";
     public IntData intInputAge = 99;
+    public SpriteData spriteTest;
     public IntToStringConverter cvtTest = new IntToStringConverter ();
 
     public ButtonCommand btnAddFriend;
