@@ -1,11 +1,7 @@
 namespace VVMUI.Core.Data {
     [System.Serializable]
     public class BoolData : BaseData<bool> {
-        [UnityEngine.SerializeField]
-        private bool editorValue;
-
         public BoolData () {
-            this.Set (editorValue);
         }
 
         public BoolData (bool v) {

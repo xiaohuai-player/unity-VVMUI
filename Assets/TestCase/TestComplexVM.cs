@@ -38,8 +38,8 @@ public class TestComplexVM : VMBehaviour {
         }
     };
 
-    public StringData strInputName = "测试输入";
-    public IntData intInputAge = 99;
+    public StringData strInputName;
+    public IntData intInputAge;
     public SpriteData spriteTest;
     public IntToStringConverter cvtTest = new IntToStringConverter ();
 

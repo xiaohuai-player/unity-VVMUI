@@ -28,12 +28,7 @@ namespace VVMUI.Core.Binder {
                 return;
             }
 
-            IData data = Source.GetData (vm);
-            if (data == null) {
-                return;
-            }
-
-            this.sourceData = data as StructData;
+            this.sourceData = Source.GetData (vm) as StructData;
             if (this.sourceData == null) {
                 return;
             }

@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace VVMUI.Core.Data {
     public abstract class BaseData<T> : IData<T>, IData {
+        [SerializeField]
         private T _value;
 
         public event Action ValueChanged;

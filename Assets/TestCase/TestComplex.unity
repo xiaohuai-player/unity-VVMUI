@@ -163,8 +163,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BindItems:
-  - Component: {fileID: 145666175}
-    Event: onClick
+  - Event: onClick
     Command: btnAddFriend
     Parameter: 
 --- !u!114 &145666175
@@ -910,9 +909,6 @@ MonoBehaviour:
       ConverterParameter: 
     Component: {fileID: 899645404}
     Property: text
-    GameObject: {fileID: 0}
-    Animation: {fileID: 0}
-    Animator: {fileID: 0}
     AnimatorLayer: 0
 --- !u!1 &907876345
 GameObject:
@@ -1068,9 +1064,6 @@ MonoBehaviour:
       ConverterParameter: 
     Component: {fileID: 907876347}
     Property: text
-    GameObject: {fileID: 0}
-    Animation: {fileID: 0}
-    Animator: {fileID: 0}
     AnimatorLayer: 0
 --- !u!1 &944421070
 GameObject:
@@ -1352,8 +1345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BindItems:
-  - Component: {fileID: 1483395283}
-    Event: onClick
+  - Event: onClick
     Command: btnDelFriend
     Parameter: 
 --- !u!114 &1483395283
@@ -1661,6 +1653,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BindRoot: {fileID: 1890290728}
+  strInputName:
+    _value: test
+  intInputAge:
+    _value: 0
+  spriteTest:
+    _value: {fileID: 0}
 --- !u!1 &1890290728
 GameObject:
   m_ObjectHideFlags: 0

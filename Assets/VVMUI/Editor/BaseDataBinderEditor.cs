@@ -18,6 +18,7 @@ public class BaseDataBinderEditor : Editor {
     public override void OnInspectorGUI () {
         BaseDataBinder binder = target as BaseDataBinder;
         VMBehaviour vm = binder.GetComponentInParent<VMBehaviour> ();
+        List<string> converters = new List<string> ();
         Dictionary<string, Type> datas = new Dictionary<string, Type> ();
         Dictionary<Type, List<string>> typeDatas = new Dictionary<Type, List<string>> ();
         if (vm != null) {
@@ -40,6 +41,9 @@ public class BaseDataBinderEditor : Editor {
                             typeDatas[gTypes[0]].Add (fi.Name);
                         }
                     }
+                }
+                if (t.GetInterface ("IConverter") != null) {
+                    converters.Add (fi.Name);
                 }
             }
         }
@@ -161,7 +165,12 @@ public class BaseDataBinderEditor : Editor {
 
                 EditorGUILayout.BeginHorizontal ();
                 EditorGUILayout.LabelField ("Converter:");
-                item.Definer.Converter = EditorGUILayout.TextField (item.Definer.Converter);
+                int converterIndex = converters.IndexOf(item.Definer.Converter);
+                converterIndex = EditorGUILayout.Popup (converterIndex, converters.ToArray (), GUILayout.MinWidth (20), GUILayout.MaxWidth (150));
+                if (converters.Count > 0 && converterIndex >= 0 && converterIndex < converters.Count) {
+                    item.Definer.Converter = converters[converterIndex];
+                }
+                item.Definer.Converter = EditorGUILayout.DelayedTextField (item.Definer.Converter, GUILayout.MaxWidth (150));
                 EditorGUILayout.EndHorizontal ();
 
                 EditorGUILayout.BeginHorizontal ();
