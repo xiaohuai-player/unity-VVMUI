@@ -11,5 +11,9 @@ namespace VVMUI.Core.Data {
         public static implicit operator IntData (int v) {
             return new IntData (v);
         }
+
+        public static implicit operator int (IntData d) {
+			return d.Get ();
+		}
     }
 }

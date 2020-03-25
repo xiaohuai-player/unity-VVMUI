@@ -13,5 +13,9 @@ namespace VVMUI.Core.Data {
         public static implicit operator Texture2DData (Texture2D v) {
             return new Texture2DData (v);
         }
+
+        public static implicit operator Texture2D (Texture2DData d) {
+			return d.Get ();
+		}
     }
 }

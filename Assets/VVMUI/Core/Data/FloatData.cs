@@ -11,5 +11,9 @@ namespace VVMUI.Core.Data {
         public static implicit operator FloatData (float v) {
             return new FloatData (v);
         }
+
+        public static implicit operator float (FloatData d) {
+			return d.Get ();
+		}
     }
 }

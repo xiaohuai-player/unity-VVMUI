@@ -11,5 +11,9 @@ namespace VVMUI.Core.Data {
         public static implicit operator LongData (long v) {
             return new LongData (v);
         }
+
+        public static implicit operator long (LongData d) {
+			return d.Get ();
+		}
     }
 }

@@ -11,5 +11,9 @@ namespace VVMUI.Core.Data {
         public static implicit operator BoolData (bool v) {
             return new BoolData (v);
         }
+
+        public static implicit operator bool (BoolData d) {
+			return d.Get ();
+		}
     }
 }

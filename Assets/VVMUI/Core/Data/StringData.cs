@@ -11,5 +11,9 @@ namespace VVMUI.Core.Data {
         public static implicit operator StringData (string v) {
             return new StringData (v);
         }
+
+        public static implicit operator string (StringData d) {
+			return d.Get ();
+		}
     }
 }
