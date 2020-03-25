@@ -12,6 +12,9 @@ namespace VVMUI.Core {
 	public class VMBehaviour : MonoBehaviour {
 		public GameObject BindRoot;
 
+		[HideInInspector]
+		public object ActiveParameter;
+
 		private Dictionary<string, IData> _allDatas = new Dictionary<string, IData> ();
 		private Dictionary<string, ICommand> _allCommands = new Dictionary<string, ICommand> ();
 		private Dictionary<string, IConverter> _allConverters = new Dictionary<string, IConverter> ();
