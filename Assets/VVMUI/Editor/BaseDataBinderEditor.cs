@@ -69,7 +69,7 @@ public class BaseDataBinderEditor : Editor {
             switch (item.Type) {
                 case BaseDataBinder.DataBinderItem.BindType.Property:
                     if (item.Component != null && !string.IsNullOrEmpty (item.Property)) {
-                        itemLabel = item.Component.GetType ().Name + ":" + item.Property;
+                        itemLabel = item.Component.GetType ().Name + "(" + item.Property + ")";
                     }
                     break;
                 case BaseDataBinder.DataBinderItem.BindType.Active:
@@ -79,8 +79,12 @@ public class BaseDataBinderEditor : Editor {
                     itemLabel = "Animation";
                     break;
                 case BaseDataBinder.DataBinderItem.BindType.Animator:
-                    itemLabel = "Animator:" + item.AnimatorLayer;
+                    itemLabel = "Animator(" + item.AnimatorLayer + ")";
                     break;
+            }
+
+            if (!string.IsNullOrEmpty (item.Definer.Key)) {
+                itemLabel += " : " + item.Definer.Key;
             }
 
             EditorGUILayout.Space ();
@@ -165,7 +169,7 @@ public class BaseDataBinderEditor : Editor {
 
                 EditorGUILayout.BeginHorizontal ();
                 EditorGUILayout.LabelField ("Converter:");
-                int converterIndex = converters.IndexOf(item.Definer.Converter);
+                int converterIndex = converters.IndexOf (item.Definer.Converter);
                 converterIndex = EditorGUILayout.Popup (converterIndex, converters.ToArray (), GUILayout.MinWidth (20), GUILayout.MaxWidth (150));
                 if (converters.Count > 0 && converterIndex >= 0 && converterIndex < converters.Count) {
                     item.Definer.Converter = converters[converterIndex];

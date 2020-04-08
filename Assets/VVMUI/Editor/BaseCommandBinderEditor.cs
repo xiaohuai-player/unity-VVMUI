@@ -121,10 +121,14 @@ public class BaseCommandBinderEditor : Editor {
                 eventLabel += " (" + string.Join (",", componentEventParamTypes[item.Event]) + ")";
             }
 
-            GUIStyle style = new GUIStyle(EditorStyles.foldout);
+            if (!string.IsNullOrEmpty (item.Command)) {
+                eventLabel += " : " + item.Command;
+            }
+
+            GUIStyle style = new GUIStyle (EditorStyles.foldout);
             style.fontStyle = FontStyle.Bold;
             componentEventsExpand[item.Event] = EditorGUILayout.Foldout (componentEventsExpand[item.Event], eventLabel, true, style);
-            
+
             if (componentEventsExpand[item.Event]) {
                 EditorGUILayout.BeginHorizontal ();
 
