@@ -15,7 +15,7 @@ public class TestListVM : VMBehaviour {
         return true;
     }
     private void btnAdd_Execute (object parameter) {
-        this.lstTest.Add ("add");
+        this.lstTest.Add (new StringData("add"));
     }
 
     public ButtonCommand btnAddRange;
@@ -23,7 +23,11 @@ public class TestListVM : VMBehaviour {
         return true;
     }
     private void btnAddRange_Execute (object parameter) {
-        this.lstTest.AddRange (new List<StringData> () { "add range 1", "add range 2", "add range 3" });
+        this.lstTest.AddRange (new List<StringData> () { 
+            new StringData("add range 1"), 
+            new StringData("add range 2"),
+            new StringData("add range 3") 
+        });
     }
 
     public ButtonCommand btnRemove;
@@ -55,7 +59,11 @@ public class TestListVM : VMBehaviour {
         return true;
     }
     private void btnInsertRange_Execute (object parameter) {
-        this.lstTest.InsertRange (UnityEngine.Random.Range (0, this.lstTest.Count), new List<StringData> () { "insert range 1", "isnert range 2", "insert range 3" });
+        this.lstTest.InsertRange (UnityEngine.Random.Range (0, this.lstTest.Count), new List<StringData> () { 
+            new StringData("insert range 1"), 
+            new StringData("isnert range 2"), 
+            new StringData("insert range 3") 
+        });
     }
 
     public ButtonCommand btnReverse;
@@ -79,7 +87,7 @@ public class TestListVM : VMBehaviour {
         return true;
     }
     private void btnSet_Execute (object parameter) {
-        this.lstTest[UnityEngine.Random.Range (0, this.lstTest.Count)] = "set";
+        this.lstTest[UnityEngine.Random.Range (0, this.lstTest.Count)] = new StringData("set");
     }
 
     public ButtonCommand btnListTest;

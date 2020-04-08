@@ -18,8 +18,8 @@ public class TestPrefabVM : VMBehaviour {
         }
     }
 
-	public StringData Name = "";
-	public IntData Age = 0;
+	public StringData Name = new StringData("");
+	public IntData Age = new IntData(0);
 
     public IntToStringConverter cvtIntToString = new IntToStringConverter ();
 }

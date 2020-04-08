@@ -25,12 +25,12 @@ public class TestStructVM : VMBehaviour {
     }
 
     public FriendData testFriend = new FriendData () {
-        Name = "小明",
-        Age = 15,
-        IsOnline = false
+        Name = new StringData("小明"),
+        Age = new IntData(15),
+        IsOnline = new BoolData(false)
     };
 
-    public StringData TestString = "";
+    public StringData TestString = new StringData();
 
     private int ttt = 0;
     private string[] bbb = new string[3] {

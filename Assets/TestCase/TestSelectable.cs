@@ -7,10 +7,10 @@ using VVMUI.Core.Data;
 
 public class TestSelectable : VMBehaviour {
 	public ListData<BoolData> Tabs = new ListData<BoolData> () {
-		true,
-		false,
-		false,
-		false
+		new BoolData(true),
+		new BoolData(false),
+		new BoolData(false),
+		new BoolData(false)
 	};
 
 	public ButtonCommand btnTest2;
