@@ -13,6 +13,7 @@ namespace VVMUI.Core.Binder {
 
         private IListData sourceData;
         private VMBehaviour vm;
+        private int childCount = 0;
 
         public override void Bind (VMBehaviour vm) {
             if (Source == null) {
@@ -30,6 +31,7 @@ namespace VVMUI.Core.Binder {
             }
 
             this.vm = vm;
+            this.childCount = 0;
 
             for (int i = 0; i < this.transform.childCount; i++) {
                 Destroy (this.transform.GetChild (i).gameObject);
@@ -55,6 +57,7 @@ namespace VVMUI.Core.Binder {
             }
 
             this.vm = vm;
+            this.childCount = 0;
 
             for (int i = 0; i < this.transform.childCount; i++) {
                 Destroy (this.transform.GetChild (i).gameObject);
@@ -66,11 +69,15 @@ namespace VVMUI.Core.Binder {
         }
 
         public override void UnBind () {
+            this.childCount = 0;
+
             for (int i = 0; i < this.transform.childCount; i++) {
                 Destroy (this.transform.GetChild (i).gameObject);
             }
 
-            (this.sourceData as IData).ValueChanged -= Arrange;
+            if (this.sourceData != null) {
+                (this.sourceData as IData).ValueChanged -= Arrange;
+            }
         }
 
         private void Arrange () {
@@ -78,7 +85,6 @@ namespace VVMUI.Core.Binder {
                 return;
             }
 
-            int childCount = this.transform.childCount;
             int dataCount = (sourceData as IList).Count;
             if (childCount < dataCount) {
                 for (int i = childCount; i < dataCount; i++) {
@@ -87,6 +93,7 @@ namespace VVMUI.Core.Binder {
                     if (binder != null) {
                         binder.Bind (this.vm, i, this.sourceData);
                     }
+                    this.childCount++;
                 }
             } else if (childCount > dataCount) {
                 for (int i = dataCount; i < childCount; i++) {
@@ -96,6 +103,7 @@ namespace VVMUI.Core.Binder {
                         binder.UnBind ();
                     }
                     GameObject.Destroy (obj);
+                    this.childCount--;
                 }
             }
         }

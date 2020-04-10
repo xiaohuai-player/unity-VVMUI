@@ -49,12 +49,28 @@ public class TestComplexVM : VMBehaviour {
         new FriendData () {
             Name = new StringData ("李明"),
             Age = new IntData (14),
-            IsOnline = new BoolData (true)
+            IsOnline = new BoolData (true),
+            Body = new BodyData () {
+                Height = new IntData(170),
+                Weight = new IntData(75)
+            },
+            Scores = new ListData<IntData>(){
+                new IntData(60),
+                new IntData(65)
+            }
         },
         new FriendData () {
             Name = new StringData ("韩梅梅"),
             Age = new IntData (15),
-            IsOnline = new BoolData (true)
+            IsOnline = new BoolData (true),
+            Body = new BodyData () {
+                Height = new IntData(160),
+                Weight = new IntData(55)
+            },
+            Scores = new ListData<IntData>(){
+                new IntData(80),
+                new IntData(95)
+            }
         }
     };
 
