@@ -9,6 +9,10 @@ namespace VVMUI.Core.Data {
         private bool _fieldsInit = false;
 
         private void InitFields () {
+            if (_fieldsInit) {
+                return;
+            }
+
             Type type = this.GetType ();
             FieldInfo[] fields = type.GetFields ();
             for (int i = 0; i < fields.Length; i++) {
@@ -21,6 +25,7 @@ namespace VVMUI.Core.Data {
                     }
                 }
             }
+
             _fieldsInit = true;
         }
 
@@ -33,9 +38,7 @@ namespace VVMUI.Core.Data {
 
         public IData this [string key] {
             get {
-                if (!_fieldsInit) {
-                    InitFields ();
-                }
+                InitFields ();
                 IData v = null;
                 _allData.TryGetValue (key, out v);
                 return v;
@@ -44,15 +47,84 @@ namespace VVMUI.Core.Data {
 
         public Dictionary<string, IData> Fields {
             get {
-                if (!_fieldsInit) {
-                    InitFields ();
-                }
+                InitFields ();
                 return _allData;
             }
         }
 
         public Type GetDataType () {
             return typeof (object);
+        }
+
+        public void Parse (object data) {
+            Type objtype = this.GetType ();
+            Type datatype = data.GetType ();
+            FieldInfo[] datafields = datatype.GetFields ();
+            for (int i = 0; i < datafields.Length; i++) {
+                FieldInfo datafi = datafields[i];
+                object datav = datafi.GetValue (data);
+                if (datav == null) {
+                    continue;
+                }
+
+                FieldInfo objfi = objtype.GetField (datafi.Name);
+                if (objfi == null || objfi.FieldType.GetInterface ("IData") == null) {
+                    continue;
+                }
+
+                object objv = objfi.GetValue (this);
+                if (objfi.FieldType.IsGenericType && objfi.FieldType.GetGenericTypeDefinition () == typeof (ListData<>)) {
+                    IListData v = (IListData) objv;
+                    if (v == null) {
+                        Type genericTypee = objfi.FieldType.GetGenericArguments () [0];
+                        objfi.SetValue (this, ListData.Parse (genericTypee, datav));
+                    } else {
+                        v.Parse (datav);
+                    }
+                } else if (objfi.FieldType.BaseType == typeof (StructData)) {
+                    StructData v = (StructData) objv;
+                    if (v == null) {
+                        objfi.SetValue (this, StructData.Parse (objfi.FieldType, datav));
+                    } else {
+                        v.Parse (datafi.GetValue (data));
+                    }
+                } else if (objfi.FieldType.BaseType.IsGenericType && objfi.FieldType.BaseType.GetGenericTypeDefinition () == typeof (BaseData<>)) {
+                    Type[] gTypes = objfi.FieldType.BaseType.GetGenericArguments ();
+                    if (gTypes.Length > 0 && gTypes[0] == datafi.FieldType) {
+                        if (objv == null) {
+                            objfi.SetValue (this, Activator.CreateInstance (objfi.FieldType, datav));
+                        } else {
+                            (objv as IData).Setter.Set (objv, datav);
+                        }
+                    }
+                }
+            }
+        }
+
+        public ISetValue Setter {
+            get {
+                return null;
+            }
+        }
+
+        public IGetValue Getter {
+            get {
+                return null;
+            }
+        }
+
+        public static T Parse<T> (object data) where T : StructData, new () {
+            return (T) Parse (typeof (T), data);
+        }
+
+        public static object Parse (Type t, object data) {
+            if (t.BaseType != typeof (StructData)) {
+                return null;
+            }
+
+            StructData obj = (StructData) Activator.CreateInstance (t);
+            obj.Parse (data);
+            return obj;
         }
     }
 }

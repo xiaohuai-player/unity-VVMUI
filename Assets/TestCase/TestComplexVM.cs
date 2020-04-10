@@ -33,28 +33,28 @@ public class TestComplexVM : VMBehaviour {
     }
 
     public class BodyData : StructData {
-        public IntData Height;
-        public IntData Weight;
+        public IntData Height = new IntData ();
+        public IntData Weight = new IntData ();
     }
 
     public class FriendData : StructData {
-        public StringData Name;
-        public IntData Age;
-        public BoolData IsOnline;
-        public BodyData Body;
+        public StringData Name = new StringData ();
+        public IntData Age = new IntData ();
+        public BoolData IsOnline = new BoolData ();
+        public BodyData Body = new BodyData ();
         public ListData<IntData> Scores;
     }
 
     public ListData<FriendData> friends = new ListData<FriendData> () {
         new FriendData () {
-            Name = new StringData("李明"),
-            Age = new IntData(14),
-            IsOnline = new BoolData(true)
+            Name = new StringData ("李明"),
+            Age = new IntData (14),
+            IsOnline = new BoolData (true)
         },
         new FriendData () {
-            Name = new StringData("韩梅梅"),
-            Age = new IntData(15),
-            IsOnline = new BoolData(true)
+            Name = new StringData ("韩梅梅"),
+            Age = new IntData (15),
+            IsOnline = new BoolData (true)
         }
     };
 
@@ -69,9 +69,9 @@ public class TestComplexVM : VMBehaviour {
     }
     public void btnAddFriend_Execute (object parameter) {
         friends.Add (new FriendData () {
-            Name = new StringData(strInputName.Get ()),
-                Age = new IntData(intInputAge.Get ()),
-                IsOnline = new BoolData(true)
+            Name = new StringData (strInputName.Get ()),
+            Age = new IntData (intInputAge.Get ()),
+            IsOnline = new BoolData (true)
         });
         strInputName.Set ("");
         intInputAge.Set (0);
@@ -85,7 +85,7 @@ public class TestComplexVM : VMBehaviour {
         friends.RemoveAt ((int) index);
     }
 
-    public FriendData testFriend;
+    public FriendData testFriend = new FriendData ();
 
     protected override void BeforeAwake () {
         btnAddFriend = new ButtonCommand (btnAddFriend_CanExecute, btnAddFriend_Execute);
@@ -105,6 +105,6 @@ public class TestComplexVM : VMBehaviour {
                 90
             }
         };
-        testFriend = StructData.Parse<FriendData> (f);
+        testFriend.Parse (f);
     }
 }

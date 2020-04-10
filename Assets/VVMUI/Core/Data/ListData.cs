@@ -8,9 +8,27 @@ namespace VVMUI.Core.Data {
         void InvokeItemValueChanged (int i);
         void AddItemValueChangedListener (int i, Action h);
         void RemoveItemValueChangedListener (int i, Action h);
+        void Parse (object data);
     }
 
-    public class ListData<T> : List<T>, IListData, IData where T : IData {
+    public sealed class ListData {
+        public static ListData<U> Parse<U> (object data) where U : IData {
+            return (ListData<U>) Parse (typeof (U), data);
+        }
+
+        public static IListData Parse (Type t, object data) {
+            if (t.GetInterface ("IData") == null) {
+                return null;
+            }
+
+            Type instanceType = typeof (ListData<>).MakeGenericType (t);
+            IListData obj = (IListData) Activator.CreateInstance (instanceType);
+            obj.Parse (data);
+            return obj;
+        }
+    }
+
+    public sealed class ListData<T> : List<T>, IListData, IData where T : IData {
         public Type GetDataType () {
             return typeof (T);
         }
@@ -174,6 +192,70 @@ namespace VVMUI.Core.Data {
             base.Sort (comparer);
             for (int i = 0; i < this.Count; i++) {
                 InvokeItemValueChanged (i);
+            }
+        }
+
+        public void Parse (object data) {
+            IList list = data as IList;
+            if (list == null) {
+                return;
+            }
+
+            Type gType = typeof (T);
+            if (gType.IsGenericType && gType.GetGenericTypeDefinition () == typeof (ListData<>)) {
+                int itr_count = Math.Min (this.Count, list.Count);
+                for (int i = 0; i < itr_count; i++) {
+                    this [i] = (T) ListData.Parse (gType, list[i]);
+                }
+                if (list.Count > this.Count) {
+                    List<T> new_data = new List<T> ();
+                    for (int i = itr_count; i < list.Count; i++) {
+                        new_data.Add ((T) ListData.Parse (gType, list[i]));
+                    }
+                    this.AddRange (new_data);
+                } else if (list.Count < this.Count) {
+                    this.RemoveRange (itr_count, this.Count - list.Count);
+                }
+            } else if (gType.BaseType == typeof (StructData)) {
+                int itr_count = Math.Min (this.Count, list.Count);
+                for (int i = 0; i < itr_count; i++) {
+                    this [i] = (T) StructData.Parse (gType, list[i]);
+                }
+                if (list.Count > this.Count) {
+                    List<T> new_data = new List<T> ();
+                    for (int i = itr_count; i < list.Count; i++) {
+                        new_data.Add ((T) StructData.Parse (gType, list[i]));
+                    }
+                    this.AddRange (new_data);
+                } else if (list.Count < this.Count) {
+                    this.RemoveRange (itr_count, this.Count - list.Count);
+                }
+            } else if (gType.BaseType.IsGenericType && gType.BaseType.GetGenericTypeDefinition () == typeof (BaseData<>)) {
+                int itr_count = Math.Min (this.Count, list.Count);
+                for (int i = 0; i < itr_count; i++) {
+                    (this [i] as IData).Setter.Set (this [i], list[i]);
+                }
+                if (list.Count > this.Count) {
+                    List<T> new_data = new List<T> ();
+                    for (int i = itr_count; i < list.Count; i++) {
+                        new_data.Add ((T) Activator.CreateInstance (gType, list[i]));
+                    }
+                    this.AddRange (new_data);
+                } else if (list.Count < this.Count) {
+                    this.RemoveRange (itr_count, this.Count - list.Count);
+                }
+            }
+        }
+
+        public ISetValue Setter {
+            get {
+                return null;
+            }
+        }
+
+        public IGetValue Getter {
+            get {
+                return null;
             }
         }
     }

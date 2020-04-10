@@ -5,6 +5,8 @@ namespace VVMUI.Core.Data {
 		event Action ValueChanged;
 		void InvokeValueChanged ();
 		Type GetDataType ();
+		ISetValue Setter { get; }
+		IGetValue Getter { get; }
 	}
 
 	public interface IData<T> {

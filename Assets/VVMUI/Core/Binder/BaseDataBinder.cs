@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
@@ -110,13 +110,11 @@ namespace VVMUI.Core.Binder {
                 }
 
                 ISetValue propertySetter = SetterWrapper.CreatePropertySetterWrapper (propertyInfo);
-
-                // TODO 性能优化：Type.GetMethod
-                Type dataType = this.Source.GetType ();
-                MethodInfo setMethod = dataType.GetMethod ("Set");
-                MethodInfo getMethod = dataType.GetMethod ("Get");
-                ISetValue sourceSetter = SetterWrapper.CreateMethodSetterWrapper (setMethod);
-                IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
+                ISetValue sourceSetter = this.Source.Setter;
+                IGetValue sourceGetter = this.Source.Getter;
+                if (propertySetter == null || sourceSetter == null || sourceGetter == null) {
+                    return;
+                }
 
                 this.SetValueHandler = delegate () {
                     object value = sourceGetter.Get (this.Source);
@@ -191,10 +189,7 @@ namespace VVMUI.Core.Binder {
                     return;
                 }
 
-                // TODO 性能优化：Type.GetMethod
-                Type dataType = this.Source.GetType ();
-                MethodInfo getMethod = dataType.GetMethod ("Get");
-                IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
+                IGetValue sourceGetter = this.Source.Getter;
                 this.SetValueHandler = delegate () {
                     object value = sourceGetter.Get (this.Source);
                     if (this.Converter != null) {
@@ -218,10 +213,7 @@ namespace VVMUI.Core.Binder {
                     return;
                 }
 
-                // TODO 性能优化：Type.GetMethod
-                Type dataType = this.Source.GetType ();
-                MethodInfo getMethod = dataType.GetMethod ("Get");
-                IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
+                IGetValue sourceGetter = this.Source.Getter;
                 this.SetValueHandler = delegate () {
                     object value = sourceGetter.Get (this.Source);
                     if (this.Converter != null) {
@@ -246,10 +238,7 @@ namespace VVMUI.Core.Binder {
                     return;
                 }
 
-                // TODO 性能优化：Type.GetMethod
-                Type dataType = this.Source.GetType ();
-                MethodInfo getMethod = dataType.GetMethod ("Get");
-                IGetValue sourceGetter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
+                IGetValue sourceGetter = this.Source.Getter;
                 this.SetValueHandler = delegate () {
                     object value = sourceGetter.Get (this.Source);
                     if (this.Converter != null) {

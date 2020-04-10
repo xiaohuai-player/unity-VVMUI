@@ -78,15 +78,8 @@ namespace VVMUI.Core.Binder {
                 IData srcData = this.sourceData[kv.Key];
                 if (dstData != null) {
                     string key = kv.Key;
-                    Type dstDataType = dstData.GetType ();
-                    MethodInfo setMethod = dstDataType.GetMethod ("Set");
-                    ISetValue setter = SetterWrapper.CreateMethodSetterWrapper (setMethod);
-                    setters[key] = setter;
-
-                    Type srcDataType = srcData.GetType ();
-                    MethodInfo getMethod = srcDataType.GetMethod ("Get");
-                    IGetValue getter = GetterWrapper.CreateMethodGetterWrapper (getMethod);
-                    getters[key] = getter;
+                    setters[key] = dstData.Setter;
+                    getters[key] = srcData.Getter;
 
                     Action handler = delegate () {
                         setters[key].Set (dstData, getters[key].Get (srcData));
