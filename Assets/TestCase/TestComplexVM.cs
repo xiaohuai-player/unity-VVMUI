@@ -45,34 +45,7 @@ public class TestComplexVM : VMBehaviour {
         public ListData<IntData> Scores;
     }
 
-    public ListData<FriendData> friends = new ListData<FriendData> () {
-        new FriendData () {
-            Name = new StringData ("李明"),
-            Age = new IntData (14),
-            IsOnline = new BoolData (true),
-            Body = new BodyData () {
-                Height = new IntData(170),
-                Weight = new IntData(75)
-            },
-            Scores = new ListData<IntData>(){
-                new IntData(60),
-                new IntData(65)
-            }
-        },
-        new FriendData () {
-            Name = new StringData ("韩梅梅"),
-            Age = new IntData (15),
-            IsOnline = new BoolData (true),
-            Body = new BodyData () {
-                Height = new IntData(160),
-                Weight = new IntData(55)
-            },
-            Scores = new ListData<IntData>(){
-                new IntData(80),
-                new IntData(95)
-            }
-        }
-    };
+    public ListData<FriendData> friends = new ListData<FriendData> ();
 
     public StringData strInputName;
     public IntData intInputAge;
@@ -103,6 +76,8 @@ public class TestComplexVM : VMBehaviour {
 
     public FriendData testFriend = new FriendData ();
 
+    public DictionaryData<FriendData> testDictFriend;
+
     protected override void BeforeAwake () {
         btnAddFriend = new ButtonCommand (btnAddFriend_CanExecute, btnAddFriend_Execute);
         btnDelFriend = new ButtonCommand (btnDelFriend_CanExecute, btnDelFriend_Execute);
@@ -122,5 +97,39 @@ public class TestComplexVM : VMBehaviour {
             }
         };
         testFriend.Parse (f);
+
+        List<Friend> fs = new List<Friend>(){
+            new Friend(){
+                Name = "李明",
+                Age = 15,
+                IsOnline = false,
+                Body = new Body () {
+                    Height = 170,
+                    Weight = 75
+                },
+                Scores = new List<int>(){
+                    60, 75
+                }
+            },
+            new Friend(){
+                Name = "韩梅梅",
+                Age = 12,
+                IsOnline = false,
+                Body = new Body () {
+                    Height = 160,
+                    Weight = 55
+                },
+                Scores = new List<int>(){
+                    80, 15
+                }
+            }
+        };
+        friends.Parse(fs);
+
+        Dictionary<string, Friend> dictFs = new Dictionary<string, Friend>(){
+            { "lm",  fs[0]},
+            { "hmm", fs[1]}
+        };
+        testDictFriend = DictionaryData.Parse<FriendData>(dictFs);
     }
 }

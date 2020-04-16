@@ -143,11 +143,6 @@ namespace VVMUI.Core {
 			AfterDeactive ();
 		}
 
-		protected virtual void OnUpdate () { }
-		private void Update () {
-			OnUpdate ();
-		}
-
 		public virtual void Refresh () {
 			NotifyCommandsCanExecute ();
 		}

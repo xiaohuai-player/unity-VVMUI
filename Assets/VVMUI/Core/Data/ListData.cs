@@ -201,49 +201,57 @@ namespace VVMUI.Core.Data {
                 return;
             }
 
+            Type dType = data.GetType ();
             Type gType = typeof (T);
-            if (gType.IsGenericType && gType.GetGenericTypeDefinition () == typeof (ListData<>)) {
-                int itr_count = Math.Min (this.Count, list.Count);
-                for (int i = 0; i < itr_count; i++) {
-                    this [i] = (T) ListData.Parse (gType, list[i]);
-                }
-                if (list.Count > this.Count) {
-                    List<T> new_data = new List<T> ();
-                    for (int i = itr_count; i < list.Count; i++) {
-                        new_data.Add ((T) ListData.Parse (gType, list[i]));
+
+            bool isList = gType.IsGenericType && gType.GetGenericTypeDefinition () == typeof (ListData<>);
+            bool isDict = gType.IsGenericType && gType.GetGenericTypeDefinition () == typeof (DictionaryData<>);
+            bool isStruct = gType.BaseType == typeof (StructData);
+            bool isBase = gType.BaseType.IsGenericType && gType.BaseType.GetGenericTypeDefinition () == typeof (BaseData<>) && dType.IsGenericType && gType.BaseType.GetGenericArguments () [0] == dType.GetGenericArguments () [0];
+
+            int itr_count = Math.Min (this.Count, list.Count);
+            for (int i = 0; i < itr_count; i++) {
+                if (this [i] != null) {
+                    if (isList) {
+                        (this [i] as IListData).Parse (list[i]);
+                    } else if (isDict) {
+                        (this [i] as IDictionaryData).Parse (list[i]);
+                    } else if (isStruct) {
+                        (this [i] as StructData).Parse (list[i]);
+                    } else if (isBase) {
+                        (this [i] as IData).Setter.Set (this [i], list[i] as IData);
                     }
-                    this.AddRange (new_data);
-                } else if (list.Count < this.Count) {
-                    this.RemoveRange (itr_count, this.Count - list.Count);
-                }
-            } else if (gType.BaseType == typeof (StructData)) {
-                int itr_count = Math.Min (this.Count, list.Count);
-                for (int i = 0; i < itr_count; i++) {
-                    this [i] = (T) StructData.Parse (gType, list[i]);
-                }
-                if (list.Count > this.Count) {
-                    List<T> new_data = new List<T> ();
-                    for (int i = itr_count; i < list.Count; i++) {
-                        new_data.Add ((T) StructData.Parse (gType, list[i]));
+                } else {
+                    if (isList) {
+                        this [i] = (T) ListData.Parse (gType.GetGenericArguments () [0], list[i]);
+                    } else if (isDict) {
+                        this [i] = (T) DictionaryData.Parse (gType.GetGenericArguments () [0], list[i]);
+                    } else if (isStruct) {
+                        this [i] = (T) StructData.Parse (gType, list[i]);
+                    } else if (isBase) {
+                        this [i] = (T) Activator.CreateInstance (gType, list[i]);
                     }
-                    this.AddRange (new_data);
-                } else if (list.Count < this.Count) {
-                    this.RemoveRange (itr_count, this.Count - list.Count);
                 }
-            } else if (gType.BaseType.IsGenericType && gType.BaseType.GetGenericTypeDefinition () == typeof (BaseData<>)) {
-                int itr_count = Math.Min (this.Count, list.Count);
-                for (int i = 0; i < itr_count; i++) {
-                    (this [i] as IData).Setter.Set (this [i], list[i]);
-                }
-                if (list.Count > this.Count) {
-                    List<T> new_data = new List<T> ();
-                    for (int i = itr_count; i < list.Count; i++) {
-                        new_data.Add ((T) Activator.CreateInstance (gType, list[i]));
+            }
+
+            if (list.Count > this.Count) {
+                List<T> new_data_range = new List<T> ();
+                for (int i = itr_count; i < list.Count; i++) {
+                    object new_data = null;
+                    if (isList) {
+                        new_data = ListData.Parse (gType.GetGenericArguments () [0], list[i]);
+                    } else if (isDict) {
+                        new_data = DictionaryData.Parse (gType.GetGenericArguments () [0], list[i]);
+                    } else if (isStruct) {
+                        new_data = StructData.Parse (gType, list[i]);
+                    } else if (isBase) {
+                        new_data = Activator.CreateInstance (gType, list[i]);
                     }
-                    this.AddRange (new_data);
-                } else if (list.Count < this.Count) {
-                    this.RemoveRange (itr_count, this.Count - list.Count);
+                    new_data_range.Add ((T) new_data);
                 }
+                this.AddRange (new_data_range);
+            } else if (list.Count < this.Count) {
+                this.RemoveRange (itr_count, this.Count - list.Count);
             }
         }
 

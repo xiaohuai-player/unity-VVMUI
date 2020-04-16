@@ -6,6 +6,14 @@ using UnityEngine;
 
 namespace VVMUI.Core.Data {
     public abstract class BaseData<T> : IData<T>, IData {
+        public BaseData () {
+
+        }
+
+        public BaseData (T value) {
+            _value = value;
+        }
+
         [SerializeField]
         private T _value;
 

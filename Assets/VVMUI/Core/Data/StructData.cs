@@ -73,29 +73,31 @@ namespace VVMUI.Core.Data {
                 }
 
                 object objv = objfi.GetValue (this);
-                if (objfi.FieldType.IsGenericType && objfi.FieldType.GetGenericTypeDefinition () == typeof (ListData<>)) {
-                    IListData v = (IListData) objv;
-                    if (v == null) {
-                        Type genericTypee = objfi.FieldType.GetGenericArguments () [0];
-                        objfi.SetValue (this, ListData.Parse (genericTypee, datav));
-                    } else {
-                        v.Parse (datav);
+
+                bool isList = objfi.FieldType.IsGenericType && objfi.FieldType.GetGenericTypeDefinition () == typeof (ListData<>);
+                bool isDict = objfi.FieldType.IsGenericType && objfi.FieldType.GetGenericTypeDefinition () == typeof (DictionaryData<>);
+                bool isStruct = objfi.FieldType.BaseType == typeof (StructData);
+                bool isBase = objfi.FieldType.BaseType.IsGenericType && objfi.FieldType.BaseType.GetGenericTypeDefinition () == typeof (BaseData<>) && objfi.FieldType.BaseType.GetGenericArguments()[0] == datafi.FieldType;
+
+                if (objv != null) {
+                    if (isList) {
+                        (objv as IListData).Parse (datav);
+                    } else if (isDict) {
+                        (objv as IDictionaryData).Parse (datav);
+                    } else if (isStruct) {
+                        (objv as StructData).Parse (datav);
+                    } else if (isBase) {
+                        (objv as IData).Setter.Set (objv, datav);
                     }
-                } else if (objfi.FieldType.BaseType == typeof (StructData)) {
-                    StructData v = (StructData) objv;
-                    if (v == null) {
+                } else {
+                    if (isList) {
+                        objfi.SetValue (this, ListData.Parse (objfi.FieldType.GetGenericArguments () [0], datav));
+                    } else if (isDict) {
+                        objfi.SetValue (this, DictionaryData.Parse (objfi.FieldType.GetGenericArguments () [0], datav));
+                    } else if (isStruct) {
                         objfi.SetValue (this, StructData.Parse (objfi.FieldType, datav));
-                    } else {
-                        v.Parse (datafi.GetValue (data));
-                    }
-                } else if (objfi.FieldType.BaseType.IsGenericType && objfi.FieldType.BaseType.GetGenericTypeDefinition () == typeof (BaseData<>)) {
-                    Type[] gTypes = objfi.FieldType.BaseType.GetGenericArguments ();
-                    if (gTypes.Length > 0 && gTypes[0] == datafi.FieldType) {
-                        if (objv == null) {
-                            objfi.SetValue (this, Activator.CreateInstance (objfi.FieldType, datav));
-                        } else {
-                            (objv as IData).Setter.Set (objv, datav);
-                        }
+                    } else if (isBase) {
+                        objfi.SetValue (this, Activator.CreateInstance (objfi.FieldType, datav));
                     }
                 }
             }
