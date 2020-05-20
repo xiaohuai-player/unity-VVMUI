@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace VVMUI.Core.Data {
@@ -7,11 +9,19 @@ namespace VVMUI.Core.Data {
     }
 
     public class GetterWrapper {
+        private static Dictionary<PropertyInfo, IGetValue> _propertyGettersCache = new Dictionary<PropertyInfo, IGetValue> ();
+        private static Dictionary<MethodInfo, IGetValue> _methodGettersCache = new Dictionary<MethodInfo, IGetValue> ();
+
         public static IGetValue CreatePropertyGetterWrapper (PropertyInfo propertyInfo) {
             if (propertyInfo == null)
                 throw new ArgumentNullException ("propertyInfo is null");
             if (propertyInfo.CanRead == false)
                 throw new NotSupportedException ("属性不支持读操作。");
+
+            IGetValue getter = null;
+            if (_propertyGettersCache.TryGetValue (propertyInfo, out getter)) {
+                return getter;
+            }
 
             MethodInfo mi = propertyInfo.GetGetMethod (true);
 
@@ -19,7 +29,9 @@ namespace VVMUI.Core.Data {
                 throw new NotSupportedException ("不支持构造索引器属性的委托。");
 
             Type instanceType = typeof (GetterWrapper<,>).MakeGenericType (propertyInfo.DeclaringType, propertyInfo.PropertyType);
-            return (IGetValue) Activator.CreateInstance (instanceType, propertyInfo);
+            getter = (IGetValue) Activator.CreateInstance (instanceType, propertyInfo);
+            _propertyGettersCache[propertyInfo] = getter;
+            return getter;
         }
 
         public static IGetValue CreateMethodGetterWrapper (MethodInfo methodInfo) {
@@ -29,10 +41,17 @@ namespace VVMUI.Core.Data {
             if (methodInfo.GetParameters ().Length != 0)
                 throw new ArgumentNullException ("不支持含参读取方法");
 
+            IGetValue getter = null;
+            if (_methodGettersCache.TryGetValue (methodInfo, out getter)) {
+                return getter;
+            }
+
             // TODO 检查 methodInfo.ReturnParameter
 
             Type instanceType = typeof (GetterWrapper<,>).MakeGenericType (methodInfo.DeclaringType, methodInfo.ReturnType);
-            return (IGetValue) Activator.CreateInstance (instanceType, methodInfo);
+            getter = (IGetValue) Activator.CreateInstance (instanceType, methodInfo);
+            _methodGettersCache[methodInfo] = getter;
+            return getter;
         }
     }
 
@@ -66,25 +85,33 @@ namespace VVMUI.Core.Data {
         }
     }
 
-
     public interface ISetValue {
         void Set (object target, object val);
     }
 
     public class SetterWrapper {
+        private static Dictionary<PropertyInfo, ISetValue> _propertySettersCache = new Dictionary<PropertyInfo, ISetValue> ();
+        private static Dictionary<MethodInfo, ISetValue> _methodSettersCache = new Dictionary<MethodInfo, ISetValue> ();
+
         public static ISetValue CreatePropertySetterWrapper (PropertyInfo propertyInfo) {
             if (propertyInfo == null)
                 throw new ArgumentNullException ("propertyInfo is null");
             if (propertyInfo.CanWrite == false)
                 throw new NotSupportedException ("属性不支持写操作。");
 
-            MethodInfo mi = propertyInfo.GetSetMethod (true);
+            ISetValue setter = null;
+            if (_propertySettersCache.TryGetValue (propertyInfo, out setter)) {
+                return setter;
+            }
 
+            MethodInfo mi = propertyInfo.GetSetMethod (true);
             if (mi.GetParameters ().Length > 1)
                 throw new NotSupportedException ("不支持构造索引器属性的委托。");
 
             Type instanceType = typeof (SetterWrapper<,>).MakeGenericType (propertyInfo.DeclaringType, propertyInfo.PropertyType);
-            return (ISetValue) Activator.CreateInstance (instanceType, propertyInfo);
+            setter = (ISetValue) Activator.CreateInstance (instanceType, propertyInfo);
+            _propertySettersCache[propertyInfo] = setter;
+            return setter;
         }
 
         public static ISetValue CreateMethodSetterWrapper (MethodInfo methodInfo) {
@@ -94,8 +121,15 @@ namespace VVMUI.Core.Data {
             if (methodInfo.GetParameters ().Length != 1)
                 throw new NotSupportedException ("方法参数数量必须为 1");
 
+            ISetValue setter = null;
+            if (_methodSettersCache.TryGetValue (methodInfo, out setter)) {
+                return setter;
+            }
+
             Type instanceType = typeof (SetterWrapper<,>).MakeGenericType (methodInfo.DeclaringType, methodInfo.GetParameters () [0].ParameterType);
-            return (ISetValue) Activator.CreateInstance (instanceType, methodInfo);
+            setter = (ISetValue) Activator.CreateInstance (instanceType, methodInfo);
+            _methodSettersCache[methodInfo] = setter;
+            return setter;
         }
     }
 

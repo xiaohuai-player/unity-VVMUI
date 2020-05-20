@@ -9,6 +9,9 @@ namespace VVMUI.Core.Data {
         void AddItemValueChangedListener (int i, Action h);
         void RemoveItemValueChangedListener (int i, Action h);
         void Parse (object data);
+        int Count { get; }
+        int FocusIndex { get; set; }
+        event Action FocusIndexChanged;
     }
 
     public sealed class ListData {
@@ -29,6 +32,19 @@ namespace VVMUI.Core.Data {
     }
 
     public sealed class ListData<T> : List<T>, IListData, IData where T : IData {
+        private int _focusIndex = 0;
+        public int FocusIndex {
+            get {
+                return _focusIndex;
+            }
+            set {
+                this._focusIndex = Math.Max (0, Math.Min (value, this.Count));
+                FocusIndexChanged.Invoke ();
+            }
+        }
+
+        public event Action FocusIndexChanged;
+
         public Type GetDataType () {
             return typeof (T);
         }
@@ -100,26 +116,26 @@ namespace VVMUI.Core.Data {
         public new void Insert (int index, T item) {
             int count = this.Count;
             base.Insert (index, item);
-            for (int i = index; i < count; i++) {
-                InvokeItemValueChanged (i);
-            }
+            // for (int i = index; i < count; i++) {
+            //     InvokeItemValueChanged (i);
+            // }
             InvokeValueChanged ();
         }
 
         public new void InsertRange (int index, IEnumerable<T> collection) {
             int count = this.Count;
             base.InsertRange (index, collection);
-            for (int i = index; i < count; i++) {
-                InvokeItemValueChanged (i);
-            }
+            // for (int i = index; i < count; i++) {
+            //     InvokeItemValueChanged (i);
+            // }
             InvokeValueChanged ();
         }
 
         public new bool Remove (T item) {
             if (base.Remove (item)) {
-                for (int i = 0; i < this.Count; i++) {
-                    InvokeItemValueChanged (i);
-                }
+                // for (int i = 0; i < this.Count; i++) {
+                //     InvokeItemValueChanged (i);
+                // }
                 InvokeValueChanged ();
                 return true;
             }
@@ -129,9 +145,9 @@ namespace VVMUI.Core.Data {
         public new int RemoveAll (Predicate<T> match) {
             int count = base.RemoveAll (match);
             if (count > 0) {
-                for (int i = 0; i < this.Count; i++) {
-                    InvokeItemValueChanged (i);
-                }
+                // for (int i = 0; i < this.Count; i++) {
+                //     InvokeItemValueChanged (i);
+                // }
                 InvokeValueChanged ();
             }
             return count;
@@ -139,17 +155,17 @@ namespace VVMUI.Core.Data {
 
         public new void RemoveAt (int index) {
             base.RemoveAt (index);
-            for (int i = 0; i < this.Count; i++) {
-                InvokeItemValueChanged (i);
-            }
+            // for (int i = 0; i < this.Count; i++) {
+            //     InvokeItemValueChanged (i);
+            // }
             InvokeValueChanged ();
         }
 
         public new void RemoveRange (int index, int count) {
             base.RemoveRange (index, count);
-            for (int i = 0; i < this.Count; i++) {
-                InvokeItemValueChanged (i);
-            }
+            // for (int i = 0; i < this.Count; i++) {
+            //     InvokeItemValueChanged (i);
+            // }
             InvokeValueChanged ();
         }
 

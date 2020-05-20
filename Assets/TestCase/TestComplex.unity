@@ -615,6 +615,11 @@ MonoBehaviour:
     Converter: 
     ConverterParameter: 
   Template: {fileID: 1045727157}
+  Optimize: 1
+  PageItemsCount: 5
+  ViewPort: {fileID: 1659365739}
+  ScrollRect: {fileID: 1812285882}
+  LayoutGroup: {fileID: 345249219}
 --- !u!114 &345249218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2451,6 +2456,11 @@ MonoBehaviour:
     Converter: 
     ConverterParameter: 
   Template: {fileID: 2088024755}
+  Optimize: 0
+  PageItemsCount: 10
+  ViewPort: {fileID: 861473672}
+  ScrollRect: {fileID: 0}
+  LayoutGroup: {fileID: 1569827566}
 --- !u!1 &1647501936
 GameObject:
   m_ObjectHideFlags: 0
@@ -3372,6 +3382,11 @@ MonoBehaviour:
     Converter: 
     ConverterParameter: 
   Template: {fileID: 2088024755}
+  Optimize: 0
+  PageItemsCount: 10
+  ViewPort: {fileID: 1045727159}
+  ScrollRect: {fileID: 0}
+  LayoutGroup: {fileID: 2073286563}
 --- !u!114 &2073286563
 MonoBehaviour:
   m_ObjectHideFlags: 0

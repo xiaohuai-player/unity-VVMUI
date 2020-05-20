@@ -1,8 +1,9 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using VVMUI.Core.Data;
 
 namespace VVMUI.Core.Binder {
-    public abstract class AbstractDataBinder : MonoBehaviour {
+    public abstract class AbstractDataBinder : UIBehaviour {
         public virtual bool CanBind (VMBehaviour vm) {
             return true;
         }
@@ -18,7 +19,7 @@ namespace VVMUI.Core.Binder {
         public virtual void UnBind () { }
     }
 
-    public abstract class AbstractCommandBinder : MonoBehaviour {
+    public abstract class AbstractCommandBinder : UIBehaviour {
         public virtual bool CanBind (VMBehaviour vm) {
             return true;
         }

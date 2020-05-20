@@ -26,6 +26,10 @@ namespace VVMUI.Core.Binder {
             // property bind vars
             public UIBehaviour Component;
             public string Property;
+            private Type componentType;
+            private PropertyInfo propertyInfo;
+            private Type propertyType;
+            private ISetValue propertySetter;
 
             // animator bind vars
             public int AnimatorLayer;
@@ -48,7 +52,6 @@ namespace VVMUI.Core.Binder {
                     return false;
                 }
 
-                Type propertyType = t;
                 Type dataType = this.Source.GetType ();
                 Type dataBaseType = dataType.BaseType;
 
@@ -57,7 +60,7 @@ namespace VVMUI.Core.Binder {
                     bindData = true;
                 }
 
-                if (this.Source.GetDataType () == propertyType) {
+                if (this.Source.GetDataType () == t) {
                     bindData = true;
                 }
 
@@ -91,25 +94,37 @@ namespace VVMUI.Core.Binder {
                     Debugger.LogError ("DataBinder", obj.name + " component null.");
                     return;
                 }
+
                 if (string.IsNullOrEmpty (this.Property)) {
                     Debugger.LogError ("DataBinder", obj.name + " property empty.");
                     return;
                 }
 
-                Type componentType = this.Component.GetType ();
-                // TODO 性能优化：Type.GetProperty
-                PropertyInfo propertyInfo = componentType.GetProperty (this.Property);
+                if (componentType == null) {
+                    componentType = this.Component.GetType ();
+                }
+
+                if (propertyInfo == null) {
+                    propertyInfo = componentType.GetProperty (this.Property);
+                }
+
                 if (propertyInfo == null || propertyInfo.GetSetMethod () == null) {
                     Debugger.LogError ("DataBinder", obj.name + " property null or not support.");
                     return;
                 }
 
-                Type propertyType = propertyInfo.PropertyType;
+                if (propertyType == null) {
+                    propertyType = propertyInfo.PropertyType;
+                }
+
                 if (!CheckDataTypeValid (propertyType, obj)) {
                     return;
                 }
 
-                ISetValue propertySetter = SetterWrapper.CreatePropertySetterWrapper (propertyInfo);
+                if (propertySetter == null) {
+                    propertySetter = SetterWrapper.CreatePropertySetterWrapper (propertyInfo);
+                }
+
                 ISetValue sourceSetter = this.Source.Setter;
                 IGetValue sourceGetter = this.Source.Getter;
                 if (propertySetter == null || sourceSetter == null || sourceGetter == null) {

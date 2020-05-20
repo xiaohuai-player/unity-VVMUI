@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using VVMUI.Core.Binder;
 using VVMUI.Core.Command;
 using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
 
 namespace VVMUI.Core {
-	public class VMBehaviour : MonoBehaviour {
+	public class VMBehaviour : UIBehaviour {
 		public GameObject BindRoot;
 
 		[HideInInspector]
@@ -114,7 +115,9 @@ namespace VVMUI.Core {
 
 		protected virtual void BeforeAwake () { }
 		protected virtual void AfterAwake () { }
-		private void Awake () {
+		protected override void Awake () {
+			base.Awake ();
+
 			BeforeAwake ();
 
 			Collect ();
@@ -125,7 +128,9 @@ namespace VVMUI.Core {
 
 		protected virtual void BeforeActive () { }
 		protected virtual void AfterActive () { }
-		private void OnEnable () {
+		protected override void OnEnable () {
+			base.OnEnable ();
+
 			BeforeActive ();
 
 			NotifyCommandsCanExecute ();
@@ -135,7 +140,9 @@ namespace VVMUI.Core {
 
 		protected virtual void BeforeDeactive () { }
 		protected virtual void AfterDeactive () { }
-		private void OnDisable () {
+		protected override void OnDisable () {
+			base.OnDisable ();
+
 			BeforeDeactive ();
 
 			//TODO real deactive
@@ -149,7 +156,9 @@ namespace VVMUI.Core {
 
 		protected virtual void BeforeDestroy () { }
 		protected virtual void AfterDestroy () { }
-		private void OnDestroy () {
+		protected override void OnDestroy () {
+			base.OnDestroy ();
+
 			BeforeDestroy ();
 
 			//TODO real destroy

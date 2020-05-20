@@ -37,7 +37,7 @@ namespace VVMUI.Core.Data {
 			return typeof (T);
 		}
 
-		// 列表数据结构，在列表项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
+		// 字典数据结构，在字典项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
 		public event Action ValueChanged;
 		public void InvokeValueChanged () {
 			if (ValueChanged != null) {
@@ -45,7 +45,7 @@ namespace VVMUI.Core.Data {
 			}
 		}
 
-		// 列表数据结构，在列表项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
+		// 字典数据结构，在字典项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
 		public Dictionary<string, List<Action>> ItemValueChanged = new Dictionary<string, List<Action>> ();
 		public void InvokeItemValueChanged (string k) {
 			List<Action> handlers = null;

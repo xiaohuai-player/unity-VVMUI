@@ -85,7 +85,7 @@ public class TestComplexVM : VMBehaviour {
         Friend f = new Friend () {
             Name = "testabc",
             Age = 12,
-            IsOnline = true,
+            IsOnline = false,
             Body = new Body () {
                 Height = 170,
                 Weight = 75

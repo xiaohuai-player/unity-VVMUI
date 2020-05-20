@@ -3,25 +3,31 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
 
 namespace VVMUI.Core.Binder {
-    public class ListTemplateBinder : MonoBehaviour {
+    public class ListTemplateBinder : UIBehaviour {
         [SerializeField]
         private int index;
+        public int Index {
+            get { return index; }
+        }
+
         private IListData source;
         private VMBehaviour vm;
 
         private List<AbstractDataBinder> dataBinders = new List<AbstractDataBinder> ();
         private List<AbstractCommandBinder> commandBinders = new List<AbstractCommandBinder> ();
 
-        private void Awake () {
+        protected override void Awake () {
+            base.Awake();
             this.gameObject.GetComponentsInChildren<AbstractDataBinder> (true, dataBinders);
             this.gameObject.GetComponentsInChildren<AbstractCommandBinder> (true, commandBinders);
         }
 
-        private void OnDestroy () {
+        protected override void OnDestroy () {
             this.UnBind ();
         }
 
@@ -58,13 +64,25 @@ namespace VVMUI.Core.Binder {
             }
         }
 
-        private void ReBind () {
+        public void ReBind () {
             for (int i = 0; i < dataBinders.Count; i++) {
                 dataBinders[i].UnBind ();
                 if (dataBinders[i].CanBind (this.vm, this.source.GetAt (this.index))) {
                     dataBinders[i].Bind (this.vm, this.source.GetAt (this.index));
                 }
             }
+
+            for (int i = 0; i < commandBinders.Count; i++) {
+                commandBinders[i].UnBind ();
+                if (commandBinders[i].CanBindListItem (this.vm, this.index)) {
+                    commandBinders[i].BindListItem (this.vm, this.index);
+                }
+            }
+        }
+
+        public void ReBind (int index) {
+            this.index = index;
+            this.ReBind ();
         }
     }
 }
