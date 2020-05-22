@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace VVMUI.Core.Test {
 	public class BaseDataBindingTest : IPrebuildSetup {
 		public void Setup () {
-			GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject> ("Assets/VVMUI/Core/Tests/BaseDataBindingTestCanvas.prefab");
+			GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject> ("Assets/VVMUI/Core/Tests/BaseDataBinding/BaseDataBindingTestCanvas.prefab");
 			GameObject obj = GameObject.Instantiate (prefab);
 			obj.name = "BaseDataBindingTestCanvas";
 		}
@@ -179,6 +179,53 @@ namespace VVMUI.Core.Test {
 
 			toggle3.isOn = true;
 			Assert.That (!vm.testToggles[0].Get () && !vm.testToggles[1].Get () && vm.testToggles[2].Get (), "toggle group toggle3 fail");
+		}
+
+		[UnityTest]
+		public IEnumerator ActiveTestPasses () {
+			yield return null;
+
+			GameObject obj = GameObject.Find ("BaseDataBindingTestCanvas");
+			BaseDataBindingTestVMBehaviour vm = obj.GetComponentInChildren<BaseDataBindingTestVMBehaviour> ();
+
+			vm.testActive.Set (true);
+			Assert.That (vm.transform.Find ("active").gameObject.activeSelf, "active set to true failed");
+
+			vm.testActive.Set (false);
+			Assert.That (vm.transform.Find ("active").gameObject.activeSelf, Is.False, "active set to false failed");
+		}
+
+		[UnityTest]
+		public IEnumerator AnimationTestPasses () {
+			yield return null;
+
+			GameObject obj = GameObject.Find ("BaseDataBindingTestCanvas");
+			BaseDataBindingTestVMBehaviour vm = obj.GetComponentInChildren<BaseDataBindingTestVMBehaviour> ();
+
+			vm.testAnimation.Set ("animationTest1");
+			yield return null;
+			Assert.That (vm.transform.Find ("animation").GetComponent<Animation> ().IsPlaying ("animationTest1"), "animationTest1 failed");
+
+			vm.testAnimation.Set ("animationTest2");
+			yield return null;
+			Assert.That (vm.transform.Find ("animation").GetComponent<Animation> ().IsPlaying ("animationTest2"), "animationTest2 failed");
+		}
+
+		[UnityTest]
+		public IEnumerator AnimatorTestPasses () {
+			yield return null;
+
+			GameObject obj = GameObject.Find ("BaseDataBindingTestCanvas");
+			BaseDataBindingTestVMBehaviour vm = obj.GetComponentInChildren<BaseDataBindingTestVMBehaviour> ();
+			Animator animator = vm.transform.Find ("animator").GetComponent<Animator> ();
+
+			vm.testAnimator.Set ("animatorTest1");
+			yield return null;
+			Assert.That (animator.GetCurrentAnimatorClipInfo (0) [0].clip.name, Is.EqualTo ("animatorTest1"), "animatorTest1 failed");
+
+			vm.testAnimator.Set ("animatorTest2");
+			yield return null;
+			Assert.That (animator.GetCurrentAnimatorClipInfo (0) [0].clip.name, Is.EqualTo ("animatorTest2"), "animatorTest2 failed");
 		}
 	}
 }

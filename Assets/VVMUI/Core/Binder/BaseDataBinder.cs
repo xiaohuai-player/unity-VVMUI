@@ -235,7 +235,10 @@ namespace VVMUI.Core.Binder {
                         value = this.Converter.Convert (value, propertyType, this.Definer.ConverterParameter, vm);
                     }
                     cptAnim.Stop ();
-                    cptAnim.Play ((string) value, PlayMode.StopAll);
+                    string animName = (string) value;
+                    if (!string.IsNullOrEmpty (animName)) {
+                        cptAnim.Play (animName, PlayMode.StopAll);
+                    }
                 };
                 this.Source.ValueChanged += this.SetValueHandler;
                 this.SetValueHandler.Invoke ();
@@ -259,7 +262,11 @@ namespace VVMUI.Core.Binder {
                     if (this.Converter != null) {
                         value = this.Converter.Convert (value, propertyType, this.Definer.ConverterParameter, vm);
                     }
-                    cptAnim.Play ((string) value, this.AnimatorLayer);
+                    cptAnim.StopPlayback ();
+                    string animName = (string) value;
+                    if (!string.IsNullOrEmpty (animName)) {
+                        cptAnim.Play (animName, this.AnimatorLayer);
+                    }
                 };
                 this.Source.ValueChanged += this.SetValueHandler;
                 this.SetValueHandler.Invoke ();

@@ -19,5 +19,11 @@ namespace VVMUI.Core.Test {
 		};
 
 		public StringConverter testConverter = new StringConverter ();
+
+		public BoolData testActive = new BoolData (false);
+
+		public StringData testAnimation = new StringData ("");
+
+		public StringData testAnimator = new StringData ("");
 	}
 }
