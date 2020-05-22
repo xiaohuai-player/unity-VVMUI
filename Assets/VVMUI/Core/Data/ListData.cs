@@ -38,7 +38,7 @@ namespace VVMUI.Core.Data {
                 return _focusIndex;
             }
             set {
-                this._focusIndex = Math.Max (0, Math.Min (value, this.Count));
+                this._focusIndex = Math.Max (0, Math.Min (value, this.Count - 1));
                 FocusIndexChanged.Invoke ();
             }
         }

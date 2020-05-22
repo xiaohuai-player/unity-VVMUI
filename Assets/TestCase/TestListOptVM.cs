@@ -49,10 +49,10 @@ public class TestListOptVM : VMBehaviour {
 		items.FocusIndex = items.Count - 1;
 	}
 
-	protected override void BeforeAwake(){
-		BtnFocusFirst = new ButtonCommand(BtnFocusFirst_CanExecute, BtnFocusFirst_Execute);
-		BtnFocusMiddle = new ButtonCommand(BtnFocusMiddle_CanExecute, BtnFocusMiddle_Execute);
-		BtnFocusLast = new ButtonCommand(BtnFocusLast_CanExecute, BtnFocusLast_Execute);
+	protected override void BeforeAwake () {
+		BtnFocusFirst = new ButtonCommand (BtnFocusFirst_CanExecute, BtnFocusFirst_Execute);
+		BtnFocusMiddle = new ButtonCommand (BtnFocusMiddle_CanExecute, BtnFocusMiddle_Execute);
+		BtnFocusLast = new ButtonCommand (BtnFocusLast_CanExecute, BtnFocusLast_Execute);
 	}
 
 	protected override void BeforeActive () {
@@ -65,5 +65,7 @@ public class TestListOptVM : VMBehaviour {
 			});
 		}
 		items.AddRange (list);
+		items.FocusIndex = 0;
+		items[items.FocusIndex].color.Set (new Color (0, 0, 0, 0));
 	}
 }

@@ -115,6 +115,10 @@ namespace VVMUI.Core.Binder {
                 return;
             }
 
+            if (this.dirty) {
+                return;
+            }
+
             Rect viewportRect, firstChildRect, lastChildRect;
             viewportRect = new Rect (ViewPort.rect.x + ViewPort.position.x, ViewPort.rect.y + ViewPort.position.y, ViewPort.rect.width, ViewPort.rect.height);
 
@@ -133,12 +137,12 @@ namespace VVMUI.Core.Binder {
             bool prevNextPage = false;
             bool sufNextPage = false;
             if (hLayout != null || (gLayout != null && gLayout.startAxis == GridLayoutGroup.Axis.Vertical)) {
-                prevNextPage = firstChildRect.center.x >= viewportRect.xMin;
-                sufNextPage = lastChildRect.center.x <= viewportRect.xMax;
+                prevNextPage = firstChildRect.center.x > viewportRect.xMin;
+                sufNextPage = lastChildRect.center.x < viewportRect.xMax;
             }
             if (vLayout != null || (gLayout != null && gLayout.startAxis == GridLayoutGroup.Axis.Horizontal)) {
-                prevNextPage = firstChildRect.center.y <= viewportRect.yMax;
-                sufNextPage = lastChildRect.center.y >= viewportRect.yMin;
+                prevNextPage = firstChildRect.center.y < viewportRect.yMax;
+                sufNextPage = lastChildRect.center.y > viewportRect.yMin;
             }
 
             if (prevNextPage && this.startIndex > 0) {
@@ -232,8 +236,16 @@ namespace VVMUI.Core.Binder {
         private void SetDirty (bool resetIndex) {
             if (resetIndex) {
                 if (this.IsOptimizeLayout () && this.sourceData != null) {
-                    this.startIndex = this.sourceData.FocusIndex;
-                    this.endIndex = this.sourceData.FocusIndex + this.PageItemsCount * 2;
+                    if (this.sourceData.FocusIndex < this.PageItemsCount) {
+                        this.startIndex = 0;
+                        this.endIndex = this.PageItemsCount * 2;
+                    } else if (this.sourceData.FocusIndex >= this.sourceData.Count - this.PageItemsCount) {
+                        this.startIndex = this.sourceData.Count - this.PageItemsCount * 2;
+                        this.endIndex = this.sourceData.Count;
+                    } else {
+                        this.startIndex = this.sourceData.FocusIndex - this.PageItemsCount;
+                        this.endIndex = this.sourceData.FocusIndex + this.PageItemsCount;
+                    }
                 } else {
                     this.startIndex = 0;
                     this.endIndex = -1;
@@ -253,6 +265,13 @@ namespace VVMUI.Core.Binder {
         private IEnumerator DelayArrange (bool focus) {
             yield return null;
             Arrange (focus);
+
+            if (focus) {
+                yield return null;
+                SetFocus ();
+            }
+
+            this.dirty = false;
         }
 
         private void Arrange (bool focus) {
@@ -298,11 +317,29 @@ namespace VVMUI.Core.Binder {
 
             if (this.IsOptimizeLayout ()) {
                 this.SetPadding ();
-            } else {
+            }
+        }
 
+        private void SetFocus () {
+            RectTransform templateRectTransform = this.Template.transform as RectTransform;
+            if (templateRectTransform == null) {
+                return;
             }
 
-            this.dirty = false;
+            RectTransform rectTransform = this.transform as RectTransform;
+            HorizontalLayoutGroup hLayout = this.LayoutGroup as HorizontalLayoutGroup;
+            VerticalLayoutGroup vLayout = this.LayoutGroup as VerticalLayoutGroup;
+            GridLayoutGroup gLayout = this.LayoutGroup as GridLayoutGroup;
+            Vector2 originPosition = rectTransform.anchoredPosition;
+
+            if (hLayout != null) {
+                float x = -this.sourceData.FocusIndex * (templateRectTransform.rect.width + hLayout.spacing);
+                rectTransform.anchoredPosition = new Vector2 (x, originPosition.y);
+            }
+            if (vLayout != null) {
+                float y = this.sourceData.FocusIndex * (templateRectTransform.rect.height + vLayout.spacing);
+                rectTransform.anchoredPosition = new Vector2 (originPosition.x, y);
+            }
         }
 
         private void SetPadding () {
