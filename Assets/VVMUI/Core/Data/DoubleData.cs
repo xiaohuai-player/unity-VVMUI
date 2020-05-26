@@ -1,11 +1,11 @@
 ﻿namespace VVMUI.Core.Data {
 	[System.Serializable]
-	public sealed class DoubleData : BaseData<float> {
+	public sealed class DoubleData : BaseData<double> {
 		public DoubleData () { 
 			
 		}
 
-		public DoubleData (float v) {
+		public DoubleData (double v) {
 			this.Set (v);
 		}
 
