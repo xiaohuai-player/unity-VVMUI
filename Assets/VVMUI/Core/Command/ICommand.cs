@@ -2,8 +2,9 @@
 
 namespace VVMUI.Core.Command {
 	public interface ICommand {
-		event Action CanExecuteChanged;
 		void NotifyCanExecute ();
+		void AddCanExecuteChangedListener (Action handler);
+		void RemoveCanExecuteChangedListener (Action handler);
 		void BindVM (VMBehaviour vm);
 		bool CanExecute (object parameter);
 		void Execute (object parameter);

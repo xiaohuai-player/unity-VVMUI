@@ -97,7 +97,7 @@ namespace VVMUI.Core.Binder {
                 canExecuteHandler = new Action (delegate {
                     component.interactable = command.CanExecute (parameter);
                 });
-                command.CanExecuteChanged += canExecuteHandler;
+                command.AddCanExecuteChangedListener (canExecuteHandler);
                 component.interactable = command.CanExecute (parameter);
             }
 
@@ -105,7 +105,7 @@ namespace VVMUI.Core.Binder {
                 if (command != null && sourceEventType != null && sourceEventObj != null && executeDelegate != null && canExecuteHandler != null) {
                     // TODO 性能优化：Type.GetMethod, MethodInfo.Invoke
                     sourceEventType.GetMethod ("RemoveListener").Invoke (sourceEventObj, new object[] { executeDelegate });
-                    command.CanExecuteChanged -= canExecuteHandler;
+                    command.RemoveCanExecuteChangedListener (canExecuteHandler);
                 }
             }
         }

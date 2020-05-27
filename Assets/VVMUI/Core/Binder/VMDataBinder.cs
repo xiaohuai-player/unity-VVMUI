@@ -85,7 +85,7 @@ namespace VVMUI.Core.Binder {
                         setters[key].Set (dstData, getters[key].Get (srcData));
                     };
                     handlers[key] = handler;
-                    srcData.ValueChanged += handler;
+                    srcData.AddValueChangedListener (handler);
                     handler.Invoke ();
                 }
             }
@@ -94,7 +94,7 @@ namespace VVMUI.Core.Binder {
         private void DoUnBind () {
             foreach (KeyValuePair<string, Action> kv in handlers) {
                 IData srcData = this.sourceData[kv.Key];
-                srcData.ValueChanged -= kv.Value;
+                srcData.RemoveValueChangedListener (kv.Value);
             }
             if (this.obj != null) {
                 Destroy (this.obj);

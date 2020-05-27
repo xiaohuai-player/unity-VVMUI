@@ -148,7 +148,7 @@ namespace VVMUI.Core.Binder {
                         }
                     }
                 };
-                this.Source.ValueChanged += this.SetValueHandler;
+                this.Source.AddValueChangedListener (this.SetValueHandler);
                 this.SetValueHandler.Invoke ();
 
                 // 可交互组件的双向绑定
@@ -212,7 +212,7 @@ namespace VVMUI.Core.Binder {
                     }
                     obj.SetActive ((bool) value);
                 };
-                this.Source.ValueChanged += this.SetValueHandler;
+                this.Source.AddValueChangedListener (this.SetValueHandler);
                 this.SetValueHandler.Invoke ();
             }
 
@@ -240,7 +240,7 @@ namespace VVMUI.Core.Binder {
                         cptAnim.Play (animName, PlayMode.StopAll);
                     }
                 };
-                this.Source.ValueChanged += this.SetValueHandler;
+                this.Source.AddValueChangedListener (this.SetValueHandler);
                 this.SetValueHandler.Invoke ();
             }
 
@@ -268,7 +268,7 @@ namespace VVMUI.Core.Binder {
                         cptAnim.Play (animName, this.AnimatorLayer);
                     }
                 };
-                this.Source.ValueChanged += this.SetValueHandler;
+                this.Source.AddValueChangedListener (this.SetValueHandler);
                 this.SetValueHandler.Invoke ();
             }
 
@@ -291,7 +291,7 @@ namespace VVMUI.Core.Binder {
 
             private void DoPropertyUnBind () {
                 if (this.Source != null && this.SetValueHandler != null) {
-                    this.Source.ValueChanged -= this.SetValueHandler;
+                    this.Source.RemoveValueChangedListener (this.SetValueHandler);
                 }
                 if (this.ValueChangedHandler != null) {
                     Type componentType = this.Component.GetType ();
@@ -312,19 +312,19 @@ namespace VVMUI.Core.Binder {
 
             private void DoActiveUnBind () {
                 if (this.Source != null && this.SetValueHandler != null) {
-                    this.Source.ValueChanged -= this.SetValueHandler;
+                    this.Source.RemoveValueChangedListener (this.SetValueHandler);
                 }
             }
 
             private void DoAnimationUnBind () {
                 if (this.Source != null && this.SetValueHandler != null) {
-                    this.Source.ValueChanged -= this.SetValueHandler;
+                    this.Source.RemoveValueChangedListener (this.SetValueHandler);
                 }
             }
 
             private void DoAnimatorUnBind () {
                 if (this.Source != null && this.SetValueHandler != null) {
-                    this.Source.ValueChanged -= this.SetValueHandler;
+                    this.Source.RemoveValueChangedListener (this.SetValueHandler);
                 }
             }
         }

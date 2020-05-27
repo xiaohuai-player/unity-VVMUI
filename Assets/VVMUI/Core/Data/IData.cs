@@ -2,8 +2,9 @@
 
 namespace VVMUI.Core.Data {
 	public interface IData {
-		event Action ValueChanged;
 		void InvokeValueChanged ();
+		void AddValueChangedListener (Action handler);
+		void RemoveValueChangedListener (Action handler);
 		Type GetDataType ();
 		ISetValue Setter { get; }
 		IGetValue Getter { get; }

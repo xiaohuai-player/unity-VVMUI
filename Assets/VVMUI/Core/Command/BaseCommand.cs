@@ -8,13 +8,20 @@ namespace VVMUI.Core.Command {
         protected Func<object, bool> _canExecuteHandler;
         protected Action<object> _noArgExecuteHandler;
         protected VMBehaviour _vm;
-
-        public event Action CanExecuteChanged;
+        private List<Action> _canExecuteChangedHandlers = new List<Action> ();
 
         public void NotifyCanExecute () {
-            if (CanExecuteChanged != null) {
-                CanExecuteChanged.Invoke ();
+            for (int i = 0; i < _canExecuteChangedHandlers.Count; i++) {
+                _canExecuteChangedHandlers[i].Invoke ();
             }
+        }
+
+        public void AddCanExecuteChangedListener (Action handler) {
+            _canExecuteChangedHandlers.Add (handler);
+        }
+
+        public void RemoveCanExecuteChangedListener (Action handler) {
+            _canExecuteChangedHandlers.Remove (handler);
         }
 
         public void BindVM (VMBehaviour vm) {

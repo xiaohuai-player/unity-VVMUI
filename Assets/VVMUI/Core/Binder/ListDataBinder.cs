@@ -206,7 +206,7 @@ namespace VVMUI.Core.Binder {
             }
 
             if (this.sourceData != null) {
-                (this.sourceData as IData).ValueChanged -= SetDirty;
+                (this.sourceData as IData).RemoveValueChangedListener (SetDirty);
                 this.sourceData.FocusIndexChanged -= FocusIndexChanged;
                 this.sourceData = null;
                 this.vm = null;
@@ -219,7 +219,7 @@ namespace VVMUI.Core.Binder {
                 Destroy (this.transform.GetChild (i).gameObject);
             }
 
-            (this.sourceData as IData).ValueChanged += SetDirty;
+            (this.sourceData as IData).AddValueChangedListener (SetDirty);
             this.sourceData.FocusIndexChanged += FocusIndexChanged;
 
             this.SetDirty (true);

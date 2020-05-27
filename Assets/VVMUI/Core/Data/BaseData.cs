@@ -17,12 +17,20 @@ namespace VVMUI.Core.Data {
         [SerializeField]
         private T _value;
 
-        public event Action ValueChanged;
+        private List<Action> _valueChangedHandlers = new List<Action> ();
 
         public void InvokeValueChanged () {
-            if (ValueChanged != null) {
-                ValueChanged.Invoke ();
+            for (int i = 0; i < _valueChangedHandlers.Count; i++) {
+                _valueChangedHandlers[i].Invoke ();
             }
+        }
+
+        public void AddValueChangedListener (Action handler) {
+            _valueChangedHandlers.Add (handler);
+        }
+
+        public void RemoveValueChangedListener (Action handler) {
+            _valueChangedHandlers.Remove (handler);
         }
 
         public Type GetDataType () {

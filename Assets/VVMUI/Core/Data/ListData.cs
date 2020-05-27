@@ -50,11 +50,17 @@ namespace VVMUI.Core.Data {
         }
 
         // 列表数据结构，在列表项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
-        public event Action ValueChanged;
+        private List<Action> _valueChangedHandlers = new List<Action> ();
         public void InvokeValueChanged () {
-            if (ValueChanged != null) {
-                ValueChanged.Invoke ();
+            for (int i = 0; i < _valueChangedHandlers.Count; i++) {
+                _valueChangedHandlers[i].Invoke ();
             }
+        }
+        public void AddValueChangedListener (Action handler) {
+            _valueChangedHandlers.Add (handler);
+        }
+        public void RemoveValueChangedListener (Action handler) {
+            _valueChangedHandlers.Remove (handler);
         }
 
         // 列表数据结构，在列表项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged

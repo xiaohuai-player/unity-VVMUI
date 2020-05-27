@@ -38,12 +38,21 @@ namespace VVMUI.Core.Data {
 		}
 
 		// 字典数据结构，在字典项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
-		public event Action ValueChanged;
-		public void InvokeValueChanged () {
-			if (ValueChanged != null) {
-				ValueChanged.Invoke ();
-			}
-		}
+        private List<Action> _valueChangedHandlers = new List<Action> ();
+
+        public void InvokeValueChanged () {
+            for (int i = 0; i < _valueChangedHandlers.Count; i++) {
+                _valueChangedHandlers[i].Invoke ();
+            }
+        }
+
+        public void AddValueChangedListener (Action handler) {
+            _valueChangedHandlers.Add (handler);
+        }
+
+        public void RemoveValueChangedListener (Action handler) {
+            _valueChangedHandlers.Remove (handler);
+        }
 
 		// 字典数据结构，在字典项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
 		public Dictionary<string, List<Action>> ItemValueChanged = new Dictionary<string, List<Action>> ();
