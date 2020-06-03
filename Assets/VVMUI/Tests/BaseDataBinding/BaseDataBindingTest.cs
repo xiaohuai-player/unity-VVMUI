@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace VVMUI.Core.Test {
 	public class BaseDataBindingTest : IPrebuildSetup {
 		public void Setup () {
-			GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject> ("Assets/VVMUI/Core/Tests/BaseDataBinding/BaseDataBindingTestCanvas.prefab");
+			GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject> ("Assets/VVMUI/Tests/BaseDataBinding/BaseDataBindingTestCanvas.prefab");
 			GameObject obj = GameObject.Instantiate (prefab);
 			obj.name = "BaseDataBindingTestCanvas";
 		}
