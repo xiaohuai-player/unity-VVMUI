@@ -14,6 +14,7 @@ namespace VVMUI.Core.Binder {
         public GameObject Template;
 
         public bool Optimize = false;
+        public Canvas Canvas = null;
         public RectTransform ViewPort = null;
         public ScrollRect ScrollRect = null;
         public LayoutGroup LayoutGroup = null;
@@ -38,6 +39,9 @@ namespace VVMUI.Core.Binder {
         protected override void OnValidate () {
             base.OnValidate ();
 
+            if (Canvas == null) {
+                Canvas = this.transform.GetComponentInParent<Canvas> ();
+            }
             if (ViewPort == null && this.transform.parent != null) {
                 ViewPort = this.transform.parent as RectTransform;
             }
@@ -88,7 +92,7 @@ namespace VVMUI.Core.Binder {
         }
 
         private bool IsOptimizeLayout () {
-            return this.Optimize && this.Template != null && this.ScrollRect != null && this.ViewPort != null && this.LayoutGroup != null;
+            return this.Optimize && this.Template != null && this.ScrollRect != null && this.ViewPort != null && this.LayoutGroup != null && this.Canvas != null;
         }
 
         protected override void Awake () {
@@ -110,6 +114,25 @@ namespace VVMUI.Core.Binder {
             });
         }
 
+        private static Rect GetRectOfTransformInCanvas (RectTransform transform, Canvas canvas) {
+            Vector2[] cornersInCanvans = new Vector2[4];
+            Vector3[] corners = new Vector3[4];
+            transform.GetWorldCorners (corners);
+
+            Camera camera = canvas.worldCamera;
+            for (int i = 0; i < corners.Length; i++) {
+                if (camera != null) {
+                    corners[i] = camera.WorldToScreenPoint (corners[i]);
+                }
+                Vector2 pos;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle (canvas.transform as RectTransform, corners[i], canvas.worldCamera, out pos);
+                cornersInCanvans[i] = pos;
+            }
+
+            Rect rect = new Rect (cornersInCanvans[0], new Vector2 (cornersInCanvans[2].x - cornersInCanvans[1].x, cornersInCanvans[1].y - cornersInCanvans[0].y));
+            return rect;
+        }
+
         private void CalculateDisplayRange () {
             if (this.sourceData == null || !this.IsOptimizeLayout () || this.transform.childCount <= 0) {
                 return;
@@ -119,14 +142,19 @@ namespace VVMUI.Core.Binder {
                 return;
             }
 
+            // RectTransform.rect 不是准确的区域，自行实现通过四个角的坐标换算出真实的区域
+
             Rect viewportRect, firstChildRect, lastChildRect;
-            viewportRect = new Rect (ViewPort.rect.x + ViewPort.position.x, ViewPort.rect.y + ViewPort.position.y, ViewPort.rect.width, ViewPort.rect.height);
+            // viewportRect = new Rect (ViewPort.rect.x + ViewPort.position.x, ViewPort.rect.y + ViewPort.position.y, ViewPort.rect.width, ViewPort.rect.height);
+            viewportRect = GetRectOfTransformInCanvas (ViewPort, Canvas);
 
             RectTransform firstChild = this.transform.GetChild (0) as RectTransform;
-            firstChildRect = new Rect (firstChild.rect.x + firstChild.position.x, firstChild.rect.y + firstChild.position.y, firstChild.rect.width, firstChild.rect.height);
+            // firstChildRect = new Rect (firstChild.rect.x + firstChild.position.x, firstChild.rect.y + firstChild.position.y, firstChild.rect.width, firstChild.rect.height);
+            firstChildRect = GetRectOfTransformInCanvas (firstChild, Canvas);
 
             RectTransform lastChild = this.transform.GetChild (this.transform.childCount - 1) as RectTransform;
-            lastChildRect = new Rect (lastChild.rect.x + lastChild.position.x, lastChild.rect.y + lastChild.position.y, lastChild.rect.width, lastChild.rect.height);
+            // lastChildRect = new Rect (lastChild.rect.x + lastChild.position.x, lastChild.rect.y + lastChild.position.y, lastChild.rect.width, lastChild.rect.height);
+            lastChildRect = GetRectOfTransformInCanvas (lastChild, Canvas);
 
             int stepCount = PageItemsCount / 2;
 

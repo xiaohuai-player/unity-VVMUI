@@ -16,6 +16,8 @@ public class TestSelectable : VMBehaviour {
 	public ButtonCommand btnTest2;
 	public FloatCommand sliderTest;
 
+	public FloatData sliderValue;
+
 	protected override void BeforeAwake () {
 		int selectTabIndex = 0;
 		this.AddCommand ("btnTest", new ButtonCommand (
