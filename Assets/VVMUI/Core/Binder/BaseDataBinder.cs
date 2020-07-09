@@ -24,7 +24,7 @@ namespace VVMUI.Core.Binder {
             public DataDefiner Definer = new DataDefiner ();
 
             // property bind vars
-            public UIBehaviour Component;
+            public Component Component;
             public string Property;
             private Type componentType;
             private PropertyInfo propertyInfo;
