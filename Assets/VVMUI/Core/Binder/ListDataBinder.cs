@@ -284,8 +284,8 @@ namespace VVMUI.Core.Binder {
                 return;
             }
 
-            this.dirty = true;
             if (this.isActiveAndEnabled) {
+                this.dirty = true;
                 StartCoroutine (DelayArrange (resetIndex));
             }
         }
