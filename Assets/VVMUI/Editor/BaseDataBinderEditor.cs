@@ -45,6 +45,7 @@ public class BaseDataBinderEditor : Editor
                                 typeDatas[gTypes[0]] = new List<string>();
                             }
                             typeDatas[gTypes[0]].Add(fi.Name);
+                            datas[fi.Name] = gTypes[0];
                         }
                     }
                 }
@@ -152,10 +153,17 @@ public class BaseDataBinderEditor : Editor
                             {
                                 PropertyInfo property = properties[j];
                                 MethodInfo setMethod = property.GetSetMethod();
-                                if (BaseData.SupportDataType.Contains(property.PropertyType) && setMethod != null && setMethod.IsPublic)
+                                if (setMethod != null && setMethod.IsPublic)
                                 {
-                                    propertiesStr.Add(property.Name);
-                                    propertiesType.Add(property.PropertyType);
+                                    foreach (Type t in BaseData.SupportDataType)
+                                    {
+                                        if (property.PropertyType.IsAssignableFrom(t))
+                                        {
+                                            propertiesStr.Add(property.Name);
+                                            propertiesType.Add(property.PropertyType);
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -192,10 +200,15 @@ public class BaseDataBinderEditor : Editor
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Key:");
                 List<string> datasStr = new List<string>();
-                if (dataType != null && typeDatas.ContainsKey(dataType))
-                {
-                    datasStr.AddRange(typeDatas[dataType].ToArray());
+                foreach(KeyValuePair<string, Type> kv in datas){
+                    if(dataType.IsAssignableFrom(kv.Value)){
+                        datasStr.Add(kv.Key);
+                    }
                 }
+                // if (dataType != null && typeDatas.ContainsKey(dataType))
+                // {
+                //     datasStr.AddRange(typeDatas[dataType].ToArray());
+                // }
                 int dataIndex = datasStr.IndexOf(item.Definer.Key);
                 dataIndex = EditorGUILayout.Popup(dataIndex, datasStr.ToArray(), GUILayout.MinWidth(20), GUILayout.MaxWidth(150));
                 if (datasStr.Count > 0 && dataIndex >= 0 && dataIndex < datasStr.Count)
