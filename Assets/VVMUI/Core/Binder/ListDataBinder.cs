@@ -142,6 +142,13 @@ namespace VVMUI.Core.Binder
             this.SetDirty(true);
         }
 
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+
+            this.dirty = false;
+        }
+
         private static Rect GetRectOfTransformInCanvas(RectTransform transform, Canvas canvas)
         {
             Vector2[] cornersInCanvans = new Vector2[4];
