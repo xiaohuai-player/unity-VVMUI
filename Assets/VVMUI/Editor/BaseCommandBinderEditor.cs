@@ -29,7 +29,7 @@ public class BaseCommandBinderEditor : Editor {
             }
         }
 
-        Selectable component = binder.GetBindComponent ();
+        Component component = binder.GetBindComponent ();
         if (component == null) {
             GUILayout.Label ("No bind component.", EditorStyles.boldLabel);
             return;

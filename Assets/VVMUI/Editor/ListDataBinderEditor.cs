@@ -51,6 +51,5 @@ public class ListDataBinderEditor : Editor {
 			EditorGUILayout.IntField ("PageItemsCount:", binder.PageItemsCount);
 			EditorGUI.EndDisabledGroup ();
 		}
-		Debug.Log (datas);
 	}
 }
