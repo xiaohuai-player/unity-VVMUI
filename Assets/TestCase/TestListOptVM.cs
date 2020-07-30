@@ -60,11 +60,18 @@ public class TestListOptVM : VMBehaviour
         items.FocusIndex = items.Count - 1;
     }
 
+    public Vector2Command ScrollRectValueChanged;
+    public void ScrollRectValueChanged_Execute(Vector2 value, object param)
+    {
+        Debug.Log(value);
+    }
+
     protected override void BeforeAwake()
     {
         BtnFocusFirst = new ButtonCommand(BtnFocusFirst_CanExecute, BtnFocusFirst_Execute);
         BtnFocusMiddle = new ButtonCommand(BtnFocusMiddle_CanExecute, BtnFocusMiddle_Execute);
         BtnFocusLast = new ButtonCommand(BtnFocusLast_CanExecute, BtnFocusLast_Execute);
+        ScrollRectValueChanged = new Vector2Command(null, ScrollRectValueChanged_Execute);
     }
 
     protected override void BeforeActive()

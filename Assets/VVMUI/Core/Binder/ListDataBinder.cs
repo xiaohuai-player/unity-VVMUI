@@ -443,6 +443,11 @@ namespace VVMUI.Core.Binder
                 return;
             }
 
+            if (this.sourceData == null)
+            {
+                return;
+            }
+
             RectTransform rectTransform = this.transform as RectTransform;
             HorizontalLayoutGroup hLayout = this.LayoutGroup as HorizontalLayoutGroup;
             VerticalLayoutGroup vLayout = this.LayoutGroup as VerticalLayoutGroup;

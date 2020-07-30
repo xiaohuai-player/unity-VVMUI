@@ -87,9 +87,9 @@ namespace VVMUI.Core.Data {
 
                 if (objv != null) {
                     if (isList) {
-                        (objv as IListData).Parse (datav);
+                        (objv as IListData).ParseObject (datav);
                     } else if (isDict) {
-                        (objv as IDictionaryData).Parse (datav);
+                        (objv as IDictionaryData).ParseObject (datav);
                     } else if (isStruct) {
                         (objv as StructData).Parse (datav);
                     } else if (isBase) {

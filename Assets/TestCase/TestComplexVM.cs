@@ -124,12 +124,19 @@ public class TestComplexVM : VMBehaviour {
                 }
             }
         };
-        friends.Parse(fs);
+        friends.Parse(fs, delegate(FriendData item, object data){
+            Debug.Log("List parse " + item.Name.Get() + " " + (data as Friend).Name);
+        });
+        friends = ListData.Parse<FriendData>(fs, delegate(FriendData item, object data){
+            Debug.Log("List static parse " + item.Name.Get() + " " + (data as Friend).Name);
+        });
 
         Dictionary<string, Friend> dictFs = new Dictionary<string, Friend>(){
             { "lm",  fs[0]},
             { "hmm", fs[1]}
         };
-        testDictFriend = DictionaryData.Parse<FriendData>(dictFs);
+        testDictFriend = DictionaryData.Parse<FriendData>(dictFs, delegate(FriendData item, object data){
+            Debug.Log("Dictionary parse " + item.Name.Get() + " " + (data as Friend).Name);
+        });
     }
 }
