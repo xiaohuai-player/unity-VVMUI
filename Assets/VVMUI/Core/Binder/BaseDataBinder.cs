@@ -135,6 +135,11 @@ namespace VVMUI.Core.Binder
                     propertyType = propertyInfo.PropertyType;
                 }
 
+                if (!BaseData.SupportDataType.Contains(propertyType))
+                {
+                    return;
+                }
+
                 if (!CheckDataTypeValid(propertyType, obj))
                 {
                     return;

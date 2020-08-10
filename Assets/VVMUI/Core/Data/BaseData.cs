@@ -8,7 +8,7 @@ namespace VVMUI.Core.Data
 {
     public sealed class BaseData
     {
-        public static readonly List<Type> SupportDataType = new List<Type>() { 
+        public static readonly List<Type> SupportDataType = new List<Type>() {
             typeof(bool),
             typeof(Color),
             typeof(double),
@@ -21,6 +21,8 @@ namespace VVMUI.Core.Data
             typeof(Vector2),
             typeof(Vector3)
         };
+
+        //TODO 需要硬写支持绑定的组件类型
     }
 
     public abstract class BaseData<T> : IData<T>, IData
@@ -85,7 +87,7 @@ namespace VVMUI.Core.Data
                     MethodInfo setMethod = dataType.GetMethod("Set");
                     if (setMethod != null)
                     {
-                        _setter = SetterWrapper.CreateMethodSetterWrapper(setMethod);
+                        _setter = SetterWrapper.CreateMethodSetterWrapper<BaseData<T>, T>(setMethod);
                     }
                 }
                 return _setter;
@@ -103,7 +105,7 @@ namespace VVMUI.Core.Data
                     MethodInfo getMethod = dataType.GetMethod("Get");
                     if (getMethod != null)
                     {
-                        _getter = GetterWrapper.CreateMethodGetterWrapper(getMethod);
+                        _getter = GetterWrapper.CreateMethodGetterWrapper<BaseData<T>, T>(getMethod);
                     }
                 }
                 return _getter;

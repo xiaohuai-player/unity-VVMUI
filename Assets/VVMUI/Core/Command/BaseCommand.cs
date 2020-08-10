@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 
 namespace VVMUI.Core.Command {
+
+    //TODO 需要硬写支持绑定的组件类型
+    
     public abstract class BaseCommand : ICommand {
         protected Func<object, bool> _canExecuteHandler;
         protected Action<object> _noArgExecuteHandler;

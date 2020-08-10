@@ -148,11 +148,13 @@ namespace VVMUI.Core.Binder
 
             this.dirty = false;
         }
-
+        
+        private static Vector2[] cornersInCanvans = new Vector2[4];
+        private static Vector3[] corners = new Vector3[4];
         private static Rect GetRectOfTransformInCanvas(RectTransform transform, Canvas canvas)
         {
-            Vector2[] cornersInCanvans = new Vector2[4];
-            Vector3[] corners = new Vector3[4];
+            // Vector2[] cornersInCanvans = new Vector2[4];
+            // Vector3[] corners = new Vector3[4];
             transform.GetWorldCorners(corners);
 
             Camera camera = canvas.worldCamera;

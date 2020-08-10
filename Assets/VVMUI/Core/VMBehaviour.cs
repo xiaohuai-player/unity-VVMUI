@@ -3,11 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Scripting;
 using UnityEngine.EventSystems;
 using VVMUI.Core.Binder;
 using VVMUI.Core.Command;
 using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
+
+[assembly:Preserve]
 
 namespace VVMUI.Core {
 	public class VMBehaviour : UIBehaviour {

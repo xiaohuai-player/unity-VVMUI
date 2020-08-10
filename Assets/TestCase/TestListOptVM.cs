@@ -63,7 +63,6 @@ public class TestListOptVM : VMBehaviour
     public Vector2Command ScrollRectValueChanged;
     public void ScrollRectValueChanged_Execute(Vector2 value, object param)
     {
-        Debug.Log(value);
     }
 
     protected override void BeforeAwake()

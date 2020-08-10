@@ -25,7 +25,11 @@ public class TestComplexVM : VMBehaviour {
     }
 
     public class Friend {
-        public string Name;
+        public string Name {
+            get{
+                return "name from property";
+            }
+        }
         public int Age;
         public bool IsOnline;
         public Body Body;
@@ -83,7 +87,7 @@ public class TestComplexVM : VMBehaviour {
         btnDelFriend = new ButtonCommand (btnDelFriend_CanExecute, btnDelFriend_Execute);
 
         Friend f = new Friend () {
-            Name = "testabc",
+            // Name = "testabc",
             Age = 12,
             IsOnline = false,
             Body = new Body () {
@@ -100,7 +104,7 @@ public class TestComplexVM : VMBehaviour {
 
         List<Friend> fs = new List<Friend>(){
             new Friend(){
-                Name = "李明",
+                // Name = "李明",
                 Age = 15,
                 IsOnline = false,
                 Body = new Body () {
@@ -112,7 +116,7 @@ public class TestComplexVM : VMBehaviour {
                 }
             },
             new Friend(){
-                Name = "韩梅梅",
+                // Name = "韩梅梅",
                 Age = 12,
                 IsOnline = false,
                 Body = new Body () {
