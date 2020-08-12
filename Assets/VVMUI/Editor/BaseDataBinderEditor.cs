@@ -194,52 +194,58 @@ public class BaseDataBinderEditor : Editor
                         break;
                 }
 
-                EditorGUILayout.LabelField("Definder:");
-                EditorGUI.indentLevel = 1;
+                if (dataType != null)
+                {
 
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Key:");
-                List<string> datasStr = new List<string>();
-                foreach(KeyValuePair<string, Type> kv in datas){
-                    if(dataType.IsAssignableFrom(kv.Value)){
-                        datasStr.Add(kv.Key);
+                    EditorGUILayout.LabelField("Definder:");
+                    EditorGUI.indentLevel = 1;
+
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("Key:");
+                    List<string> datasStr = new List<string>();
+                    foreach (KeyValuePair<string, Type> kv in datas)
+                    {
+                        if (dataType.IsAssignableFrom(kv.Value))
+                        {
+                            datasStr.Add(kv.Key);
+                        }
                     }
-                }
-                // if (dataType != null && typeDatas.ContainsKey(dataType))
-                // {
-                //     datasStr.AddRange(typeDatas[dataType].ToArray());
-                // }
-                int dataIndex = datasStr.IndexOf(item.Definer.Key);
-                dataIndex = EditorGUILayout.Popup(dataIndex, datasStr.ToArray(), GUILayout.MinWidth(20), GUILayout.MaxWidth(150));
-                if (datasStr.Count > 0 && dataIndex >= 0 && dataIndex < datasStr.Count)
-                {
-                    item.Definer.Key = datasStr[dataIndex];
-                }
-                item.Definer.Key = EditorGUILayout.DelayedTextField(item.Definer.Key, GUILayout.MaxWidth(150));
-                EditorGUILayout.EndHorizontal();
+                    // if (dataType != null && typeDatas.ContainsKey(dataType))
+                    // {
+                    //     datasStr.AddRange(typeDatas[dataType].ToArray());
+                    // }
+                    int dataIndex = datasStr.IndexOf(item.Definer.Key);
+                    dataIndex = EditorGUILayout.Popup(dataIndex, datasStr.ToArray(), GUILayout.MinWidth(20), GUILayout.MaxWidth(150));
+                    if (datasStr.Count > 0 && dataIndex >= 0 && dataIndex < datasStr.Count)
+                    {
+                        item.Definer.Key = datasStr[dataIndex];
+                    }
+                    item.Definer.Key = EditorGUILayout.DelayedTextField(item.Definer.Key, GUILayout.MaxWidth(150));
+                    EditorGUILayout.EndHorizontal();
 
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Converter:");
-                int converterIndex = converters.IndexOf(item.Definer.Converter);
-                converterIndex = EditorGUILayout.Popup(converterIndex, converters.ToArray(), GUILayout.MinWidth(20), GUILayout.MaxWidth(150));
-                if (converters.Count > 0 && converterIndex >= 0 && converterIndex < converters.Count)
-                {
-                    item.Definer.Converter = converters[converterIndex];
-                }
-                item.Definer.Converter = EditorGUILayout.DelayedTextField(item.Definer.Converter, GUILayout.MaxWidth(150));
-                EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("Converter:");
+                    int converterIndex = converters.IndexOf(item.Definer.Converter);
+                    converterIndex = EditorGUILayout.Popup(converterIndex, converters.ToArray(), GUILayout.MinWidth(20), GUILayout.MaxWidth(150));
+                    if (converters.Count > 0 && converterIndex >= 0 && converterIndex < converters.Count)
+                    {
+                        item.Definer.Converter = converters[converterIndex];
+                    }
+                    item.Definer.Converter = EditorGUILayout.DelayedTextField(item.Definer.Converter, GUILayout.MaxWidth(150));
+                    EditorGUILayout.EndHorizontal();
 
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("ConverterParameter:");
-                item.Definer.ConverterParameter = EditorGUILayout.TextField(item.Definer.ConverterParameter);
-                EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("ConverterParameter:");
+                    item.Definer.ConverterParameter = EditorGUILayout.TextField(item.Definer.ConverterParameter);
+                    EditorGUILayout.EndHorizontal();
 
-                EditorGUI.indentLevel = 0;
+                    EditorGUI.indentLevel = 0;
 
-                if (GUILayout.Button("Del"))
-                {
-                    binder.BindItems.RemoveAt(i);
-                    itemsExpand.RemoveAt(i);
+                    if (GUILayout.Button("Del"))
+                    {
+                        binder.BindItems.RemoveAt(i);
+                        itemsExpand.RemoveAt(i);
+                    }
                 }
             }
         }

@@ -17,7 +17,7 @@ namespace VVMUI.Core.Data
             typeof(long),
             typeof(Sprite),
             typeof(string),
-            typeof(Texture2D),
+            typeof(Texture),
             typeof(Vector2),
             typeof(Vector3)
         };

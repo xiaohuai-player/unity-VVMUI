@@ -97,8 +97,6 @@ namespace VVMUI.Core.Data
             if (mi.GetParameters().Length > 1)
                 throw new NotSupportedException("不支持构造索引器属性的委托。");
 
-            Debugger.Log("test", propertyInfo.DeclaringType.ToString());
-
             Type instanceType = typeof(SetterWrapper<,>).MakeGenericType(propertyInfo.DeclaringType, propertyInfo.PropertyType);
             setter = (ISetValue)Activator.CreateInstance(instanceType, propertyInfo);
             _propertySettersCache[propertyInfo] = setter;
