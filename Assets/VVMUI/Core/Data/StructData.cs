@@ -1,7 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 
 namespace VVMUI.Core.Data
 {
@@ -28,7 +28,10 @@ namespace VVMUI.Core.Data
                     if (data != null)
                     {
                         _allData[fields[i].Name] = data;
-                        data.AddValueChangedListener(this.InvokeValueChanged);
+                        data.AddValueChangedListener(delegate (IData source)
+                        {
+                            this.InvokeValueChanged();
+                        });
                     }
                 }
             }
@@ -36,19 +39,19 @@ namespace VVMUI.Core.Data
             _fieldsInit = true;
         }
 
-        private List<Action> _valueChangedHandlers = new List<Action>();
+        private List<DataChangedHandler> _valueChangedHandlers = new List<DataChangedHandler>();
         public void InvokeValueChanged()
         {
             for (int i = 0; i < _valueChangedHandlers.Count; i++)
             {
-                _valueChangedHandlers[i].Invoke();
+                _valueChangedHandlers[i].Invoke(this);
             }
         }
-        public void AddValueChangedListener(Action handler)
+        public void AddValueChangedListener(DataChangedHandler handler)
         {
             _valueChangedHandlers.Add(handler);
         }
-        public void RemoveValueChangedListener(Action handler)
+        public void RemoveValueChangedListener(DataChangedHandler handler)
         {
             _valueChangedHandlers.Remove(handler);
         }
@@ -76,6 +79,30 @@ namespace VVMUI.Core.Data
         public Type GetDataType()
         {
             return typeof(object);
+        }
+
+        public void CopyFrom(IData data)
+        {
+            if (!this.GetType().IsAssignableFrom(data.GetType()))
+            {
+                Debug.Log("can not copy data with not the same type");
+                return;
+            }
+
+            StructData strct = (StructData)data;
+            if (strct == null)
+            {
+                Debug.Log("can not copy data with not the same type");
+                return;
+            }
+
+            foreach (KeyValuePair<string, IData> kv in strct.Fields)
+            {
+                if (this[kv.Key] != null)
+                {
+                    this[kv.Key].CopyFrom(kv.Value);
+                }
+            }
         }
 
         private class ParseStruct
@@ -140,7 +167,7 @@ namespace VVMUI.Core.Data
 
                 bool isList = objfi.FieldType.IsGenericType && objfi.FieldType.GetGenericTypeDefinition() == typeof(ListData<>);
                 bool isDict = objfi.FieldType.IsGenericType && objfi.FieldType.GetGenericTypeDefinition() == typeof(DictionaryData<>);
-                bool isStruct = objfi.FieldType.BaseType == typeof(StructData);
+                bool isStruct = typeof(StructData).IsAssignableFrom(objfi.FieldType);
                 bool isBase = objfi.FieldType.BaseType.IsGenericType && objfi.FieldType.BaseType.GetGenericTypeDefinition() == typeof(BaseData<>) && objfi.FieldType.BaseType.GetGenericArguments()[0] == parseStruct.Type;
 
                 object objv = objfi.GetValue(this);

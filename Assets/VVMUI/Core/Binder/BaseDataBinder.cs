@@ -45,7 +45,7 @@ namespace VVMUI.Core.Binder
             public IConverter Converter;
 
             [HideInInspector]
-            public Action SetValueHandler;
+            public DataChangedHandler SetValueHandler;
 
             [HideInInspector]
             public object ValueChangedHandler;
@@ -157,7 +157,7 @@ namespace VVMUI.Core.Binder
                     return;
                 }
 
-                this.SetValueHandler = delegate ()
+                this.SetValueHandler = delegate (IData source)
                 {
                     object value = sourceGetter.Get(this.Source);
                     if (this.Converter != null)
@@ -167,7 +167,7 @@ namespace VVMUI.Core.Binder
                     propertySetter.Set(this.Component, value);
 
                     // ToggleGroup 特殊处理
-                    if (componentType == typeof(Toggle) && this.Property.Equals("isOn"))
+                    if (typeof(Toggle).IsAssignableFrom(componentType) && this.Property.Equals("isOn"))
                     {
                         Toggle t = this.Component as Toggle;
                         if (t.group != null && t.isOn)
@@ -181,10 +181,10 @@ namespace VVMUI.Core.Binder
                     }
                 };
                 this.Source.AddValueChangedListener(this.SetValueHandler);
-                this.SetValueHandler.Invoke();
+                this.SetValueHandler.Invoke(this.Source);
 
                 // 可交互组件的双向绑定
-                if (componentType == typeof(Toggle) && this.Property.Equals("isOn"))
+                if (typeof(Toggle).IsAssignableFrom(componentType) && this.Property.Equals("isOn"))
                 {
                     this.ValueChangedHandler = new UnityAction<bool>(delegate (bool arg)
                     {
@@ -200,7 +200,7 @@ namespace VVMUI.Core.Binder
                     });
                     (this.Component as Toggle).onValueChanged.AddListener((UnityAction<bool>)this.ValueChangedHandler);
                 }
-                if (componentType == typeof(InputField) && this.Property.Equals("text"))
+                if (typeof(InputField).IsAssignableFrom(componentType) && this.Property.Equals("text"))
                 {
                     this.ValueChangedHandler = new UnityAction<string>(delegate (string arg)
                     {
@@ -216,7 +216,7 @@ namespace VVMUI.Core.Binder
                     });
                     (this.Component as InputField).onValueChanged.AddListener((UnityAction<string>)this.ValueChangedHandler);
                 }
-                if (componentType == typeof(Dropdown) && this.Property.Equals("value"))
+                if (typeof(Dropdown).IsAssignableFrom(componentType) && this.Property.Equals("value"))
                 {
                     this.ValueChangedHandler = new UnityAction<int>(delegate (int arg)
                     {
@@ -232,7 +232,7 @@ namespace VVMUI.Core.Binder
                     });
                     (this.Component as Dropdown).onValueChanged.AddListener((UnityAction<int>)this.ValueChangedHandler);
                 }
-                if (componentType == typeof(Slider) && this.Property.Equals("value"))
+                if (typeof(Slider).IsAssignableFrom(componentType) && this.Property.Equals("value"))
                 {
                     this.ValueChangedHandler = new UnityAction<float>(delegate (float arg)
                     {
@@ -259,7 +259,7 @@ namespace VVMUI.Core.Binder
                 }
 
                 IGetValue sourceGetter = this.Source.Getter;
-                this.SetValueHandler = delegate ()
+                this.SetValueHandler = delegate (IData source)
                 {
                     object value = sourceGetter.Get(this.Source);
                     if (this.Converter != null)
@@ -269,7 +269,7 @@ namespace VVMUI.Core.Binder
                     obj.SetActive((bool)value);
                 };
                 this.Source.AddValueChangedListener(this.SetValueHandler);
-                this.SetValueHandler.Invoke();
+                this.SetValueHandler.Invoke(this.Source);
             }
 
             private void DoAnimationBind(VMBehaviour vm, GameObject obj)
@@ -288,7 +288,7 @@ namespace VVMUI.Core.Binder
                 }
 
                 IGetValue sourceGetter = this.Source.Getter;
-                this.SetValueHandler = delegate ()
+                this.SetValueHandler = delegate (IData source)
                 {
                     object value = sourceGetter.Get(this.Source);
                     if (this.Converter != null)
@@ -303,7 +303,7 @@ namespace VVMUI.Core.Binder
                     }
                 };
                 this.Source.AddValueChangedListener(this.SetValueHandler);
-                this.SetValueHandler.Invoke();
+                this.SetValueHandler.Invoke(this.Source);
             }
 
             private void DoAnimatorBind(VMBehaviour vm, GameObject obj)
@@ -322,7 +322,7 @@ namespace VVMUI.Core.Binder
                 }
 
                 IGetValue sourceGetter = this.Source.Getter;
-                this.SetValueHandler = delegate ()
+                this.SetValueHandler = delegate (IData source)
                 {
                     object value = sourceGetter.Get(this.Source);
                     if (this.Converter != null)
@@ -337,7 +337,7 @@ namespace VVMUI.Core.Binder
                     }
                 };
                 this.Source.AddValueChangedListener(this.SetValueHandler);
-                this.SetValueHandler.Invoke();
+                this.SetValueHandler.Invoke(this.Source);
             }
 
             public void DoUnBind()
@@ -368,19 +368,19 @@ namespace VVMUI.Core.Binder
                 if (this.ValueChangedHandler != null)
                 {
                     Type componentType = this.Component.GetType();
-                    if (componentType == typeof(Toggle) && this.Property.Equals("isOn"))
+                    if (typeof(Toggle).IsAssignableFrom(componentType) && this.Property.Equals("isOn"))
                     {
                         (this.Component as Toggle).onValueChanged.RemoveListener((UnityAction<bool>)this.ValueChangedHandler);
                     }
-                    if (componentType == typeof(InputField) && this.Property.Equals("text"))
+                    if (typeof(InputField).IsAssignableFrom(componentType) && this.Property.Equals("text"))
                     {
                         (this.Component as InputField).onValueChanged.RemoveListener((UnityAction<string>)this.ValueChangedHandler);
                     }
-                    if (componentType == typeof(Dropdown) && this.Property.Equals("value"))
+                    if (typeof(Dropdown).IsAssignableFrom(componentType) && this.Property.Equals("value"))
                     {
                         (this.Component as Dropdown).onValueChanged.RemoveListener((UnityAction<int>)this.ValueChangedHandler);
                     }
-                    if (componentType == typeof(Slider) && this.Property.Equals("value"))
+                    if (typeof(Slider).IsAssignableFrom(componentType) && this.Property.Equals("value"))
                     {
                         (this.Component as Slider).onValueChanged.RemoveListener((UnityAction<float>)this.ValueChangedHandler);
                     }

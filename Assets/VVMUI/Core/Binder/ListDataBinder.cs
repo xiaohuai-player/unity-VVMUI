@@ -148,7 +148,7 @@ namespace VVMUI.Core.Binder
 
             this.dirty = false;
         }
-        
+
         private static Vector2[] cornersInCanvans = new Vector2[4];
         private static Vector3[] corners = new Vector3[4];
         private static Rect GetRectOfTransformInCanvas(RectTransform transform, Canvas canvas)
@@ -292,7 +292,7 @@ namespace VVMUI.Core.Binder
 
             if (this.sourceData != null)
             {
-                (this.sourceData as IData).RemoveValueChangedListener(SetDirty);
+                (this.sourceData as IData).RemoveValueChangedListener(this.SourceDataChanged);
                 this.sourceData.FocusIndexChanged -= FocusIndexChanged;
                 this.sourceData = null;
                 this.vm = null;
@@ -307,7 +307,7 @@ namespace VVMUI.Core.Binder
                 Destroy(this.transform.GetChild(i).gameObject);
             }
 
-            (this.sourceData as IData).AddValueChangedListener(SetDirty);
+            (this.sourceData as IData).AddValueChangedListener(this.SourceDataChanged);
             this.sourceData.FocusIndexChanged += FocusIndexChanged;
 
             this.SetDirty(true);
@@ -316,6 +316,11 @@ namespace VVMUI.Core.Binder
         private void FocusIndexChanged()
         {
             this.SetDirty(true);
+        }
+
+        private void SourceDataChanged(IData source)
+        {
+            this.SetDirty();
         }
 
         private void SetDirty()
@@ -385,8 +390,8 @@ namespace VVMUI.Core.Binder
                 return;
             }
 
-            int start = Mathf.Max(0, startIndex);
-            int end = endIndex >= 0 ? Mathf.Min(endIndex, this.sourceData.Count) : this.sourceData.Count;
+            int start = Mathf.Max(0, this.startIndex);
+            int end = endIndex >= 0 ? Mathf.Min(this.endIndex, this.sourceData.Count) : this.sourceData.Count;
 
             int dataCount = end - start;
             for (int i = 0; i < this.transform.childCount; i++)
@@ -439,6 +444,11 @@ namespace VVMUI.Core.Binder
 
         private void SetFocus()
         {
+            if (!IsOptimizeLayout())
+            {
+                return;
+            }
+
             RectTransform templateRectTransform = this.Template.transform as RectTransform;
             if (templateRectTransform == null)
             {

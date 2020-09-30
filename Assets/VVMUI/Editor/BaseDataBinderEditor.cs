@@ -28,7 +28,7 @@ public class BaseDataBinderEditor : Editor
             {
                 FieldInfo fi = fields[i];
                 Type t = fi.FieldType;
-                if (t.GetInterface("IData") != null || t.BaseType == typeof(StructData))
+                if (t.GetInterface("IData") != null || typeof(StructData).IsAssignableFrom(t))
                 {
                     datas[fi.Name] = t.BaseType;
                 }

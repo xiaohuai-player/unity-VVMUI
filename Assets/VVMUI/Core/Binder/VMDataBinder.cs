@@ -1,103 +1,138 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
-using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
 
-namespace VVMUI.Core.Binder {
-    public class VMDataBinder : AbstractDataBinder {
+namespace VVMUI.Core.Binder
+{
+    public class VMDataBinder : AbstractDataBinder
+    {
         public DataDefiner Source;
         public GameObject Template;
 
         private StructData sourceData;
-        private VMBehaviour vm;
+
         private GameObject obj;
         private VMBehaviour objVM;
-        private Dictionary<string, IGetValue> getters = new Dictionary<string, IGetValue> ();
-        private Dictionary<string, ISetValue> setters = new Dictionary<string, ISetValue> ();
-        private Dictionary<string, Action> handlers = new Dictionary<string, Action> ();
 
-        public override void Bind (VMBehaviour vm) {
-            if (Source == null) {
-                return;
-            }
+        private Dictionary<IData, DataChangedHandler> handlers = new Dictionary<IData, DataChangedHandler>();
 
-            if (Template == null) {
-                return;
-            }
-
-            this.sourceData = Source.GetData (vm) as StructData;
-            if (this.sourceData == null) {
-                return;
-            }
-
-            this.vm = vm;
-
-            DoBind ();
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            DoBind();
         }
 
-        public override void Bind (VMBehaviour vm, IData data) {
-            if (Source == null) {
-                return;
-            }
-
-            if (Template == null) {
-                return;
-            }
-
-            if (data == null) {
-                return;
-            }
-
-            this.sourceData = Source.GetData (data) as StructData;
-            if (this.sourceData == null) {
-                return;
-            }
-
-            this.vm = vm;
-
-            DoBind ();
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            DoUnBind();
         }
 
-        public override void UnBind () {
-            DoUnBind ();
+        public override void Bind(VMBehaviour vm)
+        {
+            if (Source == null)
+            {
+                return;
+            }
+
+            if (Template == null)
+            {
+                return;
+            }
+
+            this.sourceData = Source.GetData(vm) as StructData;
+            if (this.sourceData == null)
+            {
+                return;
+            }
+
+            DoBind();
         }
 
-        private void DoBind () {
-            this.obj = GameObject.Instantiate (this.Template, this.transform);
-            this.obj.SetActive (true);
-            this.objVM = this.obj.GetComponent<VMBehaviour> ();
+        public override void Bind(VMBehaviour vm, IData data)
+        {
+            if (Source == null)
+            {
+                return;
+            }
 
-            getters.Clear ();
-            setters.Clear ();
-            handlers.Clear ();
-            foreach (KeyValuePair<string, IData> kv in this.sourceData.Fields) {
-                IData dstData = this.objVM.GetData (kv.Key);
+            if (Template == null)
+            {
+                return;
+            }
+
+            if (data == null)
+            {
+                return;
+            }
+
+            this.sourceData = Source.GetData(data) as StructData;
+            if (this.sourceData == null)
+            {
+                return;
+            }
+
+            DoBind();
+        }
+
+        public override void UnBind()
+        {
+            DoUnBind();
+        }
+
+        private void DoBind()
+        {
+            if (!this.isActiveAndEnabled)
+            {
+                return;
+            }
+
+            if (this.Template == null || this.sourceData == null)
+            {
+                return;
+            }
+
+            if (this.obj != null)
+            {
+                Destroy(this.obj);
+            }
+
+            this.obj = GameObject.Instantiate(this.Template, this.transform);
+            this.obj.SetActive(true);
+            this.objVM = this.obj.GetComponent<VMBehaviour>();
+
+            this.handlers.Clear();
+            foreach (KeyValuePair<string, IData> kv in this.sourceData.Fields)
+            {
+                IData dstData = this.objVM.GetData(kv.Key);
                 IData srcData = this.sourceData[kv.Key];
-                if (dstData != null) {
-                    string key = kv.Key;
-                    setters[key] = dstData.Setter;
-                    getters[key] = srcData.Getter;
-
-                    Action handler = delegate () {
-                        setters[key].Set (dstData, getters[key].Get (srcData));
+                if (dstData != null && srcData.GetType().IsAssignableFrom(dstData.GetType()))
+                {
+                    DataChangedHandler handler = delegate (IData src)
+                    {
+                        dstData.CopyFrom(src);
                     };
-                    handlers[key] = handler;
-                    srcData.AddValueChangedListener (handler);
-                    handler.Invoke ();
+                    handler.Invoke(srcData);
+                    srcData.AddValueChangedListener(handler);
+                    this.handlers[srcData] = handler;
                 }
             }
         }
 
-        private void DoUnBind () {
-            foreach (KeyValuePair<string, Action> kv in handlers) {
-                IData srcData = this.sourceData[kv.Key];
-                srcData.RemoveValueChangedListener (kv.Value);
+        private void DoUnBind()
+        {
+            foreach (KeyValuePair<IData, DataChangedHandler> kv in handlers)
+            {
+                if (kv.Key != null)
+                {
+                    kv.Key.RemoveValueChangedListener(kv.Value);
+                }
             }
-            if (this.obj != null) {
-                Destroy (this.obj);
+            this.handlers.Clear();
+
+            if (this.obj != null)
+            {
+                Destroy(this.obj);
             }
         }
     }

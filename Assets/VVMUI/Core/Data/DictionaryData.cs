@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace VVMUI.Core.Data
 {
     public interface IDictionaryData
     {
         IData Get(string key);
-        void InvokeItemValueChanged(string key);
-        void AddItemValueChangedListener(string key, Action h);
-        void RemoveItemValueChangedListener(string key, Action h);
         void ParseObject(object data, Action<object, object> onParseItem = null);
     }
 
     public sealed class DictionaryData
     {
-        public static DictionaryData<T> Parse<T>(object data, Action<T, object> onParseItem = null) where T : IData
+        public static DictionaryData<T> Parse<T>(object data, Action<T, object> onParseItem = null) where T : IData, new()
         {
             DictionaryData<T> obj = new DictionaryData<T>();
             obj.Parse(data, onParseItem);
@@ -36,7 +34,7 @@ namespace VVMUI.Core.Data
         }
     }
 
-    public sealed class DictionaryData<T> : Dictionary<string, T>, IDictionaryData, IData where T : IData
+    public sealed class DictionaryData<T> : Dictionary<string, T>, IDictionaryData, IData where T : IData, new()
     {
         public IData Get(string key)
         {
@@ -48,59 +46,24 @@ namespace VVMUI.Core.Data
             return typeof(T);
         }
 
-        // 字典数据结构，在字典项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
-        private List<Action> _valueChangedHandlers = new List<Action>();
-
+        // 如果是元素内部数据发生改变不能通知到字典数据本身的改变事件
+        private List<DataChangedHandler> _valueChangedHandlers = new List<DataChangedHandler>();
         public void InvokeValueChanged()
         {
             for (int i = 0; i < _valueChangedHandlers.Count; i++)
             {
-                _valueChangedHandlers[i].Invoke();
+                _valueChangedHandlers[i].Invoke(this);
             }
         }
 
-        public void AddValueChangedListener(Action handler)
+        public void AddValueChangedListener(DataChangedHandler handler)
         {
             _valueChangedHandlers.Add(handler);
         }
 
-        public void RemoveValueChangedListener(Action handler)
+        public void RemoveValueChangedListener(DataChangedHandler handler)
         {
             _valueChangedHandlers.Remove(handler);
-        }
-
-        // 字典数据结构，在字典项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
-        public Dictionary<string, List<Action>> ItemValueChanged = new Dictionary<string, List<Action>>();
-        public void InvokeItemValueChanged(string k)
-        {
-            List<Action> handlers = null;
-            if (ItemValueChanged.TryGetValue(k, out handlers) && handlers != null)
-            {
-                for (int j = 0; j < handlers.Count; j++)
-                {
-                    handlers[j].Invoke();
-                }
-            }
-        }
-
-        public void AddItemValueChangedListener(string k, Action h)
-        {
-            List<Action> handlers = null;
-            if (!ItemValueChanged.TryGetValue(k, out handlers))
-            {
-                handlers = new List<Action>();
-                ItemValueChanged[k] = handlers;
-            }
-            handlers.Add(h);
-        }
-
-        public void RemoveItemValueChangedListener(string k, Action h)
-        {
-            List<Action> handlers = null;
-            if (ItemValueChanged.TryGetValue(k, out handlers))
-            {
-                handlers.Remove(h);
-            }
         }
 
         public new T this[string key]
@@ -111,17 +74,8 @@ namespace VVMUI.Core.Data
             }
             set
             {
-                int oldcount = this.Keys.Count;
                 base[key] = value;
-                int newcount = this.Keys.Count;
-                if (newcount > oldcount)
-                {
-                    InvokeValueChanged();
-                }
-                else
-                {
-                    InvokeItemValueChanged(key);
-                }
+                InvokeValueChanged();
             }
         }
 
@@ -147,6 +101,30 @@ namespace VVMUI.Core.Data
             return f;
         }
 
+        public void CopyFrom(IData data)
+        {
+            if (!this.GetType().IsAssignableFrom(data.GetType()))
+            {
+                Debug.Log("can not copy data with not the same type");
+                return;
+            }
+
+            DictionaryData<T> dict = (DictionaryData<T>)data;
+            if (dict == null)
+            {
+                Debug.Log("can not copy data with not the same type");
+                return;
+            }
+
+            this.Clear();
+            foreach (KeyValuePair<string, T> kv in dict)
+            {
+                T obj = new T();
+                obj.CopyFrom(kv.Value);
+                this[kv.Key] = obj;
+            }
+        }
+
         public void ParseObject(object data, Action<object, object> onParseItem = null)
         {
             this.Parse(data, onParseItem as Action<T, object>);
@@ -170,7 +148,7 @@ namespace VVMUI.Core.Data
 
             bool isList = gType.IsGenericType && gType.GetGenericTypeDefinition() == typeof(ListData<>);
             bool isDict = gType.IsGenericType && gType.GetGenericTypeDefinition() == typeof(DictionaryData<>);
-            bool isStruct = gType.BaseType == typeof(StructData);
+            bool isStruct = typeof(StructData).IsAssignableFrom(gType);
             bool isBase = gType.BaseType.IsGenericType && gType.BaseType.GetGenericTypeDefinition() == typeof(BaseData<>) && dType.IsGenericType && gType.BaseType.GetGenericArguments()[0] == dType.GetGenericArguments()[1];
 
             foreach (string key in dict.Keys)

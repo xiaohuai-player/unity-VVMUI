@@ -40,22 +40,22 @@ namespace VVMUI.Core.Data
         [SerializeField]
         private T _value;
 
-        private List<Action> _valueChangedHandlers = new List<Action>();
+        private List<DataChangedHandler> _valueChangedHandlers = new List<DataChangedHandler>();
 
         public void InvokeValueChanged()
         {
             for (int i = 0; i < _valueChangedHandlers.Count; i++)
             {
-                _valueChangedHandlers[i].Invoke();
+                _valueChangedHandlers[i].Invoke(this);
             }
         }
 
-        public void AddValueChangedListener(Action handler)
+        public void AddValueChangedListener(DataChangedHandler handler)
         {
             _valueChangedHandlers.Add(handler);
         }
 
-        public void RemoveValueChangedListener(Action handler)
+        public void RemoveValueChangedListener(DataChangedHandler handler)
         {
             _valueChangedHandlers.Remove(handler);
         }
@@ -74,6 +74,24 @@ namespace VVMUI.Core.Data
         {
             _value = arg;
             InvokeValueChanged();
+        }
+
+        public void CopyFrom(IData data)
+        {
+            if (!this.GetType().IsAssignableFrom(data.GetType()))
+            {
+                Debug.Log("can not copy data with not the same type");
+                return;
+            }
+
+            BaseData<T> d = (BaseData<T>)data;
+            if (d == null)
+            {
+                Debug.Log("can not copy data with not the same type");
+                return;
+            }
+
+            this.Set(d.Get());
         }
 
         private ISetValue _setter;

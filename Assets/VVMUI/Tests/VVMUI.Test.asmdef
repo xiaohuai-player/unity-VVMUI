@@ -1,14 +1,14 @@
 {
     "name": "VVMUI.Test",
     "references": [
-        "GUID:1a817592bda9548eb8c76940134cdc87"
+        "VVMUI.Core"
     ],
+    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": []
+    "defineConstraints": []
 }

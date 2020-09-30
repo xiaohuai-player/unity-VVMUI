@@ -1,15 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace VVMUI.Core.Data
 {
     public interface IListData
     {
         IData GetAt(int index);
-        void InvokeItemValueChanged(int i);
-        void AddItemValueChangedListener(int i, Action h);
-        void RemoveItemValueChangedListener(int i, Action h);
         void ParseObject(object data, Action<object, object> onParseItem = null);
         int Count { get; }
         int FocusIndex { get; set; }
@@ -62,56 +60,22 @@ namespace VVMUI.Core.Data
             return typeof(T);
         }
 
-        // 列表数据结构，在列表项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
-        private List<Action> _valueChangedHandlers = new List<Action>();
+        // 如果是元素内部数据发生改变不能通知到列表数据本身的改变事件
+        private List<DataChangedHandler> _valueChangedHandlers = new List<DataChangedHandler>();
         public void InvokeValueChanged()
         {
             for (int i = 0; i < _valueChangedHandlers.Count; i++)
             {
-                _valueChangedHandlers[i].Invoke();
+                _valueChangedHandlers[i].Invoke(this);
             }
         }
-        public void AddValueChangedListener(Action handler)
+        public void AddValueChangedListener(DataChangedHandler handler)
         {
             _valueChangedHandlers.Add(handler);
         }
-        public void RemoveValueChangedListener(Action handler)
+        public void RemoveValueChangedListener(DataChangedHandler handler)
         {
             _valueChangedHandlers.Remove(handler);
-        }
-
-        // 列表数据结构，在列表项数量发生变化时才会触发 ValueChanged，仅数据内容变化时触发 ItemValueChanged
-        public Dictionary<int, List<Action>> ItemValueChanged = new Dictionary<int, List<Action>>();
-        public void InvokeItemValueChanged(int i)
-        {
-            List<Action> handlers = null;
-            if (ItemValueChanged.TryGetValue(i, out handlers) && handlers != null)
-            {
-                for (int j = 0; j < handlers.Count; j++)
-                {
-                    handlers[j].Invoke();
-                }
-            }
-        }
-
-        public void AddItemValueChangedListener(int i, Action h)
-        {
-            List<Action> handlers = null;
-            if (!ItemValueChanged.TryGetValue(i, out handlers))
-            {
-                handlers = new List<Action>();
-                ItemValueChanged[i] = handlers;
-            }
-            handlers.Add(h);
-        }
-
-        public void RemoveItemValueChangedListener(int i, Action h)
-        {
-            List<Action> handlers = null;
-            if (ItemValueChanged.TryGetValue(i, out handlers))
-            {
-                handlers.Remove(h);
-            }
         }
 
         public new T this[int index]
@@ -123,7 +87,7 @@ namespace VVMUI.Core.Data
             set
             {
                 base[index] = value;
-                InvokeItemValueChanged(index);
+                InvokeValueChanged();
             }
         }
 
@@ -217,55 +181,38 @@ namespace VVMUI.Core.Data
         public new void Reverse(int index, int count)
         {
             base.Reverse(index, count);
-            for (int i = 0; i < count; i++)
-            {
-                InvokeItemValueChanged(i);
-            }
+            InvokeValueChanged();
+            
         }
 
         public new void Reverse()
         {
             base.Reverse();
-            for (int i = 0; i < this.Count; i++)
-            {
-                InvokeItemValueChanged(i);
-            }
+            InvokeValueChanged();
         }
 
         public new void Sort(Comparison<T> comparison)
         {
             base.Sort(comparison);
-            for (int i = 0; i < this.Count; i++)
-            {
-                InvokeItemValueChanged(i);
-            }
+            InvokeValueChanged();
         }
 
         public new void Sort(int index, int count, IComparer<T> comparer)
         {
             base.Sort(index, count, comparer);
-            for (int i = 0; i < this.Count; i++)
-            {
-                InvokeItemValueChanged(i);
-            }
+            InvokeValueChanged();
         }
 
         public new void Sort()
         {
             base.Sort();
-            for (int i = 0; i < this.Count; i++)
-            {
-                InvokeItemValueChanged(i);
-            }
+            InvokeValueChanged();
         }
 
         public new void Sort(IComparer<T> comparer)
         {
             base.Sort(comparer);
-            for (int i = 0; i < this.Count; i++)
-            {
-                InvokeItemValueChanged(i);
-            }
+            InvokeValueChanged();
         }
 
         public void Instantiate(int count, Action<T> onItemInstaniated)
@@ -282,6 +229,33 @@ namespace VVMUI.Core.Data
             }
             base.AddRange(data);
             InvokeValueChanged();
+        }
+
+        public void CopyFrom(IData data)
+        {
+            if (!this.GetType().IsAssignableFrom(data.GetType()))
+            {
+                Debug.Log("can not copy data with not the same type");
+                return;
+            }
+
+            ListData<T> list = (ListData<T>)data;
+            if (list == null)
+            {
+                Debug.Log("can not copy data with not the same type");
+                return;
+            }
+
+            this.Clear();
+
+            List<T> tmp = new List<T>();
+            for (int i = 0; i < list.Count; i++)
+            {
+                T obj = new T();
+                obj.CopyFrom(list[i]);
+                tmp.Add(obj);
+            }
+            this.AddRange(tmp);
         }
 
         public void ParseObject(object data, Action<object, object> onParseItem = null)
@@ -302,7 +276,7 @@ namespace VVMUI.Core.Data
 
             bool isList = gType.IsGenericType && gType.GetGenericTypeDefinition() == typeof(ListData<>);
             bool isDict = gType.IsGenericType && gType.GetGenericTypeDefinition() == typeof(DictionaryData<>);
-            bool isStruct = gType.BaseType == typeof(StructData);
+            bool isStruct = typeof(StructData).IsAssignableFrom(gType);
             bool isBase = gType.BaseType.IsGenericType && gType.BaseType.GetGenericTypeDefinition() == typeof(BaseData<>) && dType.IsGenericType && gType.BaseType.GetGenericArguments()[0] == dType.GetGenericArguments()[0];
 
             int itr_count = Math.Min(this.Count, list.Count);
