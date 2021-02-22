@@ -21,59 +21,75 @@ namespace VVMUI.Core
         [HideInInspector]
         public object ActiveParameter;
 
-        private Dictionary<string, IData> _allDatas = new Dictionary<string, IData>();
-        private Dictionary<string, ICommand> _allCommands = new Dictionary<string, ICommand>();
-        private Dictionary<string, IConverter> _allConverters = new Dictionary<string, IConverter>();
-        private List<AbstractDataBinder> _allDataBinders = new List<AbstractDataBinder>();
-        private List<AbstractCommandBinder> _allCommandBinders = new List<AbstractCommandBinder>();
+        private readonly Dictionary<string, IData> allDatas = new Dictionary<string, IData>();
+        private readonly Dictionary<string, ICommand> allCommands = new Dictionary<string, ICommand>();
+        private readonly Dictionary<string, IConverter> allConverters = new Dictionary<string, IConverter>();
+
+        private readonly List<AbstractDataBinder> allDataBinders = new List<AbstractDataBinder>();
+        private readonly List<AbstractCommandBinder> allCommandBinders = new List<AbstractCommandBinder>();
+
+        public IEnumerable<string> GetDataKeys()
+        {
+            return allDatas.Keys;
+        }
 
         public IData GetData(string key)
         {
             IData d = null;
-            _allDatas.TryGetValue(key, out d);
+            allDatas.TryGetValue(key, out d);
             return d;
         }
 
         public void AddData(string key, IData data)
         {
-            _allDatas[key] = data;
+            allDatas[key] = data;
+        }
+
+        public IEnumerable<string> GetCommandKeys()
+        {
+            return allCommands.Keys;
         }
 
         public ICommand GetCommand(string key)
         {
             ICommand cmd = null;
-            _allCommands.TryGetValue(key, out cmd);
+            allCommands.TryGetValue(key, out cmd);
             return cmd;
         }
 
         public void AddCommand(string key, ICommand cmd)
         {
-            _allCommands[key] = cmd;
+            allCommands[key] = cmd;
+        }
+
+        public IEnumerable<string> GetConverterKeys()
+        {
+            return allConverters.Keys;
         }
 
         public IConverter GetConverter(string key)
         {
             IConverter converter = null;
-            _allConverters.TryGetValue(key, out converter);
+            allConverters.TryGetValue(key, out converter);
             return converter;
         }
 
         public void AddConverter(string key, IConverter converter)
         {
-            _allConverters[key] = converter;
+            allConverters[key] = converter;
         }
 
         public void AddConverter(string key, Type converterType)
         {
-            _allConverters[key] = (IConverter)Activator.CreateInstance(converterType);
+            allConverters[key] = (IConverter)Activator.CreateInstance(converterType);
         }
 
         public void AddConverter<T>(string key) where T : IConverter, new()
         {
-            _allConverters[key] = new T();
+            allConverters[key] = new T();
         }
 
-        protected void Collect()
+        public void Collect()
         {
             Type type = this.GetType();
             FieldInfo[] fields = type.GetFields();
@@ -86,7 +102,7 @@ namespace VVMUI.Core
                     IData data = fi.GetValue(this) as IData;
                     if (data != null)
                     {
-                        _allDatas[fi.Name] = data;
+                        allDatas[fi.Name] = data;
                     }
                 }
                 if (t.GetInterface("ICommand") != null)
@@ -94,7 +110,7 @@ namespace VVMUI.Core
                     ICommand cmd = fi.GetValue(this) as ICommand;
                     if (cmd != null)
                     {
-                        _allCommands[fi.Name] = cmd;
+                        allCommands[fi.Name] = cmd;
                     }
                 }
                 if (t.GetInterface("IConverter") != null)
@@ -102,7 +118,7 @@ namespace VVMUI.Core
                     IConverter cvt = fi.GetValue(this) as IConverter;
                     if (cvt != null)
                     {
-                        _allConverters[fi.Name] = cvt;
+                        allConverters[fi.Name] = cvt;
                     }
                 }
             }
@@ -111,32 +127,32 @@ namespace VVMUI.Core
             {
                 this.BindRoot = this.gameObject;
             }
-            this.BindRoot.GetComponentsInChildren<AbstractDataBinder>(true, _allDataBinders);
-            this.BindRoot.GetComponentsInChildren<AbstractCommandBinder>(true, _allCommandBinders);
+            this.BindRoot.GetComponentsInChildren<AbstractDataBinder>(true, allDataBinders);
+            this.BindRoot.GetComponentsInChildren<AbstractCommandBinder>(true, allCommandBinders);
         }
 
         protected void Bind()
         {
-            for (int i = 0; i < this._allDataBinders.Count; i++)
+            for (int i = 0; i < this.allDataBinders.Count; i++)
             {
-                if (this._allDataBinders[i].CanBind(this))
+                if (this.allDataBinders[i].CanBind(this))
                 {
-                    this._allDataBinders[i].Bind(this);
+                    this.allDataBinders[i].Bind(this);
                 }
             }
 
-            for (int i = 0; i < this._allCommandBinders.Count; i++)
+            for (int i = 0; i < this.allCommandBinders.Count; i++)
             {
-                if (this._allCommandBinders[i].CanBind(this))
+                if (this.allCommandBinders[i].CanBind(this))
                 {
-                    this._allCommandBinders[i].Bind(this);
+                    this.allCommandBinders[i].Bind(this);
                 }
             }
         }
 
         public void NotifyCommandsCanExecute()
         {
-            foreach (KeyValuePair<string, ICommand> kv in _allCommands)
+            foreach (KeyValuePair<string, ICommand> kv in allCommands)
             {
                 kv.Value.NotifyCanExecute();
             }

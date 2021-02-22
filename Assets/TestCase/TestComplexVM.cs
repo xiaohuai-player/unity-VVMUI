@@ -46,15 +46,23 @@ public class TestComplexVM : VMBehaviour {
         public IntData Age = new IntData ();
         public BoolData IsOnline = new BoolData ();
         public BodyData Body = new BodyData ();
-        public ListData<IntData> Scores;
+        public ListData<IntData> Scores = new ListData<IntData>();
     }
 
-    public ListData<FriendData> friends = new ListData<FriendData> ();
 
-    public StringData strInputName;
-    public IntData intInputAge;
-    public SpriteData spriteTest;
+
+    public ListData<FriendData> friends = new ListData<FriendData>() { new FriendData() };
+    public StringData strInputName = new StringData("");
+    public IntData intInputAge = new IntData(0);
+    public SpriteData spriteTest = new SpriteData(null);
+    public FriendData testFriend = new FriendData();
+    public DictionaryData<FriendData> testDictFriend = new DictionaryData<FriendData>();
+
+
+
     public IntToStringConverter cvtTest = new IntToStringConverter ();
+
+
 
     public ButtonCommand btnAddFriend;
     public bool btnAddFriend_CanExecute (object parameter) {
@@ -70,6 +78,8 @@ public class TestComplexVM : VMBehaviour {
         intInputAge.Set (0);
     }
 
+
+
     public ButtonCommand btnDelFriend;
     public bool btnDelFriend_CanExecute (object index) {
         return (int) index != 1;
@@ -78,9 +88,6 @@ public class TestComplexVM : VMBehaviour {
         friends.RemoveAt ((int) index);
     }
 
-    public FriendData testFriend = new FriendData ();
-
-    public DictionaryData<FriendData> testDictFriend;
 
     protected override void BeforeAwake () {
         btnAddFriend = new ButtonCommand (btnAddFriend_CanExecute, btnAddFriend_Execute);

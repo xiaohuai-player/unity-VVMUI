@@ -7,12 +7,12 @@ namespace VVMUI.Core.Data
 {
     public abstract class StructData : IData
     {
-        protected Dictionary<string, IData> _allData = new Dictionary<string, IData>();
-        private bool _fieldsInit = false;
+        protected Dictionary<string, IData> allData = new Dictionary<string, IData>();
+        private bool fieldsInit = false;
 
         private void InitFields()
         {
-            if (_fieldsInit)
+            if (fieldsInit)
             {
                 return;
             }
@@ -27,7 +27,7 @@ namespace VVMUI.Core.Data
                     IData data = fields[i].GetValue(this) as IData;
                     if (data != null)
                     {
-                        _allData[fields[i].Name] = data;
+                        allData[fields[i].Name] = data;
                         data.AddValueChangedListener(delegate (IData source)
                         {
                             this.InvokeValueChanged();
@@ -36,24 +36,35 @@ namespace VVMUI.Core.Data
                 }
             }
 
-            _fieldsInit = true;
+            fieldsInit = true;
         }
 
-        private List<DataChangedHandler> _valueChangedHandlers = new List<DataChangedHandler>();
+        private List<DataChangedHandler> valueChangedHandlers = new List<DataChangedHandler>();
         public void InvokeValueChanged()
         {
-            for (int i = 0; i < _valueChangedHandlers.Count; i++)
+            for (int i = 0; i < valueChangedHandlers.Count; i++)
             {
-                _valueChangedHandlers[i].Invoke(this);
+                valueChangedHandlers[i].Invoke(this);
             }
         }
         public void AddValueChangedListener(DataChangedHandler handler)
         {
-            _valueChangedHandlers.Add(handler);
+            valueChangedHandlers.Add(handler);
         }
         public void RemoveValueChangedListener(DataChangedHandler handler)
         {
-            _valueChangedHandlers.Remove(handler);
+            valueChangedHandlers.Remove(handler);
+        }
+
+        public object FastGetValue()
+        {
+            Debugger.LogError("StructData", "StructData should not call FastGetValue.");
+            return null;
+        }
+
+        public void FastSetValue(object value)
+        {
+            Debugger.LogError("StructData", "StructData should not call FastSetValue.");
         }
 
         public IData this[string key]
@@ -62,7 +73,7 @@ namespace VVMUI.Core.Data
             {
                 InitFields();
                 IData v = null;
-                _allData.TryGetValue(key, out v);
+                allData.TryGetValue(key, out v);
                 return v;
             }
         }
@@ -72,13 +83,18 @@ namespace VVMUI.Core.Data
             get
             {
                 InitFields();
-                return _allData;
+                return allData;
             }
         }
 
-        public Type GetDataType()
+        public Type GetBindDataType()
         {
             return typeof(object);
+        }
+
+        public DataType GetDataType()
+        {
+            return DataType.Struct;
         }
 
         public void CopyFrom(IData data)
@@ -187,7 +203,7 @@ namespace VVMUI.Core.Data
                     }
                     else if (isBase)
                     {
-                        (objv as IData).Setter.Set(objv, parseStruct.Value);
+                        (objv as IData).FastSetValue(parseStruct.Value);
                     }
                 }
                 else
@@ -209,22 +225,6 @@ namespace VVMUI.Core.Data
                         objfi.SetValue(this, Activator.CreateInstance(objfi.FieldType, parseStruct.Value));
                     }
                 }
-            }
-        }
-
-        public ISetValue Setter
-        {
-            get
-            {
-                return null;
-            }
-        }
-
-        public IGetValue Getter
-        {
-            get
-            {
-                return null;
             }
         }
 

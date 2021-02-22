@@ -1,62 +1,72 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Collections;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using VVMUI.Core;
-using VVMUI.Core.Binder;
-using VVMUI.Core.Command;
 using VVMUI.Core.Data;
+using VVMUI.Core.Binder;
 
-[CustomEditor(typeof(ListDataBinder))]
-[CanEditMultipleObjects]
-public class ListDataBinderEditor : Editor
+namespace VVMUI.Inspector
 {
-    private List<bool> itemsExpand = new List<bool>();
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(ListDataBinder))]
+    [CanEditMultipleObjects]
+    public class ListDataBinderEditor : Editor
     {
-        ListDataBinder binder = target as ListDataBinder;
-        VMBehaviour vm = binder.GetComponentInParent<VMBehaviour>();
-        List<string> datas = new List<string>();
-        if (vm != null)
+        private DataDefinerDrawer definerDrawer;
+        public override void OnInspectorGUI()
         {
-            Type type = vm.GetType();
-            FieldInfo[] fields = type.GetFields();
-            for (int i = 0; i < fields.Length; i++)
+            ListDataBinder binder = target as ListDataBinder;
+            binder.EditorBind();
+
+            if (definerDrawer == null)
             {
-                FieldInfo fi = fields[i];
-                Type t = fi.FieldType;
-                if (t.GetInterface("IListData") != null)
+                definerDrawer = new DataDefinerDrawer(binder.Source);
+            }
+            definerDrawer.Draw(binder.BindVM, binder.BindData, typeof(IEnumerable));
+
+            binder.Template = (GameObject)EditorGUILayout.ObjectField("Template:", binder.Template, typeof(GameObject), true);
+            if (binder.Template == null || binder.Template.GetComponent<ListTemplateBinder>() == null)
+            {
+                GUIStyle style = new GUIStyle(EditorStyles.boldLabel);
+                style.normal.textColor = Color.red;
+                if (binder.Template == null)
                 {
-                    datas.Add(fi.Name);
+                    EditorGUILayout.LabelField("template can not be null.", style);
+                }
+                else
+                {
+                    EditorGUILayout.LabelField("template game object must have ListTemplateBinder.", style);
                 }
             }
-        }
+            else
+            {
+                IData data = binder.Source.GetData(binder.BindVM);
+                if (data != null && data is IListData)
+                {
+                    IListData list = (IListData)data;
+                    if (list.Count <= 0)
+                    {
+                        GUIStyle style = new GUIStyle(EditorStyles.boldLabel);
+                        style.normal.textColor = Color.red;
+                        EditorGUILayout.LabelField("source list data must instantiate with one element at least.", style);
+                    }
+                    else
+                    {
+                        binder.Template.GetComponent<ListTemplateBinder>().ItemSource.Key = binder.Source.Key;
+                    }
+                }
+            }
 
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Source:");
-        int dataIndex = datas.IndexOf(binder.Source.Key);
-        dataIndex = EditorGUILayout.Popup(dataIndex, datas.ToArray(), GUILayout.MinWidth(20), GUILayout.MaxWidth(150));
-        if (datas.Count > 0 && dataIndex >= 0 && dataIndex < datas.Count)
-        {
-            binder.Source.Key = datas[dataIndex];
-        }
-        binder.Source.Key = EditorGUILayout.DelayedTextField(binder.Source.Key, GUILayout.MaxWidth(150));
-        EditorGUILayout.EndHorizontal();
-
-        binder.Template = (GameObject)EditorGUILayout.ObjectField("Template:", binder.Template, typeof(GameObject), true);
-        binder.Optimize = EditorGUILayout.Toggle("Optimize:", binder.Optimize);
-        if (binder.Optimize)
-        {
-            EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.ObjectField("ViewPort:", binder.ViewPort, typeof(RectTransform), true);
-            EditorGUILayout.ObjectField("ScrollRect:", binder.ScrollRect, typeof(ScrollRect), true);
-            EditorGUILayout.ObjectField("LayoutGroup:", binder.LayoutGroup, typeof(LayoutGroup), true);
-            EditorGUILayout.IntField("PageItemsCount:", binder.PageItemsCount);
-            EditorGUI.EndDisabledGroup();
+            binder.Optimize = EditorGUILayout.Toggle("Optimize:", binder.Optimize);
+            if (binder.Optimize)
+            {
+                EditorGUI.BeginDisabledGroup(true);
+                EditorGUILayout.ObjectField("ViewPort:", binder.ViewPort, typeof(RectTransform), true);
+                EditorGUILayout.ObjectField("ScrollRect:", binder.ScrollRect, typeof(ScrollRect), true);
+                EditorGUILayout.ObjectField("LayoutGroup:", binder.LayoutGroup, typeof(LayoutGroup), true);
+                EditorGUILayout.IntField("PageItemsCount:", binder.PageItemsCount);
+                EditorGUI.EndDisabledGroup();
+            }
         }
     }
 }

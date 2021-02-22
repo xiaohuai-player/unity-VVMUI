@@ -30,6 +30,8 @@ namespace VVMUI.Core.Binder
 
         public override void Bind(VMBehaviour vm)
         {
+            base.Bind(vm);
+
             if (Source == null)
             {
                 return;
@@ -51,6 +53,8 @@ namespace VVMUI.Core.Binder
 
         public override void Bind(VMBehaviour vm, IData data)
         {
+            base.Bind(vm, data);
+
             if (Source == null)
             {
                 return;
@@ -77,6 +81,8 @@ namespace VVMUI.Core.Binder
 
         public override void UnBind()
         {
+            base.UnBind();
+
             DoUnBind();
         }
 

@@ -7,6 +7,8 @@ namespace VVMUI.Core.Binder
 {
     public class ListTemplateBinder : UIBehaviour
     {
+        public DataDefiner ItemSource = new DataDefiner();
+
         [SerializeField]
         private int index;
         public int Index
@@ -14,8 +16,8 @@ namespace VVMUI.Core.Binder
             get { return index; }
         }
 
-        private IListData source;
         private IData item;
+        private IListData source;
         private VMBehaviour vm;
 
         private List<AbstractDataBinder> dataBinders = new List<AbstractDataBinder>();

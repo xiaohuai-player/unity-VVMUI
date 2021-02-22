@@ -1,10 +1,6 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
-using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
 
 namespace VVMUI.Core.Binder
@@ -12,6 +8,30 @@ namespace VVMUI.Core.Binder
     [ExecuteInEditMode]
     public class ListDataBinder : AbstractDataBinder
     {
+        private static Vector2[] cornersInCanvans = new Vector2[4];
+        private static Vector3[] corners = new Vector3[4];
+        private static Rect GetRectOfTransformInCanvas(RectTransform transform, Canvas canvas)
+        {
+            // Vector2[] cornersInCanvans = new Vector2[4];
+            // Vector3[] corners = new Vector3[4];
+            transform.GetWorldCorners(corners);
+
+            Camera camera = canvas.worldCamera;
+            for (int i = 0; i < corners.Length; i++)
+            {
+                if (camera != null)
+                {
+                    corners[i] = camera.WorldToScreenPoint(corners[i]);
+                }
+                Vector2 pos;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, corners[i], canvas.worldCamera, out pos);
+                cornersInCanvans[i] = pos;
+            }
+
+            Rect rect = new Rect(cornersInCanvans[0], new Vector2(cornersInCanvans[2].x - cornersInCanvans[1].x, cornersInCanvans[1].y - cornersInCanvans[0].y));
+            return rect;
+        }
+
         public DataDefiner Source;
         public GameObject Template;
 
@@ -23,7 +43,6 @@ namespace VVMUI.Core.Binder
         public int PageItemsCount = 0;
 
         private IListData sourceData;
-        private VMBehaviour vm;
 
         private int itemsCount = 0;
         private int startIndex = -1;
@@ -31,7 +50,6 @@ namespace VVMUI.Core.Binder
         private RectOffset originPadding;
 
         private bool dirty = false;
-        private bool resetArrangeIndex = false;
 
 #if UNITY_EDITOR
         /// <summary>
@@ -149,30 +167,6 @@ namespace VVMUI.Core.Binder
             this.dirty = false;
         }
 
-        private static Vector2[] cornersInCanvans = new Vector2[4];
-        private static Vector3[] corners = new Vector3[4];
-        private static Rect GetRectOfTransformInCanvas(RectTransform transform, Canvas canvas)
-        {
-            // Vector2[] cornersInCanvans = new Vector2[4];
-            // Vector3[] corners = new Vector3[4];
-            transform.GetWorldCorners(corners);
-
-            Camera camera = canvas.worldCamera;
-            for (int i = 0; i < corners.Length; i++)
-            {
-                if (camera != null)
-                {
-                    corners[i] = camera.WorldToScreenPoint(corners[i]);
-                }
-                Vector2 pos;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, corners[i], canvas.worldCamera, out pos);
-                cornersInCanvans[i] = pos;
-            }
-
-            Rect rect = new Rect(cornersInCanvans[0], new Vector2(cornersInCanvans[2].x - cornersInCanvans[1].x, cornersInCanvans[1].y - cornersInCanvans[0].y));
-            return rect;
-        }
-
         private void CalculateDisplayRange()
         {
             if (this.sourceData == null || !this.IsOptimizeLayout() || this.transform.childCount <= 0)
@@ -237,6 +231,8 @@ namespace VVMUI.Core.Binder
 
         public override void Bind(VMBehaviour vm)
         {
+            base.Bind(vm);
+
             if (Source == null)
             {
                 return;
@@ -254,13 +250,13 @@ namespace VVMUI.Core.Binder
                 return;
             }
 
-            this.vm = vm;
-
             this.DoBind();
         }
 
         public override void Bind(VMBehaviour vm, IData data)
         {
+            base.Bind(vm, data);
+
             if (Source == null)
             {
                 return;
@@ -277,13 +273,13 @@ namespace VVMUI.Core.Binder
                 return;
             }
 
-            this.vm = vm;
-
             this.DoBind();
         }
 
         public override void UnBind()
         {
+            base.UnBind();
+
             this.itemsCount = 0;
             for (int i = 0; i < this.transform.childCount; i++)
             {
@@ -295,7 +291,6 @@ namespace VVMUI.Core.Binder
                 (this.sourceData as IData).RemoveValueChangedListener(this.SourceDataChanged);
                 this.sourceData.FocusIndexChanged -= FocusIndexChanged;
                 this.sourceData = null;
-                this.vm = null;
             }
         }
 
@@ -372,7 +367,7 @@ namespace VVMUI.Core.Binder
         private IEnumerator DelayArrange(bool focus)
         {
             yield return null;
-            Arrange(focus);
+            Arrange();
 
             if (focus)
             {
@@ -383,7 +378,7 @@ namespace VVMUI.Core.Binder
             this.dirty = false;
         }
 
-        private void Arrange(bool focus)
+        private void Arrange()
         {
             if (Template == null || this.sourceData == null)
             {
@@ -413,7 +408,7 @@ namespace VVMUI.Core.Binder
                     ListTemplateBinder binder = obj.GetComponent<ListTemplateBinder>();
                     if (binder != null)
                     {
-                        binder.Bind(this.vm, start + itemsCount, this.sourceData);
+                        binder.Bind(this.BindVM, start + itemsCount, this.sourceData);
                         this.itemsCount++;
                     }
                 }

@@ -41,9 +41,14 @@ namespace VVMUI.Core.Data
             return this[key];
         }
 
-        public Type GetDataType()
+        public Type GetBindDataType()
         {
-            return typeof(T);
+            return typeof(IDictionary);
+        }
+
+        public DataType GetDataType()
+        {
+            return DataType.Dictionary;
         }
 
         // 如果是元素内部数据发生改变不能通知到字典数据本身的改变事件
@@ -64,6 +69,17 @@ namespace VVMUI.Core.Data
         public void RemoveValueChangedListener(DataChangedHandler handler)
         {
             _valueChangedHandlers.Remove(handler);
+        }
+
+        public object FastGetValue()
+        {
+            Debugger.LogError("DictionaryData", "DictionaryData should not call FastGetValue.");
+            return null;
+        }
+
+        public void FastSetValue(object value)
+        {
+            Debugger.LogError("DictionaryData", "DictionaryData should not call FastSetValue.");
         }
 
         public new T this[string key]
@@ -169,7 +185,7 @@ namespace VVMUI.Core.Data
                     }
                     else if (isBase)
                     {
-                        (this[key] as IData).Setter.Set(this[key], dict[key]);
+                        (this[key] as IData).FastSetValue(dict[key]);
                     }
                 }
                 else
@@ -195,22 +211,6 @@ namespace VVMUI.Core.Data
                 {
                     onParseItem(this[key], dict[key]);
                 }
-            }
-        }
-
-        public ISetValue Setter
-        {
-            get
-            {
-                return null;
-            }
-        }
-
-        public IGetValue Getter
-        {
-            get
-            {
-                return null;
             }
         }
     }

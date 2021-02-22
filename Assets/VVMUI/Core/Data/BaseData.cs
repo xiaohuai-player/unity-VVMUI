@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
 namespace VVMUI.Core.Data
 {
-    public sealed class BaseData
+    public static class BaseData
     {
         public static readonly List<Type> SupportDataType = new List<Type>() {
             typeof(bool),
@@ -27,12 +26,12 @@ namespace VVMUI.Core.Data
 
     public abstract class BaseData<T> : IData<T>, IData
     {
-        public BaseData()
+        protected BaseData()
         {
 
         }
 
-        public BaseData(T value)
+        protected BaseData(T value)
         {
             _value = value;
         }
@@ -60,9 +59,14 @@ namespace VVMUI.Core.Data
             _valueChangedHandlers.Remove(handler);
         }
 
-        public Type GetDataType()
+        public Type GetBindDataType()
         {
             return typeof(T);
+        }
+
+        public DataType GetDataType()
+        {
+            return DataType.Base;
         }
 
         public T Get()
@@ -74,6 +78,16 @@ namespace VVMUI.Core.Data
         {
             _value = arg;
             InvokeValueChanged();
+        }
+
+        public object FastGetValue()
+        {
+            return Getter.Get(this);
+        }
+
+        public void FastSetValue(object value)
+        {
+            Setter.Set(this, value);
         }
 
         public void CopyFrom(IData data)
@@ -95,7 +109,7 @@ namespace VVMUI.Core.Data
         }
 
         private ISetValue _setter;
-        public ISetValue Setter
+        private ISetValue Setter
         {
             get
             {
@@ -113,7 +127,7 @@ namespace VVMUI.Core.Data
         }
 
         private IGetValue _getter;
-        public IGetValue Getter
+        private IGetValue Getter
         {
             get
             {

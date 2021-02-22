@@ -55,9 +55,30 @@ namespace VVMUI.Core.Data
 
         public event Action FocusIndexChanged;
 
-        public Type GetDataType()
+        public object FastGetValue()
         {
-            return typeof(T);
+            Debugger.LogError("ListData", "ListData should not call FastGetValue.");
+            return null;
+        }
+
+        public void FastSetValue(object value)
+        {
+            Debugger.LogError("ListData", "ListData should not call FastSetValue.");
+        }
+
+        public Type GetBindDataType()
+        {
+            return typeof(IEnumerable);
+        }
+
+        public DataType GetDataType()
+        {
+            return DataType.List;
+        }
+
+        public Type GetItemBindDataType()
+        {
+            return (new T()).GetBindDataType();
         }
 
         // 如果是元素内部数据发生改变不能通知到列表数据本身的改变事件
@@ -82,7 +103,7 @@ namespace VVMUI.Core.Data
         {
             get
             {
-                return (T)base[index];
+                return base[index];
             }
             set
             {
@@ -298,7 +319,7 @@ namespace VVMUI.Core.Data
                     }
                     else if (isBase)
                     {
-                        (this[i] as IData).Setter.Set(this[i], list[i] as IData);
+                        this[i].FastSetValue(list[i]);
                     }
                 }
                 else
@@ -359,22 +380,6 @@ namespace VVMUI.Core.Data
             else if (list.Count < this.Count)
             {
                 this.RemoveRange(itr_count, this.Count - list.Count);
-            }
-        }
-
-        public ISetValue Setter
-        {
-            get
-            {
-                return null;
-            }
-        }
-
-        public IGetValue Getter
-        {
-            get
-            {
-                return null;
             }
         }
     }

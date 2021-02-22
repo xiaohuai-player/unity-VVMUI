@@ -2,16 +2,25 @@
 
 namespace VVMUI.Core.Data
 {
+    public enum DataType
+    {
+        Base,
+        List,
+        Struct,
+        Dictionary
+    }
+
     public delegate void DataChangedHandler(IData source);
 
     public interface IData
     {
+        void FastSetValue(object value);
+        object FastGetValue();
         void InvokeValueChanged();
         void AddValueChangedListener(DataChangedHandler handler);
         void RemoveValueChangedListener(DataChangedHandler handler);
-        Type GetDataType();
-        ISetValue Setter { get; }
-        IGetValue Getter { get; }
+        Type GetBindDataType();
+        DataType GetDataType();
         void CopyFrom(IData data);
     }
 

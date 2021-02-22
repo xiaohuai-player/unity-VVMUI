@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
@@ -58,16 +56,13 @@ namespace VVMUI.Core.Binder
                     return false;
                 }
 
-                Type dataType = this.Source.GetType();
-                Type dataBaseType = dataType.BaseType;
-
                 bool bindData = false;
                 if (this.Converter != null)
                 {
                     bindData = true;
                 }
 
-                if (t.IsAssignableFrom(this.Source.GetDataType()))
+                if (t.IsAssignableFrom(this.Source.GetBindDataType()))
                 {
                     bindData = true;
                 }
@@ -150,16 +145,14 @@ namespace VVMUI.Core.Binder
                     propertySetter = SetterWrapper.CreatePropertySetterWrapper(propertyInfo);
                 }
 
-                ISetValue sourceSetter = this.Source.Setter;
-                IGetValue sourceGetter = this.Source.Getter;
-                if (propertySetter == null || sourceSetter == null || sourceGetter == null)
+                if (propertySetter == null)
                 {
                     return;
                 }
 
                 this.SetValueHandler = delegate (IData source)
                 {
-                    object value = sourceGetter.Get(this.Source);
+                    object value = this.Source.FastGetValue();
                     if (this.Converter != null)
                     {
                         value = this.Converter.Convert(value, propertyType, this.Definer.ConverterParameter, vm);
@@ -190,8 +183,8 @@ namespace VVMUI.Core.Binder
                     {
                         if (this.Converter != null)
                         {
-                            object value = this.Converter.ConvertBack(arg, this.Source.GetDataType(), this.Definer.ConverterParameter, vm);
-                            sourceSetter.Set(this.Source, value);
+                            object value = this.Converter.ConvertBack(arg, this.Source.GetBindDataType(), this.Definer.ConverterParameter, vm);
+                            this.Source.FastSetValue(value);
                         }
                         else
                         {
@@ -206,8 +199,8 @@ namespace VVMUI.Core.Binder
                     {
                         if (this.Converter != null)
                         {
-                            object value = this.Converter.ConvertBack(arg, this.Source.GetDataType(), this.Definer.ConverterParameter, vm);
-                            sourceSetter.Set(this.Source, value);
+                            object value = this.Converter.ConvertBack(arg, this.Source.GetBindDataType(), this.Definer.ConverterParameter, vm);
+                            this.Source.FastSetValue(value);
                         }
                         else
                         {
@@ -222,8 +215,8 @@ namespace VVMUI.Core.Binder
                     {
                         if (this.Converter != null)
                         {
-                            object value = this.Converter.ConvertBack(arg, this.Source.GetDataType(), this.Definer.ConverterParameter, vm);
-                            sourceSetter.Set(this.Source, value);
+                            object value = this.Converter.ConvertBack(arg, this.Source.GetBindDataType(), this.Definer.ConverterParameter, vm);
+                            this.Source.FastSetValue(value);
                         }
                         else
                         {
@@ -238,8 +231,8 @@ namespace VVMUI.Core.Binder
                     {
                         if (this.Converter != null)
                         {
-                            object value = this.Converter.ConvertBack(arg, this.Source.GetDataType(), this.Definer.ConverterParameter, vm);
-                            sourceSetter.Set(this.Source, value);
+                            object value = this.Converter.ConvertBack(arg, this.Source.GetBindDataType(), this.Definer.ConverterParameter, vm);
+                            this.Source.FastSetValue(value);
                         }
                         else
                         {
@@ -258,10 +251,9 @@ namespace VVMUI.Core.Binder
                     return;
                 }
 
-                IGetValue sourceGetter = this.Source.Getter;
                 this.SetValueHandler = delegate (IData source)
                 {
-                    object value = sourceGetter.Get(this.Source);
+                    object value = this.Source.FastGetValue();
                     if (this.Converter != null)
                     {
                         value = this.Converter.Convert(value, propertyType, this.Definer.ConverterParameter, vm);
@@ -287,10 +279,9 @@ namespace VVMUI.Core.Binder
                     return;
                 }
 
-                IGetValue sourceGetter = this.Source.Getter;
                 this.SetValueHandler = delegate (IData source)
                 {
-                    object value = sourceGetter.Get(this.Source);
+                    object value = this.Source.FastGetValue();
                     if (this.Converter != null)
                     {
                         value = this.Converter.Convert(value, propertyType, this.Definer.ConverterParameter, vm);
@@ -321,10 +312,9 @@ namespace VVMUI.Core.Binder
                     return;
                 }
 
-                IGetValue sourceGetter = this.Source.Getter;
                 this.SetValueHandler = delegate (IData source)
                 {
-                    object value = sourceGetter.Get(this.Source);
+                    object value = this.Source.FastGetValue();
                     if (this.Converter != null)
                     {
                         value = this.Converter.Convert(value, propertyType, this.Definer.ConverterParameter, vm);
@@ -414,30 +404,36 @@ namespace VVMUI.Core.Binder
 
         public List<DataBinderItem> BindItems = new List<DataBinderItem>();
 
-        public override void Bind(VMBehaviour behaviour)
+        public override void Bind(VMBehaviour vm)
         {
+            base.Bind(vm);
+
             for (int i = 0; i < BindItems.Count; i++)
             {
                 DataBinderItem item = BindItems[i];
-                item.Source = item.Definer.GetData(behaviour);
-                item.Converter = item.Definer.GetConverter(behaviour);
-                item.DoBind(behaviour, this.gameObject);
+                item.Source = item.Definer.GetData(vm);
+                item.Converter = item.Definer.GetConverter(vm);
+                item.DoBind(vm, this.gameObject);
             }
         }
 
-        public override void Bind(VMBehaviour behaviour, IData source)
+        public override void Bind(VMBehaviour vm, IData data)
         {
+            base.Bind(vm, data);
+
             for (int i = 0; i < BindItems.Count; i++)
             {
                 DataBinderItem item = BindItems[i];
-                item.Source = item.Definer.GetData(source);
-                item.Converter = item.Definer.GetConverter(behaviour);
-                item.DoBind(behaviour, this.gameObject);
+                item.Source = item.Definer.GetData(data);
+                item.Converter = item.Definer.GetConverter(vm);
+                item.DoBind(vm, this.gameObject);
             }
         }
 
         public override void UnBind()
         {
+            base.UnBind();
+
             for (int i = 0; i < BindItems.Count; i++)
             {
                 DataBinderItem item = BindItems[i];

@@ -68,92 +68,139 @@ namespace VVMUI.Core.Binder
     [Serializable]
     public class DataDefiner
     {
-
         // KeyChain 示例：data.friends[5].characters["adikia"].name
         public string Key;
         public string Converter;
         public string ConverterParameter;
 
         private List<DefinerKey> keyChain = new List<DefinerKey>();
-        private bool keyParsed = false;
-        public void ParseKey()
+        public List<DefinerKey> KeyChain
         {
-            if (!keyParsed)
+            get
             {
-                keyChain.Clear();
-                if (!string.IsNullOrEmpty(this.Key))
+                return keyChain;
+            }
+        }
+
+        private bool keyParsed = false;
+        public void ParseKey(bool force = false)
+        {
+            if (keyParsed && !force) return;
+
+            keyChain.Clear();
+
+            if (string.IsNullOrEmpty(this.Key)) return;
+
+            StringBuilder sb = new StringBuilder(10);
+            bool parseIndex = false;
+            bool parseHash = false;
+            for (int i = 0; i < this.Key.Length; i++)
+            {
+                char c = this.Key[i];
+                if (c.Equals('.'))
                 {
-                    StringBuilder sb = new StringBuilder(10);
-                    bool parseIndex = false;
-                    bool parseHash = false;
-                    for (int i = 0; i < this.Key.Length; i++)
+                    string key = sb.ToString();
+                    if (!string.IsNullOrEmpty(key))
                     {
-                        char c = this.Key[i];
-                        if (c.Equals('.'))
-                        {
-                            string key = sb.ToString();
-                            if (!string.IsNullOrEmpty(key))
-                            {
-                                DefinerKey k = new DefinerKey(key);
-                                keyChain.Add(k);
-                            }
-                            sb.Remove(0, sb.Length);
-                        }
-                        else if (c.Equals('['))
-                        {
-                            string key = sb.ToString();
-                            if (!string.IsNullOrEmpty(key))
-                            {
-                                DefinerKey k = new DefinerKey(key);
-                                keyChain.Add(k);
-                            }
-                            sb.Remove(0, sb.Length);
-                            parseIndex = true;
-                        }
-                        else if (c.Equals('"') && parseIndex && !parseHash)
-                        {
-                            sb.Remove(0, sb.Length);
-                            parseIndex = false;
-                            parseHash = true;
-                        }
-                        else if (c.Equals('"') && !parseIndex && parseHash)
-                        {
-                            string key = sb.ToString();
-                            if (!string.IsNullOrEmpty(key))
-                            {
-                                DefinerKey k = new DefinerKey(null, -1, key);
-                                keyChain.Add(k);
-                            }
-                            sb.Remove(0, sb.Length);
-                            parseIndex = true;
-                            parseHash = false;
-                        }
-                        else if (c.Equals(']') && parseIndex)
-                        {
-                            int index = 0;
-                            string key = sb.ToString();
-                            if (Int32.TryParse(key, out index))
-                            {
-                                DefinerKey k = new DefinerKey(null, index, null);
-                                keyChain.Add(k);
-                            }
-                            sb.Remove(0, sb.Length);
-                            parseIndex = false;
-                        }
-                        else
-                        {
-                            sb.Append(c);
-                        }
-                    }
-                    if (sb.Length > 0 && !parseIndex)
-                    {
-                        DefinerKey k = new DefinerKey(sb.ToString());
+                        DefinerKey k = new DefinerKey(key);
                         keyChain.Add(k);
-                        sb.Remove(0, sb.Length);
+                    }
+                    sb.Remove(0, sb.Length);
+                }
+                else if (c.Equals('['))
+                {
+                    string key = sb.ToString();
+                    if (!string.IsNullOrEmpty(key))
+                    {
+                        DefinerKey k = new DefinerKey(key);
+                        keyChain.Add(k);
+                    }
+                    sb.Remove(0, sb.Length);
+                    parseIndex = true;
+                }
+                else if (c.Equals('"') && parseIndex && !parseHash)
+                {
+                    sb.Remove(0, sb.Length);
+                    parseIndex = false;
+                    parseHash = true;
+                }
+                else if (c.Equals('"') && !parseIndex && parseHash)
+                {
+                    string key = sb.ToString();
+                    if (!string.IsNullOrEmpty(key))
+                    {
+                        DefinerKey k = new DefinerKey(null, -1, key);
+                        keyChain.Add(k);
+                    }
+                    sb.Remove(0, sb.Length);
+                    parseIndex = true;
+                    parseHash = false;
+                }
+                else if (c.Equals(']') && parseIndex)
+                {
+                    int index = 0;
+                    string key = sb.ToString();
+                    if (Int32.TryParse(key, out index))
+                    {
+                        DefinerKey k = new DefinerKey(null, index, null);
+                        keyChain.Add(k);
+                    }
+                    sb.Remove(0, sb.Length);
+                    parseIndex = false;
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+            if (sb.Length > 0 && !parseIndex)
+            {
+                DefinerKey k = new DefinerKey(sb.ToString());
+                keyChain.Add(k);
+                sb.Remove(0, sb.Length);
+            }
+            keyParsed = true;
+        }
+
+        public void SerializeKey()
+        {
+            this.Key = "";
+
+            if (this.keyChain.Count <= 0) return;
+
+            for (int i = 0; i < this.keyChain.Count; i++)
+            {
+                DefinerKey key = this.keyChain[i];
+                if (key.Index >= 0)
+                {
+                    this.Key += "[" + key.Index.ToString() + "]";
+                }
+                else if (!string.IsNullOrEmpty(key.HashKey))
+                {
+                    this.Key += "[\"" + key.HashKey + "\"]";
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        this.Key += key.Key;
+                    }
+                    else
+                    {
+                        this.Key += "." + key.Key;
                     }
                 }
-                keyParsed = true;
             }
+        }
+
+        public void AddKeyChain(DefinerKey k)
+        {
+            this.keyChain.Add(k);
+        }
+
+        public void RemoveKeyChain()
+        {
+            this.keyChain.RemoveAt(this.keyChain.Count - 1);
         }
 
         public IData GetData(VMBehaviour vm)
