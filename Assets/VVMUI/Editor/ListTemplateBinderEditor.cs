@@ -31,6 +31,8 @@ namespace VVMUI.Inspector
                 style.normal.textColor = Color.red;
                 EditorGUILayout.LabelField("no source list data.", style);
             }
+
+            EditorGUILayout.LabelField("index: " + binder.Index);
         }
     }
 }
