@@ -15,7 +15,7 @@ namespace VVMUI.Inspector
         public override void OnInspectorGUI()
         {
             ListTemplateBinder binder = target as ListTemplateBinder;
-            VMBehaviour vm = binder.GetComponentInParent<VMBehaviour>();
+            VMBehaviour vm = binder.GetComponentInParent<VMBehaviour>(true);
 
             if (definerDrawer == null)
             {

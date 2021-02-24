@@ -62,15 +62,15 @@ namespace VVMUI.Core.Binder
 
             if (Canvas == null)
             {
-                Canvas = this.transform.GetComponentInParent<Canvas>();
+                Canvas = this.transform.GetComponentInParent<Canvas>(true);
             }
             if (ViewPort == null && this.transform.parent != null)
             {
                 ViewPort = this.transform.parent as RectTransform;
             }
-            if (ScrollRect == null && ViewPort != null && ViewPort.GetComponentInParent<ScrollRect>() != null)
+            if (ScrollRect == null && ViewPort != null && ViewPort.GetComponentInParent<ScrollRect>(true) != null)
             {
-                ScrollRect = ViewPort.GetComponentInParent<ScrollRect>();
+                ScrollRect = ViewPort.GetComponentInParent<ScrollRect>(true);
             }
             if (LayoutGroup == null)
             {

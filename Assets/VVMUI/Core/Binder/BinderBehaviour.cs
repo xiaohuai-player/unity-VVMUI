@@ -28,13 +28,13 @@ namespace VVMUI.Core.Binder
         public void EditorBind()
         {
             this.BindData = null;
-            this.BindVM = this.GetComponentInParent<VMBehaviour>();
+            this.BindVM = this.GetComponentInParent<VMBehaviour>(true);
             if (this.BindVM != null)
             {
                 this.BindVM.Collect();
-                if (this.GetComponentInParent<ListTemplateBinder>() != null)
+                if (this.GetComponentInParent<ListTemplateBinder>(true) != null)
                 {
-                    IData data = this.GetComponentInParent<ListTemplateBinder>().ItemSource.GetData(this.BindVM);
+                    IData data = this.GetComponentInParent<ListTemplateBinder>(true).ItemSource.GetData(this.BindVM);
                     IListData list = data as IListData;
                     if (list != null && list.Count > 0)
                     {
