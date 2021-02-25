@@ -18,7 +18,8 @@ namespace VVMUI.Core.Data
             typeof(string),
             typeof(Texture),
             typeof(Vector2),
-            typeof(Vector3)
+            typeof(Vector3),
+            typeof(Rect)
         };
 
         //TODO 需要硬写支持绑定的组件类型
