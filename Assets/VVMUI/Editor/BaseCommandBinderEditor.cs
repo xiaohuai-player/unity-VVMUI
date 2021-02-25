@@ -16,7 +16,7 @@ namespace VVMUI.Inspector
         public override void OnInspectorGUI()
         {
             BaseCommandBinder binder = target as BaseCommandBinder;
-            VMBehaviour vm = binder.GetComponentInParent<VMBehaviour>();
+            VMBehaviour vm = binder.GetComponentInParent<VMBehaviour>(true);
             Dictionary<string, Type> commands = new Dictionary<string, Type>();
             if (vm != null)
             {

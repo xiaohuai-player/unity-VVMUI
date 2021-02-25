@@ -20,9 +20,9 @@ namespace VVMUI.Inspector
             BaseDataBinder binder = target as BaseDataBinder;
             binder.EditorBind();
 
-            if (binder.GetComponentInParent<ListTemplateBinder>() != null)
+            if (binder.GetComponentInParent<ListTemplateBinder>(true) != null)
             {
-                ListTemplateBinder templateBinder = binder.GetComponentInParent<ListTemplateBinder>();
+                ListTemplateBinder templateBinder = binder.GetComponentInParent<ListTemplateBinder>(true);
                 IData data = templateBinder.ItemSource.GetData(binder.BindVM);
                 IListData list = data as IListData;
                 if (list == null)
