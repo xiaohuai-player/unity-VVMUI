@@ -1,19 +1,22 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace VVMUI.Core.Command
 {
-
-    //TODO 需要硬写支持绑定的组件类型
-
     public abstract class BaseCommand : ICommand
     {
         protected Func<object, bool> _canExecuteHandler;
         protected Action<object> _noArgExecuteHandler;
         protected VMBehaviour _vm;
         private List<Action> _canExecuteChangedHandlers = new List<Action>();
+
+        protected BaseCommand(Func<object, bool> canExecuteHandler, Action<object> executeHandler)
+        {
+            _canExecuteHandler = canExecuteHandler;
+            _noArgExecuteHandler = executeHandler;
+        }
 
         public void NotifyCanExecute()
         {
@@ -77,6 +80,12 @@ namespace VVMUI.Core.Command
     {
         protected Action<T, object> _executeHandler;
 
+        protected BaseCommand(Func<object, bool> canExecuteHandler, Action<T, object> executeHandler) : base(canExecuteHandler, null)
+        {
+            _canExecuteHandler = canExecuteHandler;
+            _executeHandler = executeHandler;
+        }
+
         public void Execute(T arg, object parameter)
         {
             if (_executeHandler != null)
@@ -97,6 +106,56 @@ namespace VVMUI.Core.Command
                 this.Execute(arg, parameter);
             });
             return executeDelegate;
+        }
+    }
+
+    public class VoidCommand : BaseCommand
+    {
+        public VoidCommand(Func<object, bool> canExecuteHandler, Action<object> executeHandler) : base(canExecuteHandler, executeHandler)
+        {
+        }
+    }
+
+    [Obsolete("please use VoidCommand instead.")]
+    public class ButtonCommand : BaseCommand
+    {
+        public ButtonCommand(Func<object, bool> canExecuteHandler, Action<object> executeHandler) : base(canExecuteHandler, executeHandler)
+        {
+        }
+    }
+
+    public class BoolCommand : BaseCommand<bool>
+    {
+        public BoolCommand(Func<object, bool> canExecuteHandler, Action<bool, object> executeHandler) : base(canExecuteHandler, executeHandler)
+        {
+        }
+    }
+
+    public class FloatCommand : BaseCommand<float>
+    {
+        public FloatCommand(Func<object, bool> canExecuteHandler, Action<float, object> executeHandler) : base(canExecuteHandler, executeHandler)
+        {
+        }
+    }
+
+    public class IntCommand : BaseCommand<int>
+    {
+        public IntCommand(Func<object, bool> canExecuteHandler, Action<int, object> executeHandler) : base(canExecuteHandler, executeHandler)
+        {
+        }
+    }
+
+    public class StringCommand : BaseCommand<string>
+    {
+        public StringCommand(Func<object, bool> canExecuteHandler, Action<string, object> executeHandler) : base(canExecuteHandler, executeHandler)
+        {
+        }
+    }
+
+    public class Vector2Command : BaseCommand<Vector2>
+    {
+        public Vector2Command(Func<object, bool> canExecuteHandler, Action<Vector2, object> executeHandler) : base(canExecuteHandler, executeHandler)
+        {
         }
     }
 }

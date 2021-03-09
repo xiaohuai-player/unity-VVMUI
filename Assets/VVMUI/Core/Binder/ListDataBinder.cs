@@ -60,10 +60,6 @@ namespace VVMUI.Core.Binder
         {
             base.OnValidate();
 
-            if (Canvas == null)
-            {
-                Canvas = this.transform.GetComponentInParent<Canvas>(true);
-            }
             if (ViewPort == null && this.transform.parent != null)
             {
                 ViewPort = this.transform.parent as RectTransform;
@@ -126,7 +122,7 @@ namespace VVMUI.Core.Binder
 
         private bool IsOptimizeLayout()
         {
-            return this.Optimize && this.Template != null && this.ScrollRect != null && this.ViewPort != null && this.LayoutGroup != null && this.Canvas != null;
+            return this.Optimize && this.Template != null && this.ScrollRect != null && this.ViewPort != null && this.LayoutGroup != null;
         }
 
         protected override void Awake()
@@ -169,6 +165,16 @@ namespace VVMUI.Core.Binder
 
         private void CalculateDisplayRange()
         {
+            if (this.Canvas == null)
+            {
+                this.Canvas = GetComponentInParent<Canvas>();
+            }
+
+            if (this.Canvas == null)
+            {
+                return;
+            }
+
             if (this.sourceData == null || !this.IsOptimizeLayout() || this.transform.childCount <= 0)
             {
                 return;

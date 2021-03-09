@@ -1,0 +1,126 @@
+local data = {
+	test_int = 3,
+	test_float = 3.5,
+	test_bool = true,
+	test_string = "this is lua string",
+	test_base_list = { "aa", "bs", "cs", "dw", "eg" },
+	test_base_struct = {
+		name = "test struct name",
+		int_in_struct = 123,
+		bool_in_struct = false,
+		x = 0.0,
+		y = 0.0
+	},
+	test_complex_list = {
+		{ name = "name1", index = 10, strct = { name = "inner struct 1", inner_index = 1 } },
+		{ name = "name2", index = 20, strct = { name = "inner struct 2", inner_index = 2 } },
+	},
+	test_complex_struct = {
+		name = "test complex struct",
+		int_value = 321,
+		inner_struct = {
+			a = "this is a",
+			b = "this is b",
+			inner_struct = {
+				c = "this is inner c",
+				d = "this is inner d"
+			}
+		}
+	}
+}
+
+local command = {
+	test_btn = {
+		XLuaCommandType.Void,
+		CanExecute = function(vm, param)
+			return true
+		end,
+		Execute = function(vm, param)
+			print("test_btn clicked")
+			vm.data.test_string = "test_btn clicked"
+		end
+	},
+	test_toggle = {
+		XLuaCommandType.Bool,
+		CanExecute = function(vm, param)
+			return true
+		end,
+		Execute = function(vm, value, param)
+			print("value of test_toggle: ", value)
+			vm.data.test_bool = value
+		end
+	},
+	test_slider = {
+		XLuaCommandType.Float,
+		CanExecute = function(vm, param)
+			return true
+		end,
+		Execute = function(vm, value, param)
+			print("value of test_slider: ", value)
+			vm.data.test_float = value
+		end
+	},
+	test_dropdown = {
+		XLuaCommandType.Int,
+		CanExecute = function(vm, param)
+			return true
+		end,
+		Execute = function(vm, value, param)
+			print("value of test_dropdown: ", value)
+			vm.data.test_int = value
+		end
+	},
+	test_input = {
+		XLuaCommandType.String,
+		CanExecute = function(vm, param)
+			return true
+		end,
+		Execute = function(vm, value, param)
+			print("value of test_input: ", value)
+			vm.data.test_string = value
+		end
+	},
+	test_scroll = {
+		XLuaCommandType.Vector2,
+		CanExecute = function(vm, param)
+			return true
+		end,
+		Execute = function(vm, value, param)
+			print("value of test_scroll: ", value.x, value.y)
+			vm.data.test_base_struct.name = "test_scroll execute"
+		end
+	}
+}
+
+local hook = {
+	BeforeAwake = function(vm)
+		print("before awake")
+	end,
+	AfterAwake = function(vm)
+		print("after awake")
+	end,
+	BeforeActive = function(vm)
+		print("before active")
+	end,
+	AfterActive = function(vm)
+		print("after active")
+	end,
+	BeforeDeactive = function(vm)
+		print("before deactive")
+	end,
+	AfterDeactive = function(vm)
+		print("after deactive")
+	end,
+	BeforeDestroy = function(vm)
+		print("before destroy")
+	end,
+	AfterDestroy = function(vm)
+		print("after destroy")
+	end
+}
+
+return vm({
+	data = data,
+	command = command,
+	hook = hook
+})

@@ -1,5 +1,0 @@
-<linker>
-       <assembly fullname="UnityEngine.CoreModule" />
-	   <assembly fullname="UnityEngine.UIModule" />
-	   <assembly fullname="UnityEngine.UI" />
-</linker>

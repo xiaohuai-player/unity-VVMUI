@@ -9,20 +9,18 @@ namespace VVMUI.Core.Data
     {
         public static readonly List<Type> SupportDataType = new List<Type>() {
             typeof(bool),
-            typeof(Color),
             typeof(double),
             typeof(float),
             typeof(int),
             typeof(long),
-            typeof(Sprite),
             typeof(string),
-            typeof(Texture),
+            typeof(Color),
             typeof(Vector2),
             typeof(Vector3),
-            typeof(Rect)
+            typeof(Rect),
+            typeof(Sprite),
+            typeof(Texture)
         };
-
-        //TODO 需要硬写支持绑定的组件类型
     }
 
     public abstract class BaseData<T> : IData<T>, IData
@@ -143,6 +141,217 @@ namespace VVMUI.Core.Data
                 }
                 return _getter;
             }
+        }
+    }
+
+    [System.Serializable]
+    public sealed class BoolData : BaseData<bool>
+    {
+        public BoolData() : base()
+        {
+        }
+
+        public BoolData(bool v) : base(v)
+        {
+        }
+
+        public static implicit operator bool(BoolData d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    public sealed class ColorData : BaseData<Color>
+    {
+        public ColorData() : base()
+        {
+        }
+
+        public ColorData(Color v) : base(v)
+        {
+        }
+
+        public static implicit operator Color(ColorData d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    public sealed class DoubleData : BaseData<double>
+    {
+        public DoubleData() : base()
+        {
+
+        }
+
+        public DoubleData(double v) : base(v)
+        {
+        }
+
+        public static implicit operator double(DoubleData d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    public sealed class FloatData : BaseData<float>
+    {
+        public FloatData() : base()
+        {
+        }
+
+        public FloatData(float v) : base(v)
+        {
+        }
+
+        public static implicit operator float(FloatData d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    public sealed class IntData : BaseData<int>
+    {
+        public IntData() : base()
+        {
+        }
+
+        public IntData(int v) : base(v)
+        {
+        }
+
+        public static implicit operator int(IntData d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    public sealed class LongData : BaseData<long>
+    {
+        public LongData() : base()
+        {
+        }
+
+        public LongData(long v) : base(v)
+        {
+        }
+
+        public static implicit operator long(LongData d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    public sealed class RectData : BaseData<Rect>
+    {
+        public RectData() : base()
+        {
+        }
+
+        public RectData(Rect v) : base(v)
+        {
+        }
+
+        public static implicit operator Rect(RectData d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    public sealed class SpriteData : BaseData<Sprite>
+    {
+        public SpriteData() : base()
+        {
+        }
+
+        public SpriteData(Sprite v) : base(v)
+        {
+        }
+
+        public static implicit operator Sprite(SpriteData d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    public sealed class StringData : BaseData<string>
+    {
+        public StringData() : base()
+        {
+        }
+
+        public StringData(string v) : base(v)
+        {
+        }
+
+        public static implicit operator string(StringData d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    [Obsolete("using TextureData instead.")]
+    public sealed class Texture2DData : BaseData<Texture2D>
+    {
+    }
+
+    [System.Serializable]
+    public sealed class TextureData : BaseData<Texture>
+    {
+        public TextureData() : base()
+        {
+        }
+
+        public TextureData(Texture v) : base(v)
+        {
+        }
+
+        public static implicit operator Texture(TextureData d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    public sealed class Vector2Data : BaseData<Vector2>
+    {
+        public Vector2Data() : base()
+        {
+        }
+
+        public Vector2Data(Vector2 v) : base(v)
+        {
+        }
+
+        public static implicit operator Vector2(Vector2Data d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    public sealed class Vector3Data : BaseData<Vector3>
+    {
+        public Vector3Data() : base()
+        {
+        }
+
+        public Vector3Data(Vector3 v) : base(v)
+        {
+        }
+
+        public static implicit operator Vector3(Vector3Data d)
+        {
+            return d.Get();
         }
     }
 }

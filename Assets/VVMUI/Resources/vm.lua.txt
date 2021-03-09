@@ -1,0 +1,28 @@
+XLuaDataType = CS.VVMUI.Script.XLua.XLuaDataType
+XLuaCommandType = CS.VVMUI.Script.XLua.XLuaCommandType
+
+vm = {}
+
+local function generate_vm_data(d)
+	print(type(d))
+end
+
+function vm:init(t)
+	vm_data = {}
+	for k, v in pairs(t) do
+		generate_vm_data(v)
+	end
+	self["__vm_data"] = vm_data
+end
+
+setmetatable(vm, {
+	__call = function(vm, t)
+		vm:init(t)
+	end
+})
+
+print("XLuaDataType", CS.VVMUI.Script.XLua.XLuaDataType.Boolean)
+print("XLuaCommandType", CS.VVMUI.Script.XLua.XLuaCommandType)
+
+return vm
+

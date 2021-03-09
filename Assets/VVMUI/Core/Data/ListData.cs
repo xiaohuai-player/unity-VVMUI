@@ -137,21 +137,13 @@ namespace VVMUI.Core.Data
 
         public new void Insert(int index, T item)
         {
-            int count = this.Count;
             base.Insert(index, item);
-            // for (int i = index; i < count; i++) {
-            //     InvokeItemValueChanged (i);
-            // }
             InvokeValueChanged();
         }
 
         public new void InsertRange(int index, IEnumerable<T> collection)
         {
-            int count = this.Count;
             base.InsertRange(index, collection);
-            // for (int i = index; i < count; i++) {
-            //     InvokeItemValueChanged (i);
-            // }
             InvokeValueChanged();
         }
 
@@ -159,9 +151,6 @@ namespace VVMUI.Core.Data
         {
             if (base.Remove(item))
             {
-                // for (int i = 0; i < this.Count; i++) {
-                //     InvokeItemValueChanged (i);
-                // }
                 InvokeValueChanged();
                 return true;
             }
@@ -173,9 +162,6 @@ namespace VVMUI.Core.Data
             int count = base.RemoveAll(match);
             if (count > 0)
             {
-                // for (int i = 0; i < this.Count; i++) {
-                //     InvokeItemValueChanged (i);
-                // }
                 InvokeValueChanged();
             }
             return count;
@@ -184,18 +170,12 @@ namespace VVMUI.Core.Data
         public new void RemoveAt(int index)
         {
             base.RemoveAt(index);
-            // for (int i = 0; i < this.Count; i++) {
-            //     InvokeItemValueChanged (i);
-            // }
             InvokeValueChanged();
         }
 
         public new void RemoveRange(int index, int count)
         {
             base.RemoveRange(index, count);
-            // for (int i = 0; i < this.Count; i++) {
-            //     InvokeItemValueChanged (i);
-            // }
             InvokeValueChanged();
         }
 

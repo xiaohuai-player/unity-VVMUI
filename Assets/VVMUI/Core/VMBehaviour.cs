@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.Scripting;
 using UnityEngine.EventSystems;
+using UnityEngine.Scripting;
 using VVMUI.Core.Binder;
 using VVMUI.Core.Command;
 using VVMUI.Core.Converter;
 using VVMUI.Core.Data;
-
-[assembly: Preserve]
 
 namespace VVMUI.Core
 {
@@ -18,15 +15,12 @@ namespace VVMUI.Core
     {
         public GameObject BindRoot;
 
-        [HideInInspector]
-        public object ActiveParameter;
+        protected readonly Dictionary<string, IData> allDatas = new Dictionary<string, IData>();
+        protected readonly Dictionary<string, ICommand> allCommands = new Dictionary<string, ICommand>();
+        protected readonly Dictionary<string, IConverter> allConverters = new Dictionary<string, IConverter>();
 
-        private readonly Dictionary<string, IData> allDatas = new Dictionary<string, IData>();
-        private readonly Dictionary<string, ICommand> allCommands = new Dictionary<string, ICommand>();
-        private readonly Dictionary<string, IConverter> allConverters = new Dictionary<string, IConverter>();
-
-        private readonly List<AbstractDataBinder> allDataBinders = new List<AbstractDataBinder>();
-        private readonly List<AbstractCommandBinder> allCommandBinders = new List<AbstractCommandBinder>();
+        protected readonly List<AbstractDataBinder> allDataBinders = new List<AbstractDataBinder>();
+        protected readonly List<AbstractCommandBinder> allCommandBinders = new List<AbstractCommandBinder>();
 
         public IEnumerable<string> GetDataKeys()
         {
@@ -193,8 +187,6 @@ namespace VVMUI.Core
 
             base.OnDisable();
 
-            //TODO real deactive
-
             AfterDeactive();
         }
 
@@ -210,8 +202,6 @@ namespace VVMUI.Core
             BeforeDestroy();
 
             base.OnDestroy();
-
-            //TODO real destroy
 
             AfterDestroy();
         }
