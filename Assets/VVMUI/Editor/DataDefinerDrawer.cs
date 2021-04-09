@@ -50,7 +50,7 @@ namespace VVMUI.Inspector
                         dict[k] = d;
                     }
                 }
-                else
+                else if (sourceData == null)
                 {
                     foreach (string k in vm.GetDataKeys())
                     {

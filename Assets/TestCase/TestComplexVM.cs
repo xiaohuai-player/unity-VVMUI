@@ -48,6 +48,7 @@ public class TestComplexVM : VMBehaviour {
 
 
     public ListData<FriendData> friends = new ListData<FriendData>() { new FriendData() };
+    public ListData<StringData> testList = new ListData<StringData>() { new StringData() }; 
     public StringData strInputName = new StringData("");
     public IntData intInputAge = new IntData(0);
     public SpriteData spriteTest = new SpriteData(null);
@@ -145,5 +146,12 @@ public class TestComplexVM : VMBehaviour {
         testDictFriend = DictionaryData.Parse<FriendData>(dictFs, delegate(FriendData item, object data){
             Debug.Log("Dictionary parse " + item.Name.Get() + " " + (data as Friend).Name);
         });
+
+        List<string> test = new List<string>();
+        for (int i = 0; i < 1000; i++)
+        {
+            test.Add(i.ToString());
+        }
+        testList.Parse(test);
     }
 }

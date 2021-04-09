@@ -65,6 +65,7 @@ namespace VVMUI.Inspector
                 EditorGUILayout.ObjectField("ScrollRect:", binder.ScrollRect, typeof(ScrollRect), true);
                 EditorGUILayout.ObjectField("LayoutGroup:", binder.LayoutGroup, typeof(LayoutGroup), true);
                 EditorGUILayout.IntField("PageItemsCount:", binder.PageItemsCount);
+                EditorGUILayout.IntField("StepPageItemsCount:", binder.StepPageItemsCount);
                 EditorGUI.EndDisabledGroup();
             }
         }

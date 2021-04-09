@@ -35,12 +35,13 @@ namespace VVMUI.Core.Binder
         public DataDefiner Source;
         public GameObject Template;
 
-        public bool Optimize = false;
+        public bool Optimize = true;
         public Canvas Canvas = null;
         public RectTransform ViewPort = null;
         public ScrollRect ScrollRect = null;
         public LayoutGroup LayoutGroup = null;
         public int PageItemsCount = 0;
+        public int StepPageItemsCount = 0;
 
         private IListData sourceData;
 
@@ -97,10 +98,12 @@ namespace VVMUI.Core.Binder
                 if (hLayout != null)
                 {
                     this.PageItemsCount = Mathf.CeilToInt(this.ViewPort.rect.width / (templateRectTransform.rect.width + hLayout.spacing));
+                    this.StepPageItemsCount = this.PageItemsCount / 2;
                 }
                 if (vLayout != null)
                 {
                     this.PageItemsCount = Mathf.CeilToInt(this.ViewPort.rect.height / (templateRectTransform.rect.height + vLayout.spacing));
+                    this.StepPageItemsCount = this.PageItemsCount / 2;
                 }
                 if (gLayout != null)
                 {
@@ -116,6 +119,14 @@ namespace VVMUI.Core.Binder
                             break;
                     }
                     this.PageItemsCount = rowsCount * collumnsCount;
+                    if (gLayout.startAxis == GridLayoutGroup.Axis.Horizontal)
+                    {
+                        this.StepPageItemsCount = collumnsCount * (rowsCount / 2);
+                    }
+                    else
+                    {
+                        this.StepPageItemsCount = rowsCount * (collumnsCount / 2);
+                    }
                 }
             }
         }
@@ -188,18 +199,13 @@ namespace VVMUI.Core.Binder
             // RectTransform.rect 不是准确的区域，自行实现通过四个角的坐标换算出真实的区域
 
             Rect viewportRect, firstChildRect, lastChildRect;
-            // viewportRect = new Rect (ViewPort.rect.x + ViewPort.position.x, ViewPort.rect.y + ViewPort.position.y, ViewPort.rect.width, ViewPort.rect.height);
             viewportRect = GetRectOfTransformInCanvas(ViewPort, Canvas);
 
             RectTransform firstChild = this.transform.GetChild(0) as RectTransform;
-            // firstChildRect = new Rect (firstChild.rect.x + firstChild.position.x, firstChild.rect.y + firstChild.position.y, firstChild.rect.width, firstChild.rect.height);
             firstChildRect = GetRectOfTransformInCanvas(firstChild, Canvas);
 
             RectTransform lastChild = this.transform.GetChild(this.transform.childCount - 1) as RectTransform;
-            // lastChildRect = new Rect (lastChild.rect.x + lastChild.position.x, lastChild.rect.y + lastChild.position.y, lastChild.rect.width, lastChild.rect.height);
             lastChildRect = GetRectOfTransformInCanvas(lastChild, Canvas);
-
-            int stepCount = PageItemsCount / 2;
 
             HorizontalLayoutGroup hLayout = this.LayoutGroup as HorizontalLayoutGroup;
             VerticalLayoutGroup vLayout = this.LayoutGroup as VerticalLayoutGroup;
@@ -220,7 +226,7 @@ namespace VVMUI.Core.Binder
 
             if (prevNextPage && this.startIndex > 0)
             {
-                this.startIndex -= stepCount;
+                this.startIndex -= StepPageItemsCount;
                 this.endIndex = this.startIndex + this.PageItemsCount * 2;
                 this.SetDirty();
                 return;
@@ -228,7 +234,7 @@ namespace VVMUI.Core.Binder
 
             if (sufNextPage && this.endIndex < this.sourceData.Count)
             {
-                this.endIndex += stepCount;
+                this.endIndex += StepPageItemsCount;
                 this.startIndex = this.endIndex - this.PageItemsCount * 2;
                 this.SetDirty();
                 return;
@@ -372,16 +378,43 @@ namespace VVMUI.Core.Binder
 
         private IEnumerator DelayArrange(bool focus)
         {
-            yield return null;
+            Rect viewportRect, firstChildRect, lastChildRect;
+            RectTransform firstChild = null, lastChild = null;
+
+            if (this.transform.childCount > 0)
+            {
+                firstChild = this.transform.GetChild(0) as RectTransform;
+                lastChild = this.transform.GetChild(this.transform.childCount - 1) as RectTransform;
+
+                viewportRect = GetRectOfTransformInCanvas(ViewPort, Canvas);
+                firstChildRect = GetRectOfTransformInCanvas(firstChild, Canvas);
+                lastChildRect = GetRectOfTransformInCanvas(lastChild, Canvas);
+                //Debug.Log("before arrange -----> yMax:" + viewportRect.yMax.ToString() + " yMin:" + viewportRect.yMin.ToString() + " f:" + firstChildRect.center.y + " l:" + lastChildRect.center.y);
+            }
+
+            yield return new WaitForEndOfFrame();
+
             Arrange();
 
             if (focus)
             {
-                yield return null;
                 SetFocus();
             }
 
+            yield return new WaitForEndOfFrame();
+
             this.dirty = false;
+
+            if (this.transform.childCount > 0)
+            {
+                firstChild = this.transform.GetChild(0) as RectTransform;
+                lastChild = this.transform.GetChild(this.transform.childCount - 1) as RectTransform;
+
+                viewportRect = GetRectOfTransformInCanvas(ViewPort, Canvas);
+                firstChildRect = GetRectOfTransformInCanvas(firstChild, Canvas);
+                lastChildRect = GetRectOfTransformInCanvas(lastChild, Canvas);
+                //Debug.Log("after arrange -----> yMax:" + viewportRect.yMax.ToString() + " yMin:" + viewportRect.yMin.ToString() + " f:" + firstChildRect.center.y + " l:" + lastChildRect.center.y);
+            }
         }
 
         private void Arrange()
@@ -393,6 +426,8 @@ namespace VVMUI.Core.Binder
 
             int start = Mathf.Max(0, this.startIndex);
             int end = endIndex >= 0 ? Mathf.Min(this.endIndex, this.sourceData.Count) : this.sourceData.Count;
+
+            Debug.Log("Arrange " + start + " " + end);
 
             int dataCount = end - start;
             for (int i = 0; i < this.transform.childCount; i++)
@@ -425,14 +460,11 @@ namespace VVMUI.Core.Binder
                 {
                     GameObject obj = this.transform.GetChild(i).gameObject;
                     ListTemplateBinder binder = obj.GetComponent<ListTemplateBinder>();
-                    if (binder != null)
+                    if (binder != null && i >= dataCount)
                     {
-                        if (i >= dataCount)
-                        {
-                            binder.UnBind();
-                            GameObject.Destroy(obj);
-                            this.itemsCount--;
-                        }
+                        binder.UnBind();
+                        GameObject.Destroy(obj);
+                        this.itemsCount--;
                     }
                 }
             }
