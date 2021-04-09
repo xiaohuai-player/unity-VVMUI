@@ -3,21 +3,22 @@ XLuaCommandType = CS.VVMUI.Script.XLua.XLuaCommandType
 
 vm = {}
 
-local function generate_vm_data(d)
-	print(type(d))
+local function generate_vm_data(k, d)
+	print(k, type(d))
 end
 
-function vm:init(t)
+function vm.init(self, t)
 	vm_data = {}
 	for k, v in pairs(t) do
-		generate_vm_data(v)
+		generate_vm_data(k, v)
 	end
 	self["__vm_data"] = vm_data
+	return self
 end
 
 setmetatable(vm, {
-	__call = function(vm, t)
-		vm:init(t)
+	__call = function(_, t)
+		return vm.init({}, t)
 	end
 })
 
