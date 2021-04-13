@@ -147,6 +147,9 @@ namespace VVMUI.Core.Binder
 
             this.originPadding = this.LayoutGroup.padding;
 
+            this.CalculatePageItemsCount();
+            this.CalculateDisplayRange();
+
             for (int i = 0; i < this.transform.childCount; i++)
             {
                 Destroy(this.transform.GetChild(i).gameObject);
@@ -154,7 +157,6 @@ namespace VVMUI.Core.Binder
 
             this.ScrollRect.onValueChanged.AddListener(delegate (Vector2 pos)
             {
-                this.CalculatePageItemsCount();
                 this.CalculateDisplayRange();
             });
         }
@@ -178,7 +180,7 @@ namespace VVMUI.Core.Binder
         {
             if (this.Canvas == null)
             {
-                this.Canvas = GetComponentInParent<Canvas>();
+                this.Canvas = this.GetComponentInParent<Canvas>(true);
             }
 
             if (this.Canvas == null)
@@ -378,20 +380,6 @@ namespace VVMUI.Core.Binder
 
         private IEnumerator DelayArrange(bool focus)
         {
-            Rect viewportRect, firstChildRect, lastChildRect;
-            RectTransform firstChild = null, lastChild = null;
-
-            if (this.transform.childCount > 0)
-            {
-                firstChild = this.transform.GetChild(0) as RectTransform;
-                lastChild = this.transform.GetChild(this.transform.childCount - 1) as RectTransform;
-
-                viewportRect = GetRectOfTransformInCanvas(ViewPort, Canvas);
-                firstChildRect = GetRectOfTransformInCanvas(firstChild, Canvas);
-                lastChildRect = GetRectOfTransformInCanvas(lastChild, Canvas);
-                //Debug.Log("before arrange -----> yMax:" + viewportRect.yMax.ToString() + " yMin:" + viewportRect.yMin.ToString() + " f:" + firstChildRect.center.y + " l:" + lastChildRect.center.y);
-            }
-
             yield return new WaitForEndOfFrame();
 
             Arrange();
@@ -404,17 +392,6 @@ namespace VVMUI.Core.Binder
             yield return new WaitForEndOfFrame();
 
             this.dirty = false;
-
-            if (this.transform.childCount > 0)
-            {
-                firstChild = this.transform.GetChild(0) as RectTransform;
-                lastChild = this.transform.GetChild(this.transform.childCount - 1) as RectTransform;
-
-                viewportRect = GetRectOfTransformInCanvas(ViewPort, Canvas);
-                firstChildRect = GetRectOfTransformInCanvas(firstChild, Canvas);
-                lastChildRect = GetRectOfTransformInCanvas(lastChild, Canvas);
-                //Debug.Log("after arrange -----> yMax:" + viewportRect.yMax.ToString() + " yMin:" + viewportRect.yMin.ToString() + " f:" + firstChildRect.center.y + " l:" + lastChildRect.center.y);
-            }
         }
 
         private void Arrange()
@@ -426,9 +403,6 @@ namespace VVMUI.Core.Binder
 
             int start = Mathf.Max(0, this.startIndex);
             int end = endIndex >= 0 ? Mathf.Min(this.endIndex, this.sourceData.Count) : this.sourceData.Count;
-
-            Debug.Log("Arrange " + start + " " + end);
-
             int dataCount = end - start;
             for (int i = 0; i < this.transform.childCount; i++)
             {

@@ -183,7 +183,6 @@ namespace VVMUI.Core.Data
         {
             base.Reverse(index, count);
             InvokeValueChanged();
-            
         }
 
         public new void Reverse()

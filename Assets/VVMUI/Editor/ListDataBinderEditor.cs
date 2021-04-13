@@ -61,6 +61,7 @@ namespace VVMUI.Inspector
             if (binder.Optimize)
             {
                 EditorGUI.BeginDisabledGroup(true);
+                EditorGUILayout.ObjectField("Canvas:", binder.Canvas, typeof(Canvas), true);
                 EditorGUILayout.ObjectField("ViewPort:", binder.ViewPort, typeof(RectTransform), true);
                 EditorGUILayout.ObjectField("ScrollRect:", binder.ScrollRect, typeof(ScrollRect), true);
                 EditorGUILayout.ObjectField("LayoutGroup:", binder.LayoutGroup, typeof(LayoutGroup), true);

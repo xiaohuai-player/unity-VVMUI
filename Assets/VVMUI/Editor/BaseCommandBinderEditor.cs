@@ -63,8 +63,8 @@ namespace VVMUI.Inspector
                     List<string> explicitCommands = new List<string>();
                     foreach (KeyValuePair<string, Type> command in commands)
                     {
-                    // 判断 event 和 command 参数类型是否匹配
-                    bool genericTypeExplicit = true;
+                        // 判断 event 和 command 参数类型是否匹配
+                        bool genericTypeExplicit = true;
                         if (type.IsGenericType != command.Value.IsGenericType)
                         {
                             genericTypeExplicit = false;
@@ -167,9 +167,12 @@ namespace VVMUI.Inspector
                     }
                     item.Command = EditorGUILayout.DelayedTextField(item.Command, GUILayout.Width(100));
 
-                    GUILayout.Space(30);
-                    EditorGUILayout.LabelField("Parameter:", GUILayout.Width(60));
-                    item.Parameter = EditorGUILayout.TextField(item.Parameter, GUILayout.Width(100));
+                    if (binder.GetComponentInParent<ListTemplateBinder>(true) == null)
+                    {
+                        GUILayout.Space(30);
+                        EditorGUILayout.LabelField("Parameter:", GUILayout.Width(60));
+                        item.Parameter = EditorGUILayout.TextField(item.Parameter, GUILayout.Width(100));
+                    }
 
                     EditorGUILayout.EndHorizontal();
                 }
