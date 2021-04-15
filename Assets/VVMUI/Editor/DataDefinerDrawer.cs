@@ -86,7 +86,7 @@ namespace VVMUI.Inspector
             converterIndex = convertersStr.IndexOf(definer.Converter);
             if (converterIndex < 0) converterIndex = 0;
 
-            bool typeFit = currentChainData != null && currentChainData.GetBindDataType() == propertyType;
+            bool typeFit = currentChainData != null && currentChainData.GetBindDataType().IsAssignableFrom(propertyType);
             if (!string.IsNullOrEmpty(definer.Converter)) typeFit = true;
 
             EditorGUILayout.LabelField("Definder:");
@@ -123,7 +123,7 @@ namespace VVMUI.Inspector
                     {
                         foreach (var kv in catData.Value)
                         {
-                            if (kv.Value.GetBindDataType() == propertyType || !string.IsNullOrEmpty(definer.Converter))
+                            if (kv.Value.GetBindDataType().IsAssignableFrom(propertyType) || !string.IsNullOrEmpty(definer.Converter))
                             {
                                 dataStr.Add(kv.Key);
                             }

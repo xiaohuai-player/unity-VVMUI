@@ -14,6 +14,7 @@ namespace VVMUI.Core.Data
             typeof(int),
             typeof(long),
             typeof(string),
+            typeof(Enum),
             typeof(Color),
             typeof(Vector2),
             typeof(Vector3),
@@ -242,6 +243,23 @@ namespace VVMUI.Core.Data
         }
 
         public static implicit operator long(LongData d)
+        {
+            return d.Get();
+        }
+    }
+
+    [System.Serializable]
+    public sealed class EnumData : BaseData<Enum>
+    {
+        public EnumData() : base()
+        {
+        }
+
+        public EnumData(Enum v) : base(v)
+        {
+        }
+
+        public static implicit operator Enum(EnumData d)
         {
             return d.Get();
         }

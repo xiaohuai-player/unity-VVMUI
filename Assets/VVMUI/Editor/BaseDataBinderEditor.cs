@@ -133,7 +133,7 @@ namespace VVMUI.Inspector
                                     {
                                         foreach (Type t in BaseData.SupportDataType)
                                         {
-                                            if (property.PropertyType.IsAssignableFrom(t))
+                                            if (t.IsAssignableFrom(property.PropertyType))
                                             {
                                                 propertiesStr.Add(property.Name);
                                                 propertiesType.Add(property.PropertyType);

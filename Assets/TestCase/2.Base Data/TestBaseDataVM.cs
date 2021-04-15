@@ -6,6 +6,8 @@
 
 using VVMUI.Core;
 using VVMUI.Core.Data;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class TestBaseDataVM : VMBehaviour
 {
@@ -19,6 +21,7 @@ public class TestBaseDataVM : VMBehaviour
         public ListData<TestItemStructData> field = new ListData<TestItemStructData>() { new TestItemStructData() };
     }
 
+    public EnumData testEnum = new EnumData(TextAnchor.MiddleCenter);
     public StringData testString = new StringData("test");
     public BoolData testBool = new BoolData(false);
     public StringData testAnimation = new StringData("anim1");
