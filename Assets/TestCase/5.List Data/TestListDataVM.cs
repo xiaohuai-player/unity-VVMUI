@@ -24,7 +24,7 @@ public class TestListDataVM : VMBehaviour
     public void btnCmd_Execute(object param)
     {
         List<StringData> data = new List<StringData>();
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 200; i++)
         {
             data.Add(new StringData(i.ToString()));
         }

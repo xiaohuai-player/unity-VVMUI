@@ -12,10 +12,7 @@ namespace VVMUI.Core.Binder
         private static Vector3[] corners = new Vector3[4];
         private static Rect GetRectOfTransformInCanvas(RectTransform transform, Canvas canvas)
         {
-            // Vector2[] cornersInCanvans = new Vector2[4];
-            // Vector3[] corners = new Vector3[4];
             transform.GetWorldCorners(corners);
-
             Camera camera = canvas.worldCamera;
             for (int i = 0; i < corners.Length; i++)
             {
@@ -27,7 +24,6 @@ namespace VVMUI.Core.Binder
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, corners[i], canvas.worldCamera, out pos);
                 cornersInCanvans[i] = pos;
             }
-
             Rect rect = new Rect(cornersInCanvans[0], new Vector2(cornersInCanvans[2].x - cornersInCanvans[1].x, cornersInCanvans[1].y - cornersInCanvans[0].y));
             return rect;
         }
@@ -40,14 +36,17 @@ namespace VVMUI.Core.Binder
         public RectTransform ViewPort = null;
         public ScrollRect ScrollRect = null;
         public LayoutGroup LayoutGroup = null;
-        public int PageItemsCount = 0;
-        public int StepPageItemsCount = 0;
+        public int PageRowsCount = 0;
+        public int StepRowsCount = 0;
+        public int RowItemsCount = 0;
 
         private IListData sourceData;
 
         private int itemsCount = 0;
         private int startIndex = -1;
         private int endIndex = -1;
+        private int gridRowCount = 0;
+        private int gridCollumnCount = 0;
         private RectOffset originPadding;
 
         private bool dirty = false;
@@ -60,85 +59,16 @@ namespace VVMUI.Core.Binder
         protected override void OnValidate()
         {
             base.OnValidate();
-
-            if (ViewPort == null && this.transform.parent != null)
-            {
-                ViewPort = this.transform.parent as RectTransform;
-            }
-            if (ScrollRect == null && ViewPort != null && ViewPort.GetComponentInParent<ScrollRect>(true) != null)
-            {
-                ScrollRect = ViewPort.GetComponentInParent<ScrollRect>(true);
-            }
-            if (LayoutGroup == null)
-            {
-                LayoutGroup = this.GetComponent<LayoutGroup>();
-            }
-        }
-
-        protected override void OnRectTransformDimensionsChange()
-        {
-            base.OnRectTransformDimensionsChange();
-            this.CalculatePageItemsCount();
+            GetComponents();
+            CalculatePageItemsCount();
         }
 #endif
-
-        private void CalculatePageItemsCount()
-        {
-            if (this.Template != null && this.IsOptimizeLayout())
-            {
-                RectTransform templateRectTransform = this.Template.transform as RectTransform;
-                HorizontalLayoutGroup hLayout = this.LayoutGroup as HorizontalLayoutGroup;
-                VerticalLayoutGroup vLayout = this.LayoutGroup as VerticalLayoutGroup;
-                GridLayoutGroup gLayout = this.LayoutGroup as GridLayoutGroup;
-                if (this.ViewPort.rect.width <= 1 || this.ViewPort.rect.height <= 1)
-                {
-                    return;
-                }
-
-                if (hLayout != null)
-                {
-                    this.PageItemsCount = Mathf.CeilToInt(this.ViewPort.rect.width / (templateRectTransform.rect.width + hLayout.spacing));
-                    this.StepPageItemsCount = this.PageItemsCount / 2;
-                }
-                if (vLayout != null)
-                {
-                    this.PageItemsCount = Mathf.CeilToInt(this.ViewPort.rect.height / (templateRectTransform.rect.height + vLayout.spacing));
-                    this.StepPageItemsCount = this.PageItemsCount / 2;
-                }
-                if (gLayout != null)
-                {
-                    int rowsCount = Mathf.FloorToInt(this.ViewPort.rect.height / (templateRectTransform.rect.height + gLayout.spacing.y));
-                    int collumnsCount = Mathf.FloorToInt(this.ViewPort.rect.width / (templateRectTransform.rect.width + gLayout.spacing.x));
-                    switch (gLayout.constraint)
-                    {
-                        case GridLayoutGroup.Constraint.FixedRowCount:
-                            rowsCount = gLayout.constraintCount;
-                            break;
-                        case GridLayoutGroup.Constraint.FixedColumnCount:
-                            collumnsCount = gLayout.constraintCount;
-                            break;
-                    }
-                    this.PageItemsCount = rowsCount * collumnsCount;
-                    if (gLayout.startAxis == GridLayoutGroup.Axis.Horizontal)
-                    {
-                        this.StepPageItemsCount = collumnsCount * (rowsCount / 2);
-                    }
-                    else
-                    {
-                        this.StepPageItemsCount = rowsCount * (collumnsCount / 2);
-                    }
-                }
-            }
-        }
-
-        private bool IsOptimizeLayout()
-        {
-            return this.Optimize && this.Template != null && this.ScrollRect != null && this.ViewPort != null && this.LayoutGroup != null;
-        }
 
         protected override void Awake()
         {
             base.Awake();
+
+            this.GetComponents();
 
             if (!IsOptimizeLayout())
             {
@@ -176,19 +106,97 @@ namespace VVMUI.Core.Binder
             this.dirty = false;
         }
 
-        private void CalculateDisplayRange()
+        private void GetComponents()
         {
-            if (this.Canvas == null)
+            if (Canvas == null)
             {
-                this.Canvas = this.GetComponentInParent<Canvas>(true);
+                Canvas = this.GetComponentInParent<Canvas>(true);
+            }
+            if (ViewPort == null && this.transform.parent != null)
+            {
+                ViewPort = this.transform.parent as RectTransform;
+            }
+            if (ScrollRect == null && ViewPort != null && ViewPort.GetComponentInParent<ScrollRect>(true) != null)
+            {
+                ScrollRect = ViewPort.GetComponentInParent<ScrollRect>(true);
+            }
+            if (LayoutGroup == null)
+            {
+                LayoutGroup = this.GetComponent<LayoutGroup>();
+            }
+        }
+
+        private bool IsOptimizeLayout()
+        {
+            return this.Optimize && this.Template != null && this.ScrollRect != null && this.ViewPort != null && this.LayoutGroup != null;
+        }
+
+        private void CalculatePageItemsCount()
+        {
+            RectTransform templateRectTransform = this.Template.transform as RectTransform;
+            HorizontalLayoutGroup hLayout = this.LayoutGroup as HorizontalLayoutGroup;
+            VerticalLayoutGroup vLayout = this.LayoutGroup as VerticalLayoutGroup;
+            GridLayoutGroup gLayout = this.LayoutGroup as GridLayoutGroup;
+            if (this.ViewPort.rect.width <= 1 || this.ViewPort.rect.height <= 1)
+            {
+                return;
             }
 
+            if (hLayout != null)
+            {
+                this.PageRowsCount = Mathf.CeilToInt(this.ViewPort.rect.width / (templateRectTransform.rect.width + hLayout.spacing));
+                this.RowItemsCount = 1;
+            }
+            if (vLayout != null)
+            {
+                this.PageRowsCount = Mathf.CeilToInt(this.ViewPort.rect.height / (templateRectTransform.rect.height + vLayout.spacing));
+                this.RowItemsCount = 1;
+            }
+            if (gLayout != null)
+            {
+                float fRowsCount = this.ViewPort.rect.height / (templateRectTransform.rect.height + gLayout.spacing.y);
+                float fCollumnsCount = this.ViewPort.rect.width / (templateRectTransform.rect.width + gLayout.spacing.x);
+                if (gLayout.startAxis == GridLayoutGroup.Axis.Horizontal)
+                {
+                    gridRowCount = Mathf.CeilToInt(fRowsCount);
+                    gridCollumnCount = Mathf.FloorToInt(fCollumnsCount);
+                }
+                else
+                {
+                    gridRowCount = Mathf.FloorToInt(fRowsCount);
+                    gridCollumnCount = Mathf.CeilToInt(fCollumnsCount);
+                }
+                switch (gLayout.constraint)
+                {
+                    case GridLayoutGroup.Constraint.FixedRowCount:
+                        gridRowCount = gLayout.constraintCount;
+                        break;
+                    case GridLayoutGroup.Constraint.FixedColumnCount:
+                        gridCollumnCount = gLayout.constraintCount;
+                        break;
+                }
+                if (gLayout.startAxis == GridLayoutGroup.Axis.Horizontal)
+                {
+                    this.PageRowsCount = gridRowCount;
+                    this.RowItemsCount = gridCollumnCount;
+                }
+                else
+                {
+                    this.PageRowsCount = gridCollumnCount;
+                    this.RowItemsCount = gridRowCount;
+                }
+            }
+            this.StepRowsCount = Mathf.CeilToInt((float)this.PageRowsCount / 2f);
+        }
+
+        private void CalculateDisplayRange()
+        {
             if (this.Canvas == null)
             {
                 return;
             }
 
-            if (this.sourceData == null || !this.IsOptimizeLayout() || this.transform.childCount <= 0)
+            if (this.sourceData == null || this.transform.childCount <= 0)
             {
                 return;
             }
@@ -202,12 +210,8 @@ namespace VVMUI.Core.Binder
 
             Rect viewportRect, firstChildRect, lastChildRect;
             viewportRect = GetRectOfTransformInCanvas(ViewPort, Canvas);
-
-            RectTransform firstChild = this.transform.GetChild(0) as RectTransform;
-            firstChildRect = GetRectOfTransformInCanvas(firstChild, Canvas);
-
-            RectTransform lastChild = this.transform.GetChild(this.transform.childCount - 1) as RectTransform;
-            lastChildRect = GetRectOfTransformInCanvas(lastChild, Canvas);
+            firstChildRect = GetRectOfTransformInCanvas(this.transform.GetChild(0) as RectTransform, Canvas);
+            lastChildRect = GetRectOfTransformInCanvas(this.transform.GetChild(this.transform.childCount - 1) as RectTransform, Canvas);
 
             HorizontalLayoutGroup hLayout = this.LayoutGroup as HorizontalLayoutGroup;
             VerticalLayoutGroup vLayout = this.LayoutGroup as VerticalLayoutGroup;
@@ -228,18 +232,46 @@ namespace VVMUI.Core.Binder
 
             if (prevNextPage && this.startIndex > 0)
             {
-                this.startIndex -= StepPageItemsCount;
-                this.endIndex = this.startIndex + this.PageItemsCount * 2;
+                this.startIndex -= (StepRowsCount * RowItemsCount);
+                this.endIndex = this.startIndex + PageRowsCount * 2 * RowItemsCount;
                 this.SetDirty();
                 return;
             }
 
             if (sufNextPage && this.endIndex < this.sourceData.Count)
             {
-                this.endIndex += StepPageItemsCount;
-                this.startIndex = this.endIndex - this.PageItemsCount * 2;
+                this.endIndex += (StepRowsCount * RowItemsCount);
+                this.startIndex = this.endIndex - PageRowsCount * 2 * RowItemsCount;
                 this.SetDirty();
                 return;
+            }
+        }
+
+        private void CalculateResetDisplayRange()
+        {
+            if (this.IsOptimizeLayout() && this.sourceData != null)
+            {
+                if (this.sourceData.FocusIndex < this.PageRowsCount)
+                {
+                    this.startIndex = 0;
+                    this.endIndex = PageRowsCount * 2 * RowItemsCount;
+                }
+                else if (this.sourceData.FocusIndex >= this.sourceData.Count - this.PageRowsCount)
+                {
+                    this.startIndex = this.sourceData.Count - PageRowsCount * 2 * RowItemsCount;
+                    this.endIndex = this.sourceData.Count;
+                }
+                else
+                {
+                    int focusRowIndex = this.sourceData.FocusIndex / RowItemsCount;
+                    this.startIndex = (focusRowIndex - this.PageRowsCount) * RowItemsCount;
+                    this.endIndex = (focusRowIndex + this.PageRowsCount) * RowItemsCount;
+                }
+            }
+            else
+            {
+                this.startIndex = 0;
+                this.endIndex = -1;
             }
         }
 
@@ -341,29 +373,7 @@ namespace VVMUI.Core.Binder
         {
             if (resetIndex)
             {
-                if (this.IsOptimizeLayout() && this.sourceData != null)
-                {
-                    if (this.sourceData.FocusIndex < this.PageItemsCount)
-                    {
-                        this.startIndex = 0;
-                        this.endIndex = this.PageItemsCount * 2;
-                    }
-                    else if (this.sourceData.FocusIndex >= this.sourceData.Count - this.PageItemsCount)
-                    {
-                        this.startIndex = this.sourceData.Count - this.PageItemsCount * 2;
-                        this.endIndex = this.sourceData.Count;
-                    }
-                    else
-                    {
-                        this.startIndex = this.sourceData.FocusIndex - this.PageItemsCount;
-                        this.endIndex = this.sourceData.FocusIndex + this.PageItemsCount;
-                    }
-                }
-                else
-                {
-                    this.startIndex = 0;
-                    this.endIndex = -1;
-                }
+                CalculateResetDisplayRange();
             }
 
             if (this.dirty)
@@ -513,49 +523,28 @@ namespace VVMUI.Core.Binder
             {
                 startWidth = startCount * templateRectTransform.rect.width + (startCount >= 1 ? (startCount - 1) : 0) * hLayout.spacing;
                 endWidth = endCount * templateRectTransform.rect.width + (endCount >= 1 ? (endCount - 1) : 0) * hLayout.spacing;
-                startHeight = templateRectTransform.rect.height;
-                endHeight = templateRectTransform.rect.height;
                 hLayout.padding = new RectOffset(this.originPadding.left + (int)startWidth, this.originPadding.right + (int)endWidth, this.originPadding.top, this.originPadding.bottom);
             }
             else if (vLayout != null)
             {
-                startWidth = templateRectTransform.rect.width;
-                endWidth = templateRectTransform.rect.width;
                 startHeight = startCount * templateRectTransform.rect.height + (startCount >= 1 ? (startCount - 1) : 0) * vLayout.spacing;
                 endHeight = endCount * templateRectTransform.rect.height + (endCount >= 1 ? (endCount - 1) : 0) * vLayout.spacing;
                 vLayout.padding = new RectOffset(this.originPadding.left, this.originPadding.right, this.originPadding.top + (int)startHeight, this.originPadding.bottom + (int)endHeight);
             }
             else if (gLayout != null)
             {
-                int rowsCount = Mathf.FloorToInt(this.ViewPort.rect.height / templateRectTransform.rect.height);
-                int collumnsCount = Mathf.FloorToInt(this.ViewPort.rect.width / templateRectTransform.rect.width);
-                switch (gLayout.constraint)
-                {
-                    case GridLayoutGroup.Constraint.FixedRowCount:
-                        rowsCount = gLayout.constraintCount;
-                        break;
-                    case GridLayoutGroup.Constraint.FixedColumnCount:
-                        collumnsCount = gLayout.constraintCount;
-                        break;
-                }
+                startCount = Mathf.CeilToInt((float)startCount / (float)RowItemsCount);
+                endCount = Mathf.CeilToInt((float)endCount / (float)RowItemsCount);
                 if (gLayout.startAxis == GridLayoutGroup.Axis.Horizontal)
                 {
-                    startCount = Mathf.CeilToInt(startCount / collumnsCount);
-                    endCount = Mathf.CeilToInt(endCount / collumnsCount);
-                    startWidth = this.ViewPort.rect.width;
-                    endWidth = this.ViewPort.rect.width;
                     startHeight = startCount * templateRectTransform.rect.height + (startCount >= 1 ? (startCount - 1) : 0) * gLayout.spacing.y;
                     endHeight = endCount * templateRectTransform.rect.height + (endCount >= 1 ? (endCount - 1) : 0) * gLayout.spacing.y;
                     gLayout.padding = new RectOffset(this.originPadding.left, this.originPadding.right, this.originPadding.top + (int)startHeight, this.originPadding.bottom + (int)endHeight);
                 }
                 else
                 {
-                    startCount = Mathf.CeilToInt(startCount / rowsCount);
-                    endCount = Mathf.CeilToInt(endCount / rowsCount);
                     startWidth = startCount * templateRectTransform.rect.width + (startCount >= 1 ? (startCount - 1) : 0) * gLayout.spacing.x;
                     endWidth = endCount * templateRectTransform.rect.width + (endCount >= 1 ? (endCount - 1) : 0) * gLayout.spacing.x;
-                    startHeight = this.ViewPort.rect.height;
-                    endHeight = this.ViewPort.rect.height;
                     gLayout.padding = new RectOffset(this.originPadding.left + (int)startWidth, this.originPadding.right + (int)endWidth, this.originPadding.top, this.originPadding.bottom);
                 }
             }
