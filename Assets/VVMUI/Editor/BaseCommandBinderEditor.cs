@@ -48,7 +48,7 @@ namespace VVMUI.Inspector
             Dictionary<string, string[]> componentEventCommands = new Dictionary<string, string[]>();
             Action<string, Type> scanType = delegate (string name, Type type)
             {
-                if (type.FullName.StartsWith("UnityEngine.Events.UnityEvent"))
+                if (typeof(UnityEngine.Events.UnityEventBase).IsAssignableFrom(type))
                 {
                     componentEvents[name] = false;
 

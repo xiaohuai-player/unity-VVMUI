@@ -8,9 +8,13 @@ namespace VVMUI.Core.Command
     public abstract class BaseCommand : ICommand
     {
         protected Func<object, bool> _canExecuteHandler;
-        protected Action<object> _noArgExecuteHandler;
+        protected List<Action> _canExecuteChangedHandlers = new List<Action>();
         protected VMBehaviour _vm;
-        private List<Action> _canExecuteChangedHandlers = new List<Action>();
+        protected Dictionary<int, object> _executeDelegatesCache = new Dictionary<int, object>();
+
+        private Action<object> _noArgExecuteHandler;
+        private Action<UnityEvent, UnityAction> _addListenerDelegate = (Action<UnityEvent, UnityAction>)Delegate.CreateDelegate(typeof(Action<UnityEvent, UnityAction>), null, ReflectionCache.Singleton[typeof(UnityEvent)].GetMethod("AddListener"));
+        private Action<UnityEvent, UnityAction> _removeListenerDelegate = (Action<UnityEvent, UnityAction>)Delegate.CreateDelegate(typeof(Action<UnityEvent, UnityAction>), null, ReflectionCache.Singleton[typeof(UnityEvent)].GetMethod("RemoveListener"));
 
         protected BaseCommand(Func<object, bool> canExecuteHandler, Action<object> executeHandler)
         {
@@ -66,19 +70,43 @@ namespace VVMUI.Core.Command
             }
         }
 
-        public virtual object GetExecuteDelegate(object parameter)
+        private object GetExecuteDelegate(object parameter)
         {
-            UnityAction executeDelegate = new UnityAction(delegate ()
+            int hashCode = 0;
+            if (parameter != null)
             {
-                this.Execute(parameter);
-            });
+                hashCode = parameter.GetHashCode();
+            }
+            if (!_executeDelegatesCache.TryGetValue(hashCode, out object executeDelegate))
+            {
+                executeDelegate = new UnityAction(delegate ()
+                {
+                    this.Execute(parameter);
+                });
+                _executeDelegatesCache[hashCode] = executeDelegate;
+            }
             return executeDelegate;
+        }
+
+        public virtual object AddListenerToEvent(object eventTarget, object parameter)
+        {
+            UnityAction action = (UnityAction)GetExecuteDelegate(parameter);
+            _addListenerDelegate.Invoke((UnityEvent)eventTarget, action);
+            return action;
+        }
+
+        public virtual void RemoveListenerFromEvent(object eventTarget, object action)
+        {
+            _removeListenerDelegate.Invoke((UnityEvent)eventTarget, (UnityAction)action);
         }
     }
 
     public abstract class BaseCommand<T> : BaseCommand, ICommand<T>
     {
         protected Action<T, object> _executeHandler;
+
+        private Action<UnityEvent<T>, UnityAction<T>> _addListenerDelegate = (Action<UnityEvent<T>, UnityAction<T>>)Delegate.CreateDelegate(typeof(Action<UnityEvent<T>, UnityAction<T>>), null, ReflectionCache.Singleton[typeof(UnityEvent<T>)].GetMethod("AddListener"));
+        private Action<UnityEvent<T>, UnityAction<T>> _removeListenerDelegate = (Action<UnityEvent<T>, UnityAction<T>>)Delegate.CreateDelegate(typeof(Action<UnityEvent<T>, UnityAction<T>>), null, ReflectionCache.Singleton[typeof(UnityEvent<T>)].GetMethod("RemoveListener"));
 
         protected BaseCommand(Func<object, bool> canExecuteHandler, Action<T, object> executeHandler) : base(canExecuteHandler, null)
         {
@@ -99,13 +127,34 @@ namespace VVMUI.Core.Command
             }
         }
 
-        public override object GetExecuteDelegate(object parameter)
+        private object GetExecuteDelegate(object parameter)
         {
-            UnityAction<T> executeDelegate = new UnityAction<T>(delegate (T arg)
+            int hashCode = 0;
+            if (parameter != null)
             {
-                this.Execute(arg, parameter);
-            });
+                hashCode = parameter.GetHashCode();
+            }
+            if (!_executeDelegatesCache.TryGetValue(hashCode, out object executeDelegate))
+            {
+                executeDelegate = new UnityAction<T>(delegate (T arg)
+                {
+                    this.Execute(arg, parameter);
+                });
+                _executeDelegatesCache[hashCode] = executeDelegate;
+            }
             return executeDelegate;
+        }
+
+        public override object AddListenerToEvent(object eventTarget, object parameter)
+        {
+            UnityAction<T> action = (UnityAction<T>)GetExecuteDelegate(parameter);
+            _addListenerDelegate.Invoke((UnityEvent<T>)eventTarget, action);
+            return action;
+        }
+
+        public override void RemoveListenerFromEvent(object eventTarget, object action)
+        {
+            _removeListenerDelegate.Invoke((UnityEvent<T>)eventTarget, (UnityAction<T>)action);
         }
     }
 

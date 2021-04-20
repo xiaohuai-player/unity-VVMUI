@@ -18,9 +18,17 @@ namespace VVMUI.Core.Binder
             public string Parameter;
 
             private ICommand command;
+            private Type commandType;
+            private ReflectionCacheData commandReflection;
+
+            private Type componentType;
+            private ReflectionCacheData componentReflection;
+
             private Type sourceEventType;
+            private ReflectionCacheData sourceEventReflection;
             private object sourceEventObj;
-            private object executeDelegate;
+            private object sourceEventAction;
+
             private Action canExecuteHandler;
 
             public void DoBind(VMBehaviour vm, object parameter, GameObject obj, Component component)
@@ -41,6 +49,7 @@ namespace VVMUI.Core.Binder
                     return;
                 }
 
+                // command type reflection
                 command = vm.GetCommand(this.Command);
                 if (command == null)
                 {
@@ -48,57 +57,72 @@ namespace VVMUI.Core.Binder
                     return;
                 }
 
-                Type commandType = command.GetType().BaseType;
-                if (!commandType.FullName.StartsWith("VVMUI.Core.Command.BaseCommand"))
+                commandType = command.GetType();
+                if (!typeof(BaseCommand).IsAssignableFrom(commandType))
                 {
                     Debugger.LogError("CommandBinder", obj.name + " command type error.");
                     return;
                 }
 
-                Type componentType = component.GetType();
+                commandReflection = ReflectionCache.Singleton[commandType];
 
+                // component type reflection
+                componentType = component.GetType();
+                componentReflection = ReflectionCache.Singleton[componentType];
+
+                // source event type reflection
+                // TODO: 性能优化 GetValue
                 // UGUI 组件的 event 有的是 property，有的不是，所以 field 和 property 都判断
-                FieldInfo sourceEventFieldInfo = componentType.GetField(this.Event);
-                PropertyInfo sourceEventPropertyInfo = componentType.GetProperty(this.Event);
+                FieldInfo sourceEventFieldInfo = componentReflection.GetField(this.Event);
+                PropertyInfo sourceEventPropertyInfo = componentReflection.GetProperty(this.Event);
                 if (sourceEventFieldInfo != null)
                 {
-                    sourceEventType = sourceEventFieldInfo.FieldType.BaseType;
+                    sourceEventType = sourceEventFieldInfo.FieldType;
                     sourceEventObj = sourceEventFieldInfo.GetValue(component);
                 }
                 if (sourceEventPropertyInfo != null)
                 {
-                    sourceEventType = sourceEventPropertyInfo.PropertyType.BaseType;
-                    sourceEventObj = sourceEventPropertyInfo.GetValue(component, null);
+                    sourceEventType = sourceEventPropertyInfo.PropertyType;
+                    sourceEventObj = sourceEventPropertyInfo.GetValue(component);
                 }
-                if (sourceEventType == null)
+                if (sourceEventType == null || sourceEventObj == null)
                 {
                     Debugger.LogError("CommandBinder", obj.name + " event null.");
                     return;
                 }
-                if (!sourceEventType.FullName.StartsWith("UnityEngine.Events.UnityEvent"))
+                if (!typeof(UnityEngine.Events.UnityEventBase).IsAssignableFrom(sourceEventType))
                 {
                     Debugger.LogError("CommandBinder", obj.name + " event type error.");
                     return;
                 }
+                sourceEventReflection = ReflectionCache.Singleton[sourceEventType];
 
                 // 判断 event 和 command 参数类型是否匹配
                 bool genericTypeExplicit = true;
-                if (sourceEventType.IsGenericType != commandType.IsGenericType)
+                while (true)
                 {
-                    genericTypeExplicit = false;
-                }
-                Type[] sourceEventGenericTypes = sourceEventType.GetGenericArguments();
-                Type[] commandGenericTypes = commandType.GetGenericArguments();
-                if (sourceEventGenericTypes.Length != commandGenericTypes.Length)
-                {
-                    genericTypeExplicit = false;
-                }
-                for (int j = 0; j < sourceEventGenericTypes.Length; j++)
-                {
-                    if (sourceEventGenericTypes[j] != commandGenericTypes[j])
+                    if (sourceEventType.IsGenericType != commandType.IsGenericType)
                     {
                         genericTypeExplicit = false;
+                        break;
                     }
+
+                    Type[] sourceEventGenericTypes = sourceEventReflection.GetGenericArguments();
+                    Type[] commandGenericTypes = commandReflection.GetGenericArguments();
+                    if (sourceEventGenericTypes.Length != commandGenericTypes.Length)
+                    {
+                        genericTypeExplicit = false;
+                        break;
+                    }
+                    for (int j = 0; j < sourceEventGenericTypes.Length; j++)
+                    {
+                        if (sourceEventGenericTypes[j] != commandGenericTypes[j])
+                        {
+                            genericTypeExplicit = false;
+                            break;
+                        }
+                    }
+                    break;
                 }
                 if (!genericTypeExplicit)
                 {
@@ -108,9 +132,7 @@ namespace VVMUI.Core.Binder
 
                 command.BindVM(vm);
 
-                executeDelegate = command.GetExecuteDelegate(parameter);
-                // TODO 性能优化：Type.GetMethod, MethodInfo.Invoke
-                sourceEventType.GetMethod("AddListener").Invoke(sourceEventObj, new object[] { executeDelegate });
+                sourceEventAction = command.AddListenerToEvent(sourceEventObj, parameter);
 
                 Selectable selectableComponent = component as Selectable;
                 if (selectableComponent != null)
@@ -126,10 +148,9 @@ namespace VVMUI.Core.Binder
 
             public void DoUnBind()
             {
-                if (command != null && sourceEventType != null && sourceEventObj != null && executeDelegate != null && canExecuteHandler != null)
+                if (command != null && sourceEventType != null && sourceEventObj != null && sourceEventAction != null && canExecuteHandler != null)
                 {
-                    // TODO 性能优化：Type.GetMethod, MethodInfo.Invoke
-                    sourceEventType.GetMethod("RemoveListener").Invoke(sourceEventObj, new object[] { executeDelegate });
+                    command.RemoveListenerFromEvent(sourceEventObj, sourceEventAction);
                     command.RemoveCanExecuteChangedListener(canExecuteHandler);
                 }
             }
@@ -137,6 +158,7 @@ namespace VVMUI.Core.Binder
 
         public List<CommandBinderItem> BindItems = new List<CommandBinderItem>();
 
+        [SerializeField]
         private Component component;
         public Component GetBindComponent()
         {

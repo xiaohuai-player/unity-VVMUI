@@ -118,6 +118,7 @@ namespace VVMUI.Core.Data
             }
 
             setter = new SetterWrapper<TTarget, TValue>(methodInfo);
+            _methodSettersCache[methodInfo] = setter;
             return setter;
         }
     }

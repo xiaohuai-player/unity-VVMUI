@@ -29,9 +29,7 @@ namespace VVMUI.Core.Binder
             public Component Component;
             public string Property;
             private Type componentType;
-            private PropertyInfo propertyInfo;
-            private Type propertyType;
-            private ISetValue propertySetter;
+            private ReflectionCacheData componentReflection;
 
             // animator bind vars
             public int AnimatorLayer;
@@ -118,34 +116,23 @@ namespace VVMUI.Core.Binder
                 if (componentType == null)
                 {
                     componentType = this.Component.GetType();
+                    componentReflection = ReflectionCache.Singleton[componentType];
                 }
 
-                if (propertyInfo == null)
-                {
-                    propertyInfo = componentType.GetProperty(this.Property);
-                }
-
+                PropertyInfo propertyInfo = componentReflection.GetProperty(this.Property);
                 if (propertyInfo == null || propertyInfo.GetSetMethod() == null)
                 {
                     Debugger.LogError("DataBinder", obj.name + " property null or not support.");
                     return;
                 }
 
-                if (propertyType == null)
-                {
-                    propertyType = propertyInfo.PropertyType;
-                }
-
+                Type propertyType = propertyInfo.PropertyType;
                 if (!CheckDataTypeValid(propertyType, obj))
                 {
                     return;
                 }
 
-                if (propertySetter == null)
-                {
-                    propertySetter = SetterWrapper.CreatePropertySetterWrapper(propertyInfo);
-                }
-
+                ISetValue propertySetter = SetterWrapper.CreatePropertySetterWrapper(propertyInfo);
                 if (propertySetter == null)
                 {
                     return;

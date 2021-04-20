@@ -10,7 +10,8 @@ namespace VVMUI.Core.Command
         void BindVM(VMBehaviour vm);
         bool CanExecute(object parameter);
         void Execute(object parameter);
-        object GetExecuteDelegate(object parameter);
+        object AddListenerToEvent(object eventTarget, object parameter);
+        void RemoveListenerFromEvent(object eventTarget, object action);
     }
 
     public interface ICommand<T>
