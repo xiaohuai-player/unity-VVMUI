@@ -4,6 +4,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using VVMUI.Core;
+using VVMUI.Core.Command;
 using VVMUI.Core.Binder;
 
 namespace VVMUI.Inspector
@@ -16,22 +17,7 @@ namespace VVMUI.Inspector
         public override void OnInspectorGUI()
         {
             BaseCommandBinder binder = target as BaseCommandBinder;
-            VMBehaviour vm = binder.GetComponentInParent<VMBehaviour>(true);
-            Dictionary<string, Type> commands = new Dictionary<string, Type>();
-            if (vm != null)
-            {
-                Type type = vm.GetType();
-                FieldInfo[] fields = type.GetFields();
-                for (int i = 0; i < fields.Length; i++)
-                {
-                    FieldInfo fi = fields[i];
-                    Type t = fi.FieldType;
-                    if (t.GetInterface("ICommand") != null)
-                    {
-                        commands[fi.Name] = t.BaseType;
-                    }
-                }
-            }
+            binder.EditorBind();
 
             Component component = binder.GetBindComponent();
             if (component == null)
@@ -40,19 +26,37 @@ namespace VVMUI.Inspector
                 return;
             }
 
+            Dictionary<string, Type> commands = new Dictionary<string, Type>();
+            foreach (string k in binder.BindVM.GetCommandKeys())
+            {
+                commands[k] = binder.BindVM.GetCommand(k).GetType().BaseType;
+            }
+
+            Type type = binder.BindVM.GetType();
+            FieldInfo[] fields = type.GetFields();
+            for (int i = 0; i < fields.Length; i++)
+            {
+                FieldInfo fi = fields[i];
+                Type t = fi.FieldType.BaseType;
+                if (typeof(ICommand).IsAssignableFrom(t))
+                {
+                    commands[fi.Name] = t;
+                }
+            }
+
             Type componentType = component.GetType();
             FieldInfo[] componentFieldInfos = componentType.GetFields();
             PropertyInfo[] componentPropertyInfos = componentType.GetProperties();
             Dictionary<string, bool> componentEvents = new Dictionary<string, bool>();
             Dictionary<string, string[]> componentEventParamTypes = new Dictionary<string, string[]>();
             Dictionary<string, string[]> componentEventCommands = new Dictionary<string, string[]>();
-            Action<string, Type> scanType = delegate (string name, Type type)
+            Action<string, Type> scanType = delegate (string name, Type sourceEventType)
             {
-                if (typeof(UnityEngine.Events.UnityEventBase).IsAssignableFrom(type))
+                if (typeof(UnityEngine.Events.UnityEventBase).IsAssignableFrom(sourceEventType))
                 {
                     componentEvents[name] = false;
 
-                    Type[] eventParamTypes = type.GetGenericArguments();
+                    Type[] eventParamTypes = sourceEventType.GetGenericArguments();
                     List<string> eventParamTypesStr = new List<string>();
                     foreach (Type t in eventParamTypes)
                     {
@@ -64,14 +68,15 @@ namespace VVMUI.Inspector
                     foreach (KeyValuePair<string, Type> command in commands)
                     {
                         // 判断 event 和 command 参数类型是否匹配
+                        Type commandType = command.Value;
                         bool genericTypeExplicit = true;
-                        if (type.IsGenericType != command.Value.IsGenericType)
+                        if (sourceEventType.IsGenericType != commandType.IsGenericType)
                         {
                             genericTypeExplicit = false;
                             continue;
                         }
-                        Type[] sourceEventGenericTypes = type.GetGenericArguments();
-                        Type[] commandGenericTypes = command.Value.GetGenericArguments();
+                        Type[] sourceEventGenericTypes = sourceEventType.GetGenericArguments();
+                        Type[] commandGenericTypes = commandType.GetGenericArguments();
                         if (sourceEventGenericTypes.Length != commandGenericTypes.Length)
                         {
                             genericTypeExplicit = false;

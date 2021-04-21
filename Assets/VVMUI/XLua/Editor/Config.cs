@@ -24,6 +24,18 @@ namespace VVMUI.Script.XLua.Config
             typeof(XLuaCommandType)
         };
 
+        [CSharpCallLua]
+        public static List<Type> CSharpCallLua = new List<Type>()
+        {
+            typeof(XLuaCommandExecuteHandler),
+            typeof(XLuaCommandExecuteHandler<bool>),
+            typeof(XLuaCommandExecuteHandler<int>),
+            typeof(XLuaCommandExecuteHandler<float>),
+            typeof(XLuaCommandExecuteHandler<string>),
+            typeof(XLuaCommandExecuteHandler<Vector2>),
+            typeof(XLuaCommandCanExecuteHandler)
+        };
+
         //黑名单
         [BlackList]
         public static List<List<string>> BlackList = new List<List<string>>()  {

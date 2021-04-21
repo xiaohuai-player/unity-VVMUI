@@ -3,16 +3,50 @@ XLuaCommandType = CS.VVMUI.Script.XLua.XLuaCommandType
 
 vm = {}
 
-local function generate_vm_data(k, d)
-	print(k, type(d))
+local function generate_vm_data(key, data)
+	vm_data_type = nil
+	data_type = type(data)
+	if data_type == "number" then
+		if math.type(data) == "integer" then
+			vm_data_type = XLuaDataType.Int
+		elseif math.type(data) == "float" then
+			vm_data_type = XLuaDataType.Float
+		end
+	elseif data_type == "string" then
+		vm_data_type = XLuaDataType.String
+	elseif data_type == "boolean" then
+		vm_data_type = XLuaDataType.Boolean
+	elseif data_type == "table" then
+		if #data > 0 then
+			vm_data_type = XLuaDataType.List
+		else
+			vm_data_type = XLuaDataType.Struct
+		end
+	elseif data_type == "userdata" then
+		vm_data_type = XLuaDataType.UserData
+	end
+
+	return {
+		type = vm_data_type,
+		value = data
+	}
 end
 
 function vm.init(self, t)
 	vm_data = {}
-	for k, v in pairs(t) do
-		generate_vm_data(k, v)
+	if t["data"] ~= nil and type(t["data"]) == "table" then
+		for k, v in pairs(t["data"]) do
+			obj = generate_vm_data(k, v)
+			if obj ~= nil then
+				vm_data[k] = obj
+			end
+		end
 	end
 	self["__vm_data"] = vm_data
+
+	self["__vm_command"] = t["command"]
+	self["__vm_hook"] = t["hook"]
+
 	return self
 end
 
@@ -21,9 +55,4 @@ setmetatable(vm, {
 		return vm.init({}, t)
 	end
 })
-
-print("XLuaDataType", CS.VVMUI.Script.XLua.XLuaDataType.Boolean)
-print("XLuaCommandType", CS.VVMUI.Script.XLua.XLuaCommandType)
-
-return vm
 

@@ -3,6 +3,7 @@ local data = {
 	test_float = 3.5,
 	test_bool = true,
 	test_string = "this is lua string",
+	test_color = CS.UnityEngine.Color(192, 100, 60),
 	test_base_list = { "aa", "bs", "cs", "dw", "eg" },
 	test_base_struct = {
 		name = "test struct name",
@@ -31,61 +32,61 @@ local data = {
 
 local command = {
 	test_btn = {
-		XLuaCommandType.Void,
-		CanExecute = function(vm, param)
+		type = XLuaCommandType.Void,
+		can_execute = function(vm, param)
 			return true
 		end,
-		Execute = function(vm, param)
+		execute = function(vm, param)
 			print("test_btn clicked")
 			vm.data.test_string = "test_btn clicked"
 		end
 	},
 	test_toggle = {
-		XLuaCommandType.Bool,
-		CanExecute = function(vm, param)
+		type = XLuaCommandType.Bool,
+		can_execute = function(vm, param)
 			return true
 		end,
-		Execute = function(vm, value, param)
+		execute = function(vm, value, param)
 			print("value of test_toggle: ", value)
 			vm.data.test_bool = value
 		end
 	},
 	test_slider = {
-		XLuaCommandType.Float,
-		CanExecute = function(vm, param)
+		type = XLuaCommandType.Float,
+		can_execute = function(vm, param)
 			return true
 		end,
-		Execute = function(vm, value, param)
+		execute = function(vm, value, param)
 			print("value of test_slider: ", value)
 			vm.data.test_float = value
 		end
 	},
 	test_dropdown = {
-		XLuaCommandType.Int,
-		CanExecute = function(vm, param)
+		type = XLuaCommandType.Int,
+		can_execute = function(vm, param)
 			return true
 		end,
-		Execute = function(vm, value, param)
+		execute = function(vm, value, param)
 			print("value of test_dropdown: ", value)
 			vm.data.test_int = value
 		end
 	},
 	test_input = {
-		XLuaCommandType.String,
-		CanExecute = function(vm, param)
+		type = XLuaCommandType.String,
+		can_execute = function(vm, param)
 			return true
 		end,
-		Execute = function(vm, value, param)
+		execute = function(vm, value, param)
 			print("value of test_input: ", value)
 			vm.data.test_string = value
 		end
 	},
 	test_scroll = {
-		XLuaCommandType.Vector2,
-		CanExecute = function(vm, param)
+		type = XLuaCommandType.Vector2,
+		can_execute = function(vm, param)
 			return true
 		end,
-		Execute = function(vm, value, param)
+		execute = function(vm, value, param)
 			print("value of test_scroll: ", value.x, value.y)
 			vm.data.test_base_struct.name = "test_scroll execute"
 		end
@@ -93,28 +94,28 @@ local command = {
 }
 
 local hook = {
-	BeforeAwake = function(vm)
+	before_awake = function(vm)
 		print("before awake")
 	end,
-	AfterAwake = function(vm)
+	after_awake = function(vm)
 		print("after awake")
 	end,
-	BeforeActive = function(vm)
+	before_active = function(vm)
 		print("before active")
 	end,
-	AfterActive = function(vm)
+	after_active = function(vm)
 		print("after active")
 	end,
-	BeforeDeactive = function(vm)
+	before_deactive = function(vm)
 		print("before deactive")
 	end,
-	AfterDeactive = function(vm)
+	after_deactive = function(vm)
 		print("after deactive")
 	end,
-	BeforeDestroy = function(vm)
+	before_destroy = function(vm)
 		print("before destroy")
 	end,
-	AfterDestroy = function(vm)
+	after_destroy = function(vm)
 		print("after destroy")
 	end
 }

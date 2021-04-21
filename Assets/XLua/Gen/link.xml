@@ -2,4 +2,20 @@
 
 <linker>
 
+	<assembly fullname="UnityEngine.CoreModule">
+	    <type fullname="UnityEngine.Color" preserve="all"/>
+		<type fullname="UnityEngine.Vector2" preserve="all"/>
+		<type fullname="UnityEngine.Vector3" preserve="all"/>
+		<type fullname="UnityEngine.Rect" preserve="all"/>
+		<type fullname="UnityEngine.Sprite" preserve="all"/>
+		<type fullname="UnityEngine.Texture" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="Assembly-CSharp">
+	    <type fullname="VVMUI.Script.XLua.XLuaDataType" preserve="all"/>
+		<type fullname="VVMUI.Script.XLua.XLuaCommandType" preserve="all"/>
+		
+	</assembly>
+
 </linker>

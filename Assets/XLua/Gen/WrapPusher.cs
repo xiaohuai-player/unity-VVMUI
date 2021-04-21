@@ -34,6 +34,8 @@ namespace XLua
 				translator.RegisterPushAndGetAndUpdate<UnityEngine.Ray>(translator.PushUnityEngineRay, translator.Get, translator.UpdateUnityEngineRay);
 				translator.RegisterPushAndGetAndUpdate<UnityEngine.Bounds>(translator.PushUnityEngineBounds, translator.Get, translator.UpdateUnityEngineBounds);
 				translator.RegisterPushAndGetAndUpdate<UnityEngine.Ray2D>(translator.PushUnityEngineRay2D, translator.Get, translator.UpdateUnityEngineRay2D);
+				translator.RegisterPushAndGetAndUpdate<VVMUI.Script.XLua.XLuaDataType>(translator.PushVVMUIScriptXLuaXLuaDataType, translator.Get, translator.UpdateVVMUIScriptXLuaXLuaDataType);
+				translator.RegisterPushAndGetAndUpdate<VVMUI.Script.XLua.XLuaCommandType>(translator.PushVVMUIScriptXLuaXLuaCommandType, translator.Get, translator.UpdateVVMUIScriptXLuaXLuaCommandType);
 			
 			}
         }
@@ -570,6 +572,174 @@ namespace XLua
             }
         }
         
+        int VVMUIScriptXLuaXLuaDataType_TypeID = -1;
+		int VVMUIScriptXLuaXLuaDataType_EnumRef = -1;
+        
+        public void PushVVMUIScriptXLuaXLuaDataType(RealStatePtr L, VVMUI.Script.XLua.XLuaDataType val)
+        {
+            if (VVMUIScriptXLuaXLuaDataType_TypeID == -1)
+            {
+			    bool is_first;
+                VVMUIScriptXLuaXLuaDataType_TypeID = getTypeId(L, typeof(VVMUI.Script.XLua.XLuaDataType), out is_first);
+				
+				if (VVMUIScriptXLuaXLuaDataType_EnumRef == -1)
+				{
+				    Utils.LoadCSTable(L, typeof(VVMUI.Script.XLua.XLuaDataType));
+				    VVMUIScriptXLuaXLuaDataType_EnumRef = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);
+				}
+				
+            }
+			
+			if (LuaAPI.xlua_tryget_cachedud(L, (int)val, VVMUIScriptXLuaXLuaDataType_EnumRef) == 1)
+            {
+			    return;
+			}
+			
+            IntPtr buff = LuaAPI.xlua_pushstruct(L, 4, VVMUIScriptXLuaXLuaDataType_TypeID);
+            if (!CopyByValue.Pack(buff, 0, (int)val))
+            {
+                throw new Exception("pack fail fail for VVMUI.Script.XLua.XLuaDataType ,value="+val);
+            }
+			
+			LuaAPI.lua_getref(L, VVMUIScriptXLuaXLuaDataType_EnumRef);
+			LuaAPI.lua_pushvalue(L, -2);
+			LuaAPI.xlua_rawseti(L, -2, (int)val);
+			LuaAPI.lua_pop(L, 1);
+			
+        }
+		
+        public void Get(RealStatePtr L, int index, out VVMUI.Script.XLua.XLuaDataType val)
+        {
+		    LuaTypes type = LuaAPI.lua_type(L, index);
+            if (type == LuaTypes.LUA_TUSERDATA )
+            {
+			    if (LuaAPI.xlua_gettypeid(L, index) != VVMUIScriptXLuaXLuaDataType_TypeID)
+				{
+				    throw new Exception("invalid userdata for VVMUI.Script.XLua.XLuaDataType");
+				}
+				
+                IntPtr buff = LuaAPI.lua_touserdata(L, index);
+				int e;
+                if (!CopyByValue.UnPack(buff, 0, out e))
+                {
+                    throw new Exception("unpack fail for VVMUI.Script.XLua.XLuaDataType");
+                }
+				val = (VVMUI.Script.XLua.XLuaDataType)e;
+                
+            }
+            else
+            {
+                val = (VVMUI.Script.XLua.XLuaDataType)objectCasters.GetCaster(typeof(VVMUI.Script.XLua.XLuaDataType))(L, index, null);
+            }
+        }
+		
+        public void UpdateVVMUIScriptXLuaXLuaDataType(RealStatePtr L, int index, VVMUI.Script.XLua.XLuaDataType val)
+        {
+		    
+            if (LuaAPI.lua_type(L, index) == LuaTypes.LUA_TUSERDATA)
+            {
+			    if (LuaAPI.xlua_gettypeid(L, index) != VVMUIScriptXLuaXLuaDataType_TypeID)
+				{
+				    throw new Exception("invalid userdata for VVMUI.Script.XLua.XLuaDataType");
+				}
+				
+                IntPtr buff = LuaAPI.lua_touserdata(L, index);
+                if (!CopyByValue.Pack(buff, 0,  (int)val))
+                {
+                    throw new Exception("pack fail for VVMUI.Script.XLua.XLuaDataType ,value="+val);
+                }
+            }
+			
+            else
+            {
+                throw new Exception("try to update a data with lua type:" + LuaAPI.lua_type(L, index));
+            }
+        }
+        
+        int VVMUIScriptXLuaXLuaCommandType_TypeID = -1;
+		int VVMUIScriptXLuaXLuaCommandType_EnumRef = -1;
+        
+        public void PushVVMUIScriptXLuaXLuaCommandType(RealStatePtr L, VVMUI.Script.XLua.XLuaCommandType val)
+        {
+            if (VVMUIScriptXLuaXLuaCommandType_TypeID == -1)
+            {
+			    bool is_first;
+                VVMUIScriptXLuaXLuaCommandType_TypeID = getTypeId(L, typeof(VVMUI.Script.XLua.XLuaCommandType), out is_first);
+				
+				if (VVMUIScriptXLuaXLuaCommandType_EnumRef == -1)
+				{
+				    Utils.LoadCSTable(L, typeof(VVMUI.Script.XLua.XLuaCommandType));
+				    VVMUIScriptXLuaXLuaCommandType_EnumRef = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);
+				}
+				
+            }
+			
+			if (LuaAPI.xlua_tryget_cachedud(L, (int)val, VVMUIScriptXLuaXLuaCommandType_EnumRef) == 1)
+            {
+			    return;
+			}
+			
+            IntPtr buff = LuaAPI.xlua_pushstruct(L, 4, VVMUIScriptXLuaXLuaCommandType_TypeID);
+            if (!CopyByValue.Pack(buff, 0, (int)val))
+            {
+                throw new Exception("pack fail fail for VVMUI.Script.XLua.XLuaCommandType ,value="+val);
+            }
+			
+			LuaAPI.lua_getref(L, VVMUIScriptXLuaXLuaCommandType_EnumRef);
+			LuaAPI.lua_pushvalue(L, -2);
+			LuaAPI.xlua_rawseti(L, -2, (int)val);
+			LuaAPI.lua_pop(L, 1);
+			
+        }
+		
+        public void Get(RealStatePtr L, int index, out VVMUI.Script.XLua.XLuaCommandType val)
+        {
+		    LuaTypes type = LuaAPI.lua_type(L, index);
+            if (type == LuaTypes.LUA_TUSERDATA )
+            {
+			    if (LuaAPI.xlua_gettypeid(L, index) != VVMUIScriptXLuaXLuaCommandType_TypeID)
+				{
+				    throw new Exception("invalid userdata for VVMUI.Script.XLua.XLuaCommandType");
+				}
+				
+                IntPtr buff = LuaAPI.lua_touserdata(L, index);
+				int e;
+                if (!CopyByValue.UnPack(buff, 0, out e))
+                {
+                    throw new Exception("unpack fail for VVMUI.Script.XLua.XLuaCommandType");
+                }
+				val = (VVMUI.Script.XLua.XLuaCommandType)e;
+                
+            }
+            else
+            {
+                val = (VVMUI.Script.XLua.XLuaCommandType)objectCasters.GetCaster(typeof(VVMUI.Script.XLua.XLuaCommandType))(L, index, null);
+            }
+        }
+		
+        public void UpdateVVMUIScriptXLuaXLuaCommandType(RealStatePtr L, int index, VVMUI.Script.XLua.XLuaCommandType val)
+        {
+		    
+            if (LuaAPI.lua_type(L, index) == LuaTypes.LUA_TUSERDATA)
+            {
+			    if (LuaAPI.xlua_gettypeid(L, index) != VVMUIScriptXLuaXLuaCommandType_TypeID)
+				{
+				    throw new Exception("invalid userdata for VVMUI.Script.XLua.XLuaCommandType");
+				}
+				
+                IntPtr buff = LuaAPI.lua_touserdata(L, index);
+                if (!CopyByValue.Pack(buff, 0,  (int)val))
+                {
+                    throw new Exception("pack fail for VVMUI.Script.XLua.XLuaCommandType ,value="+val);
+                }
+            }
+			
+            else
+            {
+                throw new Exception("try to update a data with lua type:" + LuaAPI.lua_type(L, index));
+            }
+        }
+        
         
 		// table cast optimze
 		
@@ -629,6 +799,18 @@ namespace XLua
 				translator.PushUnityEngineRay2D(L, array[index]);
 				return true;
 			}
+			else if (type == typeof(VVMUI.Script.XLua.XLuaDataType[]))
+			{
+			    VVMUI.Script.XLua.XLuaDataType[] array = obj as VVMUI.Script.XLua.XLuaDataType[];
+				translator.PushVVMUIScriptXLuaXLuaDataType(L, array[index]);
+				return true;
+			}
+			else if (type == typeof(VVMUI.Script.XLua.XLuaCommandType[]))
+			{
+			    VVMUI.Script.XLua.XLuaCommandType[] array = obj as VVMUI.Script.XLua.XLuaCommandType[];
+				translator.PushVVMUIScriptXLuaXLuaCommandType(L, array[index]);
+				return true;
+			}
             return false;
 		}
 		
@@ -680,6 +862,18 @@ namespace XLua
 			else if (type == typeof(UnityEngine.Ray2D[]))
 			{
 			    UnityEngine.Ray2D[] array = obj as UnityEngine.Ray2D[];
+				translator.Get(L, obj_idx, out array[array_idx]);
+				return true;
+			}
+			else if (type == typeof(VVMUI.Script.XLua.XLuaDataType[]))
+			{
+			    VVMUI.Script.XLua.XLuaDataType[] array = obj as VVMUI.Script.XLua.XLuaDataType[];
+				translator.Get(L, obj_idx, out array[array_idx]);
+				return true;
+			}
+			else if (type == typeof(VVMUI.Script.XLua.XLuaCommandType[]))
+			{
+			    VVMUI.Script.XLua.XLuaCommandType[] array = obj as VVMUI.Script.XLua.XLuaCommandType[];
 				translator.Get(L, obj_idx, out array[array_idx]);
 				return true;
 			}

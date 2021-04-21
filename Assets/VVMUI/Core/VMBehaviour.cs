@@ -15,6 +15,9 @@ namespace VVMUI.Core
     {
         public GameObject BindRoot;
 
+        protected bool collected = false;
+        protected bool binded = false;
+
         protected readonly Dictionary<string, IData> allDatas = new Dictionary<string, IData>();
         protected readonly Dictionary<string, ICommand> allCommands = new Dictionary<string, ICommand>();
         protected readonly Dictionary<string, IConverter> allConverters = new Dictionary<string, IConverter>();
@@ -83,7 +86,7 @@ namespace VVMUI.Core
             allConverters[key] = new T();
         }
 
-        public void Collect()
+        public virtual void Collect()
         {
             Type type = this.GetType();
             FieldInfo[] fields = type.GetFields();
@@ -91,7 +94,7 @@ namespace VVMUI.Core
             {
                 FieldInfo fi = fields[i];
                 Type t = fi.FieldType;
-                if (t.GetInterface("IData") != null || typeof(StructData).IsAssignableFrom(t))
+                if (typeof(IData).IsAssignableFrom(t))
                 {
                     IData data = fi.GetValue(this) as IData;
                     if (data != null)
@@ -99,7 +102,7 @@ namespace VVMUI.Core
                         allDatas[fi.Name] = data;
                     }
                 }
-                if (t.GetInterface("ICommand") != null)
+                if (typeof(ICommand).IsAssignableFrom(t))
                 {
                     ICommand cmd = fi.GetValue(this) as ICommand;
                     if (cmd != null)
@@ -107,7 +110,7 @@ namespace VVMUI.Core
                         allCommands[fi.Name] = cmd;
                     }
                 }
-                if (t.GetInterface("IConverter") != null)
+                if (typeof(IConverter).IsAssignableFrom(t))
                 {
                     IConverter cvt = fi.GetValue(this) as IConverter;
                     if (cvt != null)

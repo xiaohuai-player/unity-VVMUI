@@ -50,12 +50,14 @@ namespace VVMUI.Core.Binder
 
     public abstract class AbstractCommandBinder : UIBehaviour
     {
+        public VMBehaviour BindVM { get; protected set; }
+
         public virtual bool CanBind(VMBehaviour vm)
         {
             return true;
         }
 
-        public virtual void Bind(VMBehaviour vm) { }
+        public virtual void Bind(VMBehaviour vm) { this.BindVM = vm; }
 
         public virtual bool CanBindListItem(VMBehaviour vm, int index)
         {
@@ -64,9 +66,20 @@ namespace VVMUI.Core.Binder
 
         public virtual void BindListItem(VMBehaviour vm, int index)
         {
-
+            this.BindVM = vm;
         }
 
-        public virtual void UnBind() { }
+#if UNITY_EDITOR
+        public void EditorBind()
+        {
+            this.BindVM = this.GetComponentInParent<VMBehaviour>(true);
+            if (this.BindVM != null)
+            {
+                this.BindVM.Collect();
+            }
+        }
+#endif
+
+        public virtual void UnBind() { this.BindVM = null; }
     }
 }

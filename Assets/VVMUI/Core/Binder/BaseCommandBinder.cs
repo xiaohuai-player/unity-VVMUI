@@ -49,6 +49,10 @@ namespace VVMUI.Core.Binder
                     return;
                 }
 
+                // component type reflection
+                componentType = component.GetType();
+                componentReflection = ReflectionCache.Singleton[componentType];
+
                 // command type reflection
                 command = vm.GetCommand(this.Command);
                 if (command == null)
@@ -56,19 +60,13 @@ namespace VVMUI.Core.Binder
                     Debugger.LogError("CommandBinder", obj.name + " command null.");
                     return;
                 }
-
-                commandType = command.GetType();
+                commandType = command.GetType().BaseType;
                 if (!typeof(BaseCommand).IsAssignableFrom(commandType))
                 {
                     Debugger.LogError("CommandBinder", obj.name + " command type error.");
                     return;
                 }
-
                 commandReflection = ReflectionCache.Singleton[commandType];
-
-                // component type reflection
-                componentType = component.GetType();
-                componentReflection = ReflectionCache.Singleton[componentType];
 
                 // source event type reflection
                 // TODO: 性能优化 GetValue
@@ -77,12 +75,12 @@ namespace VVMUI.Core.Binder
                 PropertyInfo sourceEventPropertyInfo = componentReflection.GetProperty(this.Event);
                 if (sourceEventFieldInfo != null)
                 {
-                    sourceEventType = sourceEventFieldInfo.FieldType;
+                    sourceEventType = sourceEventFieldInfo.FieldType.BaseType;
                     sourceEventObj = sourceEventFieldInfo.GetValue(component);
                 }
                 if (sourceEventPropertyInfo != null)
                 {
-                    sourceEventType = sourceEventPropertyInfo.PropertyType;
+                    sourceEventType = sourceEventPropertyInfo.PropertyType.BaseType;
                     sourceEventObj = sourceEventPropertyInfo.GetValue(component);
                 }
                 if (sourceEventType == null || sourceEventObj == null)
@@ -177,6 +175,8 @@ namespace VVMUI.Core.Binder
 
         public override void Bind(VMBehaviour vm)
         {
+            base.Bind(vm);
+
             for (int i = 0; i < BindItems.Count; i++)
             {
                 CommandBinderItem item = BindItems[i];
@@ -186,6 +186,8 @@ namespace VVMUI.Core.Binder
 
         public override void BindListItem(VMBehaviour vm, int index)
         {
+            base.BindListItem(vm, index);
+
             for (int i = 0; i < BindItems.Count; i++)
             {
                 CommandBinderItem item = BindItems[i];
@@ -195,6 +197,8 @@ namespace VVMUI.Core.Binder
 
         public override void UnBind()
         {
+            base.UnBind();
+
             for (int i = 0; i < BindItems.Count; i++)
             {
                 CommandBinderItem item = BindItems[i];

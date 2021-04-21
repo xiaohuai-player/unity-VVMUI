@@ -19,12 +19,40 @@ namespace XLua.CSObjectWrap
 	{
         
         
+        static void wrapInit0(LuaEnv luaenv, ObjectTranslator translator)
+        {
+        
+            translator.DelayWrapLoader(typeof(UnityEngine.Color), UnityEngineColorWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(UnityEngine.Vector2), UnityEngineVector2Wrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(UnityEngine.Vector3), UnityEngineVector3Wrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(UnityEngine.Rect), UnityEngineRectWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(UnityEngine.Sprite), UnityEngineSpriteWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(UnityEngine.Texture), UnityEngineTextureWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(VVMUI.Script.XLua.XLuaDataType), VVMUIScriptXLuaXLuaDataTypeWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(VVMUI.Script.XLua.XLuaCommandType), VVMUIScriptXLuaXLuaCommandTypeWrap.__Register);
         
         
         
+        }
         
         static void Init(LuaEnv luaenv, ObjectTranslator translator)
         {
+            
+            wrapInit0(luaenv, translator);
             
             
         }
