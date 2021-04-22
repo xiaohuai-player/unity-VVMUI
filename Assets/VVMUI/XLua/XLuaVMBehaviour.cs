@@ -36,8 +36,24 @@ namespace VVMUI.Script.XLua
 
         public string LuaPath;
 
-        public override void Collect()
+        private LuaTable vmTable;
+        private LuaTable vmData;
+        private LuaTable vmCommand;
+        private LuaTable vmHook;
+
+        private XLuaHookHandler beforeAwake;
+        private XLuaHookHandler afterAwake;
+        private XLuaHookHandler beforeActive;
+        private XLuaHookHandler afterActive;
+        private XLuaHookHandler beforeDeactive;
+        private XLuaHookHandler afterDeactive;
+        private XLuaHookHandler beforeDestroy;
+        private XLuaHookHandler afterDestroy;
+
+        protected override void BeforeAwake()
         {
+            base.BeforeAwake();
+
             if (Env == null)
             {
                 Init(new LuaEnv());
@@ -49,11 +65,101 @@ namespace VVMUI.Script.XLua
                 return;
             }
 
-            LuaTable vm = (LuaTable)results[0];
-            LuaTable vmData = vm.Get<LuaTable>("__vm_data");
-            LuaTable vmCommand = vm.Get<LuaTable>("__vm_command");
-            LuaTable vmHook = vm.Get<LuaTable>("__vm_hook");
+            vmTable = (LuaTable)results[0];
+            vmData = vmTable.Get<LuaTable>("__vm_data");
+            vmCommand = vmTable.Get<LuaTable>("__vm_command");
+            vmHook = vmTable.Get<LuaTable>("__vm_hook");
 
+            if (vmHook != null)
+            {
+                beforeAwake = vmHook.Get<XLuaHookHandler>("before_awake");
+                afterAwake = vmHook.Get<XLuaHookHandler>("after_awake");
+                beforeActive = vmHook.Get<XLuaHookHandler>("before_active");
+                afterActive = vmHook.Get<XLuaHookHandler>("after_active");
+                beforeDeactive = vmHook.Get<XLuaHookHandler>("before_deactive");
+                afterDeactive = vmHook.Get<XLuaHookHandler>("after_deactive");
+                beforeDestroy = vmHook.Get<XLuaHookHandler>("before_destroy");
+                afterDestroy = vmHook.Get<XLuaHookHandler>("after_destroy");
+            }
+
+            if (beforeAwake != null)
+            {
+                beforeAwake.Invoke(vmTable);
+            }
+        }
+
+        protected override void AfterAwake()
+        {
+            base.AfterAwake();
+
+            if (afterAwake != null)
+            {
+                afterAwake.Invoke(this.vmTable);
+            }
+        }
+
+        protected override void BeforeActive()
+        {
+            base.BeforeActive();
+
+            if (beforeActive != null)
+            {
+                beforeActive.Invoke(this.vmTable);
+            }
+        }
+
+        protected override void AfterActive()
+        {
+            base.AfterActive();
+
+            if (afterActive != null)
+            {
+                afterActive.Invoke(this.vmTable);
+            }
+        }
+
+        protected override void BeforeDeactive()
+        {
+            base.BeforeDeactive();
+
+            if (beforeDeactive != null)
+            {
+                beforeDeactive.Invoke(this.vmTable);
+            }
+        }
+
+        protected override void AfterDeactive()
+        {
+            base.AfterDeactive();
+
+            if (afterDeactive != null)
+            {
+                afterDeactive.Invoke(this.vmTable);
+            }
+        }
+
+        protected override void BeforeDestroy()
+        {
+            base.BeforeDestroy();
+
+            if (beforeDestroy != null)
+            {
+                beforeDestroy.Invoke(this.vmTable);
+            }
+        }
+
+        protected override void AfterDestroy()
+        {
+            base.AfterDestroy();
+
+            if (afterDestroy != null)
+            {
+                afterDestroy.Invoke(this.vmTable);
+            }
+        }
+
+        public override void Collect()
+        {
             if (vmData != null)
             {
                 IEnumerable<string> keys = vmData.GetKeys<string>();
@@ -101,14 +207,14 @@ namespace VVMUI.Script.XLua
                                     }
                                     else
                                     {
-                                        return commandCanExecute.Invoke(vm, parameter);
+                                        return commandCanExecute.Invoke(vmTable, parameter);
                                     }
                                 },
                                 delegate(object parameter)
                                 {
                                     if (commandExecute != null)
                                     {
-                                        commandExecute.Invoke(vm, parameter);
+                                        commandExecute.Invoke(vmTable, parameter);
                                     }
                                 }
                             ));
@@ -124,14 +230,14 @@ namespace VVMUI.Script.XLua
                                     }
                                     else
                                     {
-                                        return commandCanExecute.Invoke(vm, parameter);
+                                        return commandCanExecute.Invoke(vmTable, parameter);
                                     }
                                 },
                                 delegate(bool v, object parameter)
                                 {
                                     if (boolCommandExecute != null)
                                     {
-                                        boolCommandExecute.Invoke(vm, v, parameter);
+                                        boolCommandExecute.Invoke(vmTable, v, parameter);
                                     }
                                 }
                             ));
@@ -147,14 +253,14 @@ namespace VVMUI.Script.XLua
                                     }
                                     else
                                     {
-                                        return commandCanExecute.Invoke(vm, parameter);
+                                        return commandCanExecute.Invoke(vmTable, parameter);
                                     }
                                 },
                                 delegate (float v, object parameter)
                                 {
                                     if (floatCommandExecute != null)
                                     {
-                                        floatCommandExecute.Invoke(vm, v, parameter);
+                                        floatCommandExecute.Invoke(vmTable, v, parameter);
                                     }
                                 }
                             ));
@@ -170,14 +276,14 @@ namespace VVMUI.Script.XLua
                                     }
                                     else
                                     {
-                                        return commandCanExecute.Invoke(vm, parameter);
+                                        return commandCanExecute.Invoke(vmTable, parameter);
                                     }
                                 },
                                 delegate (int v, object parameter)
                                 {
                                     if (intCommandExecute != null)
                                     {
-                                        intCommandExecute.Invoke(vm, v, parameter);
+                                        intCommandExecute.Invoke(vmTable, v, parameter);
                                     }
                                 }
                             ));
@@ -193,14 +299,14 @@ namespace VVMUI.Script.XLua
                                     }
                                     else
                                     {
-                                        return commandCanExecute.Invoke(vm, parameter);
+                                        return commandCanExecute.Invoke(vmTable, parameter);
                                     }
                                 },
                                 delegate (string v, object parameter)
                                 {
                                     if (stringCommandExecute != null)
                                     {
-                                        stringCommandExecute.Invoke(vm, v, parameter);
+                                        stringCommandExecute.Invoke(vmTable, v, parameter);
                                     }
                                 }
                             ));
@@ -216,14 +322,14 @@ namespace VVMUI.Script.XLua
                                     }
                                     else
                                     {
-                                        return commandCanExecute.Invoke(vm, parameter);
+                                        return commandCanExecute.Invoke(vmTable, parameter);
                                     }
                                 },
                                 delegate (Vector2 v, object parameter)
                                 {
                                     if (vector2CommandExecute != null)
                                     {
-                                        vector2CommandExecute.Invoke(vm, v, parameter);
+                                        vector2CommandExecute.Invoke(vmTable, v, parameter);
                                     }
                                 }
                             ));

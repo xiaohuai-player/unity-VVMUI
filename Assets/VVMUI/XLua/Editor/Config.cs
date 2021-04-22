@@ -27,6 +27,7 @@ namespace VVMUI.Script.XLua.Config
         [CSharpCallLua]
         public static List<Type> CSharpCallLua = new List<Type>()
         {
+            typeof(XLuaHookHandler),
             typeof(XLuaCommandExecuteHandler),
             typeof(XLuaCommandExecuteHandler<bool>),
             typeof(XLuaCommandExecuteHandler<int>),

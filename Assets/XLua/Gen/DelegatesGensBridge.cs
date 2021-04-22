@@ -16,7 +16,29 @@ namespace XLua
     public partial class DelegateBridge : DelegateBridgeBase
     {
 		
-		public void __Gen_Delegate_Imp0(XLua.LuaTable p0, object p1)
+		public void __Gen_Delegate_Imp0(XLua.LuaTable p0)
+		{
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+                RealStatePtr L = luaEnv.rawL;
+                int errFunc = LuaAPI.pcall_prepare(L, errorFuncRef, luaReference);
+                ObjectTranslator translator = luaEnv.translator;
+                translator.Push(L, p0);
+                
+                PCall(L, 1, 0, errFunc);
+                
+                
+                
+                LuaAPI.lua_settop(L, errFunc - 1);
+                
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+		}
+        
+		public void __Gen_Delegate_Imp1(XLua.LuaTable p0, object p1)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -39,7 +61,7 @@ namespace XLua
 #endif
 		}
         
-		public void __Gen_Delegate_Imp1(XLua.LuaTable p0, bool p1, object p2)
+		public void __Gen_Delegate_Imp2(XLua.LuaTable p0, bool p1, object p2)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -63,7 +85,7 @@ namespace XLua
 #endif
 		}
         
-		public void __Gen_Delegate_Imp2(XLua.LuaTable p0, int p1, object p2)
+		public void __Gen_Delegate_Imp3(XLua.LuaTable p0, int p1, object p2)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -87,7 +109,7 @@ namespace XLua
 #endif
 		}
         
-		public void __Gen_Delegate_Imp3(XLua.LuaTable p0, float p1, object p2)
+		public void __Gen_Delegate_Imp4(XLua.LuaTable p0, float p1, object p2)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -111,7 +133,7 @@ namespace XLua
 #endif
 		}
         
-		public void __Gen_Delegate_Imp4(XLua.LuaTable p0, string p1, object p2)
+		public void __Gen_Delegate_Imp5(XLua.LuaTable p0, string p1, object p2)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -135,7 +157,7 @@ namespace XLua
 #endif
 		}
         
-		public void __Gen_Delegate_Imp5(XLua.LuaTable p0, UnityEngine.Vector2 p1, object p2)
+		public void __Gen_Delegate_Imp6(XLua.LuaTable p0, UnityEngine.Vector2 p1, object p2)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -159,7 +181,7 @@ namespace XLua
 #endif
 		}
         
-		public bool __Gen_Delegate_Imp6(XLua.LuaTable p0, object p1)
+		public bool __Gen_Delegate_Imp7(XLua.LuaTable p0, object p1)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -191,39 +213,44 @@ namespace XLua
 		public override Delegate GetDelegateByType(Type type)
 		{
 		
+		    if (type == typeof(VVMUI.Script.XLua.XLuaHookHandler))
+			{
+			    return new VVMUI.Script.XLua.XLuaHookHandler(__Gen_Delegate_Imp0);
+			}
+		
 		    if (type == typeof(VVMUI.Script.XLua.XLuaCommandExecuteHandler))
 			{
-			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler(__Gen_Delegate_Imp0);
+			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler(__Gen_Delegate_Imp1);
 			}
 		
 		    if (type == typeof(VVMUI.Script.XLua.XLuaCommandExecuteHandler<bool>))
 			{
-			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler<bool>(__Gen_Delegate_Imp1);
+			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler<bool>(__Gen_Delegate_Imp2);
 			}
 		
 		    if (type == typeof(VVMUI.Script.XLua.XLuaCommandExecuteHandler<int>))
 			{
-			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler<int>(__Gen_Delegate_Imp2);
+			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler<int>(__Gen_Delegate_Imp3);
 			}
 		
 		    if (type == typeof(VVMUI.Script.XLua.XLuaCommandExecuteHandler<float>))
 			{
-			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler<float>(__Gen_Delegate_Imp3);
+			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler<float>(__Gen_Delegate_Imp4);
 			}
 		
 		    if (type == typeof(VVMUI.Script.XLua.XLuaCommandExecuteHandler<string>))
 			{
-			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler<string>(__Gen_Delegate_Imp4);
+			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler<string>(__Gen_Delegate_Imp5);
 			}
 		
 		    if (type == typeof(VVMUI.Script.XLua.XLuaCommandExecuteHandler<UnityEngine.Vector2>))
 			{
-			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler<UnityEngine.Vector2>(__Gen_Delegate_Imp5);
+			    return new VVMUI.Script.XLua.XLuaCommandExecuteHandler<UnityEngine.Vector2>(__Gen_Delegate_Imp6);
 			}
 		
 		    if (type == typeof(VVMUI.Script.XLua.XLuaCommandCanExecuteHandler))
 			{
-			    return new VVMUI.Script.XLua.XLuaCommandCanExecuteHandler(__Gen_Delegate_Imp6);
+			    return new VVMUI.Script.XLua.XLuaCommandCanExecuteHandler(__Gen_Delegate_Imp7);
 			}
 		
 		    return null;

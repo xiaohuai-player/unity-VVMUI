@@ -26,6 +26,7 @@ namespace VVMUI.Script.XLua
         Vector2
     }
 
+    public delegate void XLuaHookHandler(LuaTable vm);
     public delegate bool XLuaCommandCanExecuteHandler(LuaTable vm, object parameter);
     public delegate void XLuaCommandExecuteHandler(LuaTable vm, object parameter);
     public delegate void XLuaCommandExecuteHandler<T>(LuaTable vm, T value, object parameter);
