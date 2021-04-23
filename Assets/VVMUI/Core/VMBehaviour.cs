@@ -15,9 +15,6 @@ namespace VVMUI.Core
     {
         public GameObject BindRoot;
 
-        protected bool collected = false;
-        protected bool binded = false;
-
         protected readonly Dictionary<string, IData> allDatas = new Dictionary<string, IData>();
         protected readonly Dictionary<string, ICommand> allCommands = new Dictionary<string, ICommand>();
         protected readonly Dictionary<string, IConverter> allConverters = new Dictionary<string, IConverter>();
@@ -86,7 +83,7 @@ namespace VVMUI.Core
             allConverters[key] = new T();
         }
 
-        public virtual void Collect()
+        protected virtual void Collect()
         {
             Type type = this.GetType();
             FieldInfo[] fields = type.GetFields();
@@ -145,6 +142,11 @@ namespace VVMUI.Core
                     this.allCommandBinders[i].Bind(this);
                 }
             }
+        }
+
+        public virtual void EditorCollect()
+        {
+            this.Collect();
         }
 
         public void NotifyCommandsCanExecute()

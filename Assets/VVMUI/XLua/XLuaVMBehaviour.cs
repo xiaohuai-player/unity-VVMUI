@@ -50,15 +50,8 @@ namespace VVMUI.Script.XLua
         private XLuaHookHandler beforeDestroy;
         private XLuaHookHandler afterDestroy;
 
-        protected override void BeforeAwake()
+        private void ExecuteLuaScript()
         {
-            base.BeforeAwake();
-
-            if (Env == null)
-            {
-                Init(new LuaEnv());
-            }
-
             object[] results = Env.DoString("return require '" + LuaPath + "'");
             if (results == null || results.Length <= 0)
             {
@@ -81,6 +74,18 @@ namespace VVMUI.Script.XLua
                 beforeDestroy = vmHook.Get<XLuaHookHandler>("before_destroy");
                 afterDestroy = vmHook.Get<XLuaHookHandler>("after_destroy");
             }
+        }
+
+        protected override void BeforeAwake()
+        {
+            base.BeforeAwake();
+
+            if (!Initialized)
+            {
+                Init(new LuaEnv());
+            }
+
+            ExecuteLuaScript();
 
             if (beforeAwake != null)
             {
@@ -158,7 +163,129 @@ namespace VVMUI.Script.XLua
             }
         }
 
-        public override void Collect()
+        private IListData GenerateListDataWithItemLuaTable(LuaTable itemData)
+        {
+            XLuaDataType firstDataType = itemData.Get<XLuaDataType>("type");
+            switch (firstDataType)
+            {
+                case XLuaDataType.Boolean:
+                    return new ListData<BoolData>();
+                case XLuaDataType.Float:
+                    return new ListData<FloatData>();
+                case XLuaDataType.Int:
+                    return new ListData<IntData>();
+                case XLuaDataType.String:
+                    return new ListData<StringData>();
+                case XLuaDataType.UserData:
+                    object obj = itemData.Get<object>("value");
+                    Type objType = obj.GetType();
+                    if (typeof(Enum).IsAssignableFrom(objType))
+                    {
+                        return new ListData<EnumData>();
+                    }
+                    else if (typeof(Color).IsAssignableFrom(objType))
+                    {
+                        return new ListData<ColorData>();
+                    }
+                    else if (typeof(Vector2).IsAssignableFrom(objType))
+                    {
+                        return new ListData<Vector2Data>();
+                    }
+                    else if (typeof(Vector3).IsAssignableFrom(objType))
+                    {
+                        return new ListData<Vector3Data>();
+                    }
+                    else if (typeof(Rect).IsAssignableFrom(objType))
+                    {
+                        return new ListData<RectData>();
+                    }
+                    else if (typeof(Sprite).IsAssignableFrom(objType))
+                    {
+                        return new ListData<SpriteData>();
+                    }
+                    else if (typeof(Texture).IsAssignableFrom(objType))
+                    {
+                        return new ListData<TextureData>();
+                    }
+                    break;
+                case XLuaDataType.List:
+                    //return new ListData<IListData>();
+                    return null;
+                case XLuaDataType.Struct:
+                    return new ListData<StructData>();
+                default:
+                    return null;
+            }
+            return null;
+        }
+
+        private IData GenerateDataWithLuaTable(LuaTable data)
+        {
+            XLuaDataType dataType = data.Get<XLuaDataType>("type");
+            switch (dataType)
+            {
+                case XLuaDataType.Boolean:
+                    return new BoolData(data.Get<bool>("value"));
+                case XLuaDataType.Float:
+                    return new FloatData(data.Get<float>("value"));
+                case XLuaDataType.Int:
+                    return new IntData(data.Get<int>("value"));
+                case XLuaDataType.String:
+                    return new StringData(data.Get<string>("value"));
+                case XLuaDataType.UserData:
+                    object obj = data.Get<object>("value");
+                    Type objType = obj.GetType();
+                    if (typeof(Enum).IsAssignableFrom(objType))
+                    {
+                        return new EnumData((Enum)obj);
+                    }
+                    else if (typeof(Color).IsAssignableFrom(objType))
+                    {
+                        return new ColorData((Color)obj);
+                    }
+                    else if (typeof(Vector2).IsAssignableFrom(objType))
+                    {
+                        return new Vector2Data((Vector2)obj);
+                    }
+                    else if (typeof(Vector3).IsAssignableFrom(objType))
+                    {
+                        return new Vector3Data((Vector3)obj);
+                    }
+                    else if (typeof(Rect).IsAssignableFrom(objType))
+                    {
+                        return new RectData((Rect)obj);
+                    }
+                    else if (typeof(Sprite).IsAssignableFrom(objType))
+                    {
+                        return new SpriteData((Sprite)obj);
+                    }
+                    else if (typeof(Texture).IsAssignableFrom(objType))
+                    {
+                        return new TextureData((Texture)obj);
+                    }
+                    break;
+                case XLuaDataType.List:
+                    LuaTable list = data.Get<LuaTable>("value");
+                    LuaTable first = list.Get<int, LuaTable>(1);
+                    IListData listData = GenerateListDataWithItemLuaTable(first);
+                    list.ForEach<int, LuaTable>(delegate (int index, LuaTable item) {
+                        listData.AddItem(GenerateDataWithLuaTable(item));
+                    });
+                    return listData;
+                case XLuaDataType.Struct:
+                    LuaTable strct = data.Get<LuaTable>("value");
+                    StructData strctData = new StructData();
+                    strct.ForEach<string, LuaTable>(delegate (string key, LuaTable el) {
+                        strctData.AddField(key, GenerateDataWithLuaTable(el));
+                    });
+                    return strctData;
+                default:
+                    return null;
+            }
+            return null;
+        }
+
+        protected override void Collect()
         {
             if (vmData != null)
             {
@@ -166,22 +293,7 @@ namespace VVMUI.Script.XLua
                 foreach (string k in keys)
                 {
                     LuaTable data = vmData.Get<LuaTable>(k);
-                    XLuaDataType dataType = data.Get<XLuaDataType>("type");
-                    switch (dataType)
-                    {
-                        case XLuaDataType.Boolean:
-                            this.AddData(k, new BoolData(data.Get<bool>("value")));
-                            break;
-                        case XLuaDataType.Float:
-                            this.AddData(k, new FloatData(data.Get<float>("value")));
-                            break;
-                        case XLuaDataType.Int:
-                            this.AddData(k, new IntData(data.Get<int>("value")));
-                            break;
-                        case XLuaDataType.String:
-                            this.AddData(k, new StringData(data.Get<string>("value")));
-                            break;
-                    }
+                    this.AddData(k, GenerateDataWithLuaTable(data));
                 }
             }
 
@@ -199,7 +311,7 @@ namespace VVMUI.Script.XLua
                         case XLuaCommandType.Void:
                             XLuaCommandExecuteHandler commandExecute = command.Get<XLuaCommandExecuteHandler>("execute");
                             this.AddCommand(k, new VoidCommand(
-                                delegate(object parameter)
+                                delegate (object parameter)
                                 {
                                     if (commandCanExecute == null)
                                     {
@@ -210,7 +322,7 @@ namespace VVMUI.Script.XLua
                                         return commandCanExecute.Invoke(vmTable, parameter);
                                     }
                                 },
-                                delegate(object parameter)
+                                delegate (object parameter)
                                 {
                                     if (commandExecute != null)
                                     {
@@ -222,7 +334,7 @@ namespace VVMUI.Script.XLua
                         case XLuaCommandType.Bool:
                             XLuaCommandExecuteHandler<bool> boolCommandExecute = command.Get<XLuaCommandExecuteHandler<bool>>("execute");
                             this.AddCommand(k, new BoolCommand(
-                                delegate(object parameter)
+                                delegate (object parameter)
                                 {
                                     if (commandCanExecute == null)
                                     {
@@ -233,7 +345,7 @@ namespace VVMUI.Script.XLua
                                         return commandCanExecute.Invoke(vmTable, parameter);
                                     }
                                 },
-                                delegate(bool v, object parameter)
+                                delegate (bool v, object parameter)
                                 {
                                     if (boolCommandExecute != null)
                                     {
@@ -344,6 +456,17 @@ namespace VVMUI.Script.XLua
             }
             this.BindRoot.GetComponentsInChildren<AbstractDataBinder>(true, allDataBinders);
             this.BindRoot.GetComponentsInChildren<AbstractCommandBinder>(true, allCommandBinders);
+        }
+
+        public override void EditorCollect()
+        {
+            base.EditorCollect();
+
+            Env = null;
+            Initialized = false;
+            Init(new LuaEnv());
+            ExecuteLuaScript();
+            Collect();
         }
     }
 }

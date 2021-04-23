@@ -31,7 +31,7 @@ namespace VVMUI.Core.Binder
             this.BindVM = this.GetComponentInParent<VMBehaviour>(true);
             if (this.BindVM != null)
             {
-                this.BindVM.Collect();
+                this.BindVM.EditorCollect();
                 if (this.GetComponentInParent<ListTemplateBinder>(true) != null)
                 {
                     IData data = this.GetComponentInParent<ListTemplateBinder>(true).ItemSource.GetData(this.BindVM);
@@ -75,7 +75,7 @@ namespace VVMUI.Core.Binder
             this.BindVM = this.GetComponentInParent<VMBehaviour>(true);
             if (this.BindVM != null)
             {
-                this.BindVM.Collect();
+                this.BindVM.EditorCollect();
             }
         }
 #endif

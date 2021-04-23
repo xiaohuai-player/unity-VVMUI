@@ -134,6 +134,9 @@ namespace VVMUI.Inspector
                         dataStr.AddRange(catData.Value.Keys);
                     }
                 }
+                dataStr.Sort(delegate (string e1, string e2) {
+                    return e1.CompareTo(e2);
+                });
                 if (dataStr.Count > 0)
                 {
                     dataIndex = EditorGUILayout.Popup(dataIndex, dataStr.ToArray());

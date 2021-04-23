@@ -5,12 +5,13 @@ using UnityEngine;
 
 namespace VVMUI.Core.Data
 {
-    public abstract class StructData : IData
+    public class StructData : IData
     {
         protected Dictionary<string, IData> allData = new Dictionary<string, IData>();
-        private bool fieldsInit = false;
 
-        private void InitFields()
+        protected bool fieldsInit = false;
+
+        protected void InitFields()
         {
             if (fieldsInit)
             {
@@ -22,7 +23,7 @@ namespace VVMUI.Core.Data
             for (int i = 0; i < fields.Length; i++)
             {
                 FieldInfo fi = fields[i];
-                if (fi.FieldType.GetInterface("IData") != null)
+                if (!typeof(IData).IsAssignableFrom(fi.FieldType))
                 {
                     IData data = fields[i].GetValue(this) as IData;
                     if (data != null)
@@ -37,6 +38,38 @@ namespace VVMUI.Core.Data
             }
 
             fieldsInit = true;
+        }
+
+        public IData this[string key]
+        {
+            get
+            {
+                InitFields();
+                IData v = null;
+                allData.TryGetValue(key, out v);
+                return v;
+            }
+        }
+
+        public Dictionary<string, IData> Fields
+        {
+            get
+            {
+                InitFields();
+                return allData;
+            }
+        }
+
+        public void AddField(string key, IData data)
+        {
+            if (!string.IsNullOrEmpty(key) && data != null && !this.allData.ContainsKey(key))
+            {
+                allData[key] = data;
+                data.AddValueChangedListener(delegate (IData source)
+                {
+                    this.InvokeValueChanged();
+                });
+            }
         }
 
         private List<DataChangedHandler> valueChangedHandlers = new List<DataChangedHandler>();
@@ -65,26 +98,6 @@ namespace VVMUI.Core.Data
         public void FastSetValue(object value)
         {
             Debugger.LogError("StructData", "StructData should not call FastSetValue.");
-        }
-
-        public IData this[string key]
-        {
-            get
-            {
-                InitFields();
-                IData v = null;
-                allData.TryGetValue(key, out v);
-                return v;
-            }
-        }
-
-        public Dictionary<string, IData> Fields
-        {
-            get
-            {
-                InitFields();
-                return allData;
-            }
         }
 
         public Type GetBindDataType()
@@ -176,7 +189,7 @@ namespace VVMUI.Core.Data
                 ParseStruct parseStruct = all[i];
 
                 FieldInfo objfi = objtype.GetField(parseStruct.Name);
-                if (objfi == null || objfi.FieldType.GetInterface("IData") == null)
+                if (objfi == null || !typeof(IData).IsAssignableFrom(objfi.FieldType))
                 {
                     continue;
                 }
@@ -203,7 +216,7 @@ namespace VVMUI.Core.Data
                     }
                     else if (isBase)
                     {
-                        (objv as IData).FastSetValue(parseStruct.Value);
+                        (objv as IBaseData).FastSetValue(parseStruct.Value);
                     }
                 }
                 else

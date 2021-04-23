@@ -1,13 +1,13 @@
 using System;
-using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace VVMUI.Core.Data
 {
-    public interface IListData
+    public interface IListData : IData
     {
+        void AddItem(IData data);
         IData GetAt(int index);
         void ParseObject(object data, Action<object, object> onParseItem = null);
         int Count { get; }
@@ -26,7 +26,7 @@ namespace VVMUI.Core.Data
 
         public static IListData Parse(Type t, object data, Action<object, object> onParseItem = null)
         {
-            if (t.GetInterface("IData") == null)
+            if (!typeof(IData).IsAssignableFrom(t))
             {
                 return null;
             }
@@ -38,7 +38,7 @@ namespace VVMUI.Core.Data
         }
     }
 
-    public sealed class ListData<T> : List<T>, IListData, IData where T : IData, new()
+    public sealed class ListData<T> : List<T>, IListData where T : IData, new()
     {
         private int _focusIndex = 0;
         public int FocusIndex
@@ -69,7 +69,7 @@ namespace VVMUI.Core.Data
 
         public Type GetBindDataType()
         {
-            return typeof(IEnumerable);
+            return typeof(IList);
         }
 
         public DataType GetDataType()
@@ -116,6 +116,11 @@ namespace VVMUI.Core.Data
         public IData GetAt(int index)
         {
             return this[index];
+        }
+
+        public void AddItem(IData data)
+        {
+            this.Add((T)data);
         }
 
         public new void Add(T item)
@@ -299,7 +304,7 @@ namespace VVMUI.Core.Data
                     }
                     else if (isBase)
                     {
-                        this[i].FastSetValue(list[i]);
+                        (this[i] as IBaseData).FastSetValue(list[i]);
                     }
                 }
                 else
@@ -321,10 +326,7 @@ namespace VVMUI.Core.Data
                         this[i] = (T)Activator.CreateInstance(gType, list[i]);
                     }
                 }
-                if (onParseItem != null)
-                {
-                    onParseItem(this[i], list[i]);
-                }
+                onParseItem?.Invoke(this[i], list[i]);
             }
 
             if (list.Count > this.Count)
@@ -350,10 +352,7 @@ namespace VVMUI.Core.Data
                         new_data = Activator.CreateInstance(gType, list[i]);
                     }
                     new_data_range.Add((T)new_data);
-                    if (onParseItem != null)
-                    {
-                        onParseItem((T)new_data, list[i]);
-                    }
+                    onParseItem?.Invoke((T)new_data, list[i]);
                 }
                 this.AddRange(new_data_range);
             }

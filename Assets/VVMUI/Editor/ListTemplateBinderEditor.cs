@@ -21,7 +21,7 @@ namespace VVMUI.Inspector
             {
                 definerDrawer = new DataDefinerDrawer(binder.ItemSource);
             }
-            definerDrawer.Draw(vm, null, typeof(IEnumerable));
+            definerDrawer.Draw(vm, null, typeof(IList));
 
             IData data = binder.ItemSource.GetData(vm);
             IListData list = data as IListData;

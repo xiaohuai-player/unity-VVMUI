@@ -22,7 +22,7 @@ namespace VVMUI.Inspector
             {
                 definerDrawer = new DataDefinerDrawer(binder.Source);
             }
-            definerDrawer.Draw(binder.BindVM, binder.BindData, typeof(IEnumerable));
+            definerDrawer.Draw(binder.BindVM, binder.BindData, typeof(IList));
 
             binder.Template = (GameObject)EditorGUILayout.ObjectField("Template:", binder.Template, typeof(GameObject), true);
             if (binder.Template == null || binder.Template.GetComponent<ListTemplateBinder>() == null)

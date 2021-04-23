@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace VVMUI.Core.Data
 {
-    public interface IDictionaryData
+    public interface IDictionaryData : IData
     {
         IData Get(string key);
         void ParseObject(object data, Action<object, object> onParseItem = null);
@@ -23,7 +23,7 @@ namespace VVMUI.Core.Data
 
         public static object Parse(Type t, object data, Action<object, object> onParseItem = null)
         {
-            if (t.GetInterface("IData") == null)
+            if (!typeof(IData).IsAssignableFrom(t))
             {
                 return null;
             }
@@ -35,7 +35,7 @@ namespace VVMUI.Core.Data
         }
     }
 
-    public sealed class DictionaryData<T> : Dictionary<string, T>, IDictionaryData, IData where T : IData, new()
+    public sealed class DictionaryData<T> : Dictionary<string, T>, IDictionaryData where T : IData, new()
     {
         public IData Get(string key)
         {
@@ -186,7 +186,7 @@ namespace VVMUI.Core.Data
                     }
                     else if (isBase)
                     {
-                        (this[key] as IData).FastSetValue(dict[key]);
+                        (this[key] as IBaseData).FastSetValue(dict[key]);
                     }
                 }
                 else

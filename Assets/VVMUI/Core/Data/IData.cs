@@ -15,19 +15,11 @@ namespace VVMUI.Core.Data
 
     public interface IData
     {
-        void FastSetValue(object value);
-        object FastGetValue();
         void InvokeValueChanged();
         void AddValueChangedListener(DataChangedHandler handler);
         void RemoveValueChangedListener(DataChangedHandler handler);
         Type GetBindDataType();
         DataType GetDataType();
         void CopyFrom(IData data);
-    }
-
-    public interface IData<T>
-    {
-        T Get();
-        void Set(T arg);
     }
 }

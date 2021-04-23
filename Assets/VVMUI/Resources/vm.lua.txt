@@ -4,8 +4,10 @@ XLuaCommandType = CS.VVMUI.Script.XLua.XLuaCommandType
 vm = {}
 
 local function generate_vm_data(key, data)
-	vm_data_type = nil
-	data_type = type(data)
+	local vm_data_type = nil
+	local vm_data_value = nil
+	local data_type = type(data)
+
 	if data_type == "number" then
 		if math.type(data) == "integer" then
 			vm_data_type = XLuaDataType.Int
@@ -16,19 +18,34 @@ local function generate_vm_data(key, data)
 		vm_data_type = XLuaDataType.String
 	elseif data_type == "boolean" then
 		vm_data_type = XLuaDataType.Boolean
+	elseif data_type == "userdata" then
+		vm_data_type = XLuaDataType.UserData
 	elseif data_type == "table" then
 		if #data > 0 then
 			vm_data_type = XLuaDataType.List
 		else
 			vm_data_type = XLuaDataType.Struct
 		end
-	elseif data_type == "userdata" then
-		vm_data_type = XLuaDataType.UserData
+	end
+
+	if vm_data_type == XLuaDataType.List then
+		vm_data_value = {}
+		for i, v in ipairs(data) do
+			local item = generate_vm_data("", v)
+			table.insert(vm_data_value, item)
+		end
+	elseif vm_data_type == XLuaDataType.Struct then
+		vm_data_value = {}
+		for k, v in pairs(data) do
+			vm_data_value[k] = generate_vm_data(k, v)
+		end
+	else
+		vm_data_value = data
 	end
 
 	return {
 		type = vm_data_type,
-		value = data
+		value = vm_data_value
 	}
 end
 

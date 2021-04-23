@@ -24,7 +24,14 @@ namespace VVMUI.Core.Data
         };
     }
 
-    public abstract class BaseData<T> : IData<T>, IData
+    public interface IBaseData : IData
+    {
+        object FastGetValue();
+
+        void FastSetValue(object value);
+    }
+
+    public abstract class BaseData<T> : IBaseData
     {
         protected BaseData()
         {

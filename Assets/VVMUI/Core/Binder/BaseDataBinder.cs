@@ -35,7 +35,7 @@ namespace VVMUI.Core.Binder
             public int AnimatorLayer;
 
             [HideInInspector]
-            public IData Source;
+            public IBaseData Source;
 
             [HideInInspector]
             public IConverter Converter;
@@ -399,7 +399,7 @@ namespace VVMUI.Core.Binder
             for (int i = 0; i < BindItems.Count; i++)
             {
                 DataBinderItem item = BindItems[i];
-                item.Source = item.Definer.GetData(vm);
+                item.Source = (IBaseData)item.Definer.GetData(vm);
                 item.Converter = item.Definer.GetConverter(vm);
                 item.DoBind(vm, this.gameObject);
             }
@@ -412,7 +412,7 @@ namespace VVMUI.Core.Binder
             for (int i = 0; i < BindItems.Count; i++)
             {
                 DataBinderItem item = BindItems[i];
-                item.Source = item.Definer.GetData(data);
+                item.Source = (IBaseData)item.Definer.GetData(data);
                 item.Converter = item.Definer.GetConverter(vm);
                 item.DoBind(vm, this.gameObject);
             }

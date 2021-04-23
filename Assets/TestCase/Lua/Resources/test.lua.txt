@@ -3,6 +3,7 @@ local data = {
 	test_float = 3.5,
 	test_bool = true,
 	test_string = "this is lua string",
+	test_aag = "this is lua string",
 	test_color = CS.UnityEngine.Color(192, 100, 60),
 	test_base_list = { "aa", "bs", "cs", "dw", "eg" },
 	test_base_struct = {
