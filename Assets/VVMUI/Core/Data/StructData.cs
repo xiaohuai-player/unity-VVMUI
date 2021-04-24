@@ -5,6 +5,11 @@ using UnityEngine;
 
 namespace VVMUI.Core.Data
 {
+    // 没有实际用处，仅用来做类型匹配检查
+    public sealed class StructType
+    { 
+    }
+
     public class StructData : IData
     {
         protected Dictionary<string, IData> allData = new Dictionary<string, IData>();
@@ -23,7 +28,7 @@ namespace VVMUI.Core.Data
             for (int i = 0; i < fields.Length; i++)
             {
                 FieldInfo fi = fields[i];
-                if (!typeof(IData).IsAssignableFrom(fi.FieldType))
+                if (typeof(IData).IsAssignableFrom(fi.FieldType))
                 {
                     IData data = fields[i].GetValue(this) as IData;
                     if (data != null)
@@ -102,7 +107,7 @@ namespace VVMUI.Core.Data
 
         public Type GetBindDataType()
         {
-            return typeof(object);
+            return typeof(StructType);
         }
 
         public DataType GetDataType()

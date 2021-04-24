@@ -59,21 +59,9 @@ namespace VVMUI.Core.Binder
                     return false;
                 }
 
-                bool bindData = false;
-
-                if (this.Converter != null)
+                if (!this.Source.GetBindDataType().IsAssignableFrom(t) && this.Converter == null)
                 {
-                    bindData = true;
-                }
-
-                if (this.Source.GetBindDataType().IsAssignableFrom(t))
-                {
-                    bindData = true;
-                }
-
-                if (!bindData)
-                {
-                    Debugger.LogError("DataBinder", obj.name + " data type not explicit or converter is null.");
+                    Debugger.LogError("DataBinder", obj.name + " data type not explicit and converter is null.");
                     return false;
                 }
 
@@ -148,7 +136,7 @@ namespace VVMUI.Core.Binder
                     propertySetter.Set(this.Component, value);
 
                     // ToggleGroup 特殊处理
-                    if (typeof(Toggle).IsAssignableFrom(componentType) && this.Property.Equals("isOn"))
+                    if (Toggle_Type.IsAssignableFrom(componentType) && this.Property.Equals("isOn"))
                     {
                         Toggle t = this.Component as Toggle;
                         if (t.group != null && t.isOn)
@@ -345,20 +333,20 @@ namespace VVMUI.Core.Binder
                 }
                 if (this.ValueChangedHandler != null)
                 {
-                    Type componentType = this.Component.GetType();
-                    if (Toggle_Type.IsAssignableFrom(componentType) && this.Property.Equals("isOn"))
+                    Type cptType = this.Component.GetType();
+                    if (Toggle_Type.IsAssignableFrom(cptType) && this.Property.Equals("isOn"))
                     {
                         (this.Component as Toggle).onValueChanged.RemoveListener((UnityAction<bool>)this.ValueChangedHandler);
                     }
-                    if (Input_Type.IsAssignableFrom(componentType) && this.Property.Equals("text"))
+                    if (Input_Type.IsAssignableFrom(cptType) && this.Property.Equals("text"))
                     {
                         (this.Component as InputField).onValueChanged.RemoveListener((UnityAction<string>)this.ValueChangedHandler);
                     }
-                    if (Dropdown_Type.IsAssignableFrom(componentType) && this.Property.Equals("value"))
+                    if (Dropdown_Type.IsAssignableFrom(cptType) && this.Property.Equals("value"))
                     {
                         (this.Component as Dropdown).onValueChanged.RemoveListener((UnityAction<int>)this.ValueChangedHandler);
                     }
-                    if (Slider_Type.IsAssignableFrom(componentType) && this.Property.Equals("value"))
+                    if (Slider_Type.IsAssignableFrom(cptType) && this.Property.Equals("value"))
                     {
                         (this.Component as Slider).onValueChanged.RemoveListener((UnityAction<float>)this.ValueChangedHandler);
                     }

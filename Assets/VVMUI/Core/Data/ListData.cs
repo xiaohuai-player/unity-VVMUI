@@ -77,11 +77,6 @@ namespace VVMUI.Core.Data
             return DataType.List;
         }
 
-        public Type GetItemBindDataType()
-        {
-            return (new T()).GetBindDataType();
-        }
-
         // 如果是元素内部数据发生改变不能通知到列表数据本身的改变事件
         private List<DataChangedHandler> _valueChangedHandlers = new List<DataChangedHandler>();
         public void InvokeValueChanged()

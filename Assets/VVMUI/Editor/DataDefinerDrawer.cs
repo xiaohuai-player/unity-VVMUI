@@ -12,6 +12,7 @@ namespace VVMUI.Inspector
     {
         private DataDefiner definer;
 
+        private int fieldIndex;
         private int dataIndex;
         private string hashKey;
         private int converterIndex;
@@ -116,7 +117,7 @@ namespace VVMUI.Inspector
 
             if (datas.Count > 0)
             {
-                List<string> dataStr = new List<string>();
+                List<string> fields = new List<string>();
                 foreach (var catData in datas)
                 {
                     if (catData.Key == DataType.Base)
@@ -125,24 +126,25 @@ namespace VVMUI.Inspector
                         {
                             if (kv.Value.GetBindDataType().IsAssignableFrom(propertyType) || !string.IsNullOrEmpty(definer.Converter))
                             {
-                                dataStr.Add(kv.Key);
+                                fields.Add(kv.Key);
                             }
                         }
                     }
                     else
                     {
-                        dataStr.AddRange(catData.Value.Keys);
+                        fields.AddRange(catData.Value.Keys);
                     }
                 }
-                dataStr.Sort(delegate (string e1, string e2) {
+                fields.Sort(delegate (string e1, string e2)
+                {
                     return e1.CompareTo(e2);
                 });
-                if (dataStr.Count > 0)
+                if (fields.Count > 0)
                 {
-                    dataIndex = EditorGUILayout.Popup(dataIndex, dataStr.ToArray());
-                    dataIndex = Mathf.Clamp(dataIndex, 0, dataStr.Count - 1);
+                    fieldIndex = EditorGUILayout.Popup(fieldIndex, fields.ToArray());
+                    fieldIndex = Mathf.Clamp(fieldIndex, 0, fields.Count - 1);
                     add = true;
-                    addkey = new DefinerKey(dataStr[dataIndex]);
+                    addkey = new DefinerKey(fields[fieldIndex]);
                 }
             }
             else if (currentChainData != null)
@@ -158,12 +160,9 @@ namespace VVMUI.Inspector
                 }
                 else if (currentChainData.GetDataType() == DataType.List)
                 {
-                    int lIndex = EditorGUILayout.IntField(0);
-                    if (lIndex >= 0)
-                    {
-                        add = true;
-                        addkey = new DefinerKey(null, lIndex, null);
-                    }
+                    dataIndex = Mathf.Max(0, EditorGUILayout.IntField(dataIndex));
+                    add = true;
+                    addkey = new DefinerKey(null, dataIndex, null);
                 }
             }
 

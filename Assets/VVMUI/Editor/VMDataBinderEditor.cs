@@ -1,6 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using VVMUI.Core;
+using VVMUI.Core.Data;
 using VVMUI.Core.Binder;
 
 namespace VVMUI.Inspector
@@ -19,7 +20,7 @@ namespace VVMUI.Inspector
             {
                 definerDrawer = new DataDefinerDrawer(binder.Source);
             }
-            definerDrawer.Draw(binder.BindVM, binder.BindData, typeof(object));
+            definerDrawer.Draw(binder.BindVM, binder.BindData, typeof(StructType));
 
             binder.Template = (GameObject)EditorGUILayout.ObjectField("Template:", binder.Template, typeof(GameObject), true);
             if (binder.Template == null || binder.Template.GetComponent<VMBehaviour>() == null)

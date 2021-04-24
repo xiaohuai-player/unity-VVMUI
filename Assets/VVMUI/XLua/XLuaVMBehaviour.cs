@@ -163,7 +163,64 @@ namespace VVMUI.Script.XLua
             }
         }
 
-        private IListData GenerateListDataWithItemLuaTable(LuaTable itemData)
+        //TODO: 目前仅支持深度为 2 的 list
+        private IListData CreateNestListDataInstanceWithItemValueLuaTable(LuaTable valueData)
+        {
+            XLuaDataType firstDataType = valueData.Get<XLuaDataType>("type");
+            switch (firstDataType)
+            {
+                case XLuaDataType.Boolean:
+                    return new ListData<ListData<BoolData>>();
+                case XLuaDataType.Float:
+                    return new ListData<ListData<FloatData>>();
+                case XLuaDataType.Int:
+                    return new ListData<ListData<IntData>>();
+                case XLuaDataType.String:
+                    return new ListData<ListData<StringData>>();
+                case XLuaDataType.UserData:
+                    object obj = valueData.Get<object>("value");
+                    Type objType = obj.GetType();
+                    if (typeof(Enum).IsAssignableFrom(objType))
+                    {
+                        return new ListData<ListData<EnumData>>();
+                    }
+                    else if (typeof(Color).IsAssignableFrom(objType))
+                    {
+                        return new ListData<ListData<ColorData>>();
+                    }
+                    else if (typeof(Vector2).IsAssignableFrom(objType))
+                    {
+                        return new ListData<ListData<Vector2Data>>();
+                    }
+                    else if (typeof(Vector3).IsAssignableFrom(objType))
+                    {
+                        return new ListData<ListData<Vector3Data>>();
+                    }
+                    else if (typeof(Rect).IsAssignableFrom(objType))
+                    {
+                        return new ListData<ListData<RectData>>();
+                    }
+                    else if (typeof(Sprite).IsAssignableFrom(objType))
+                    {
+                        return new ListData<ListData<SpriteData>>();
+                    }
+                    else if (typeof(Texture).IsAssignableFrom(objType))
+                    {
+                        return new ListData<ListData<TextureData>>();
+                    }
+                    break;
+                case XLuaDataType.List:
+                    Debugger.LogError("XLuaVMBehaviour", "can not generate nested list data of depth greater than 2.");
+                    return null;
+                case XLuaDataType.Struct:
+                    return new ListData<ListData<StructData>>();
+                default:
+                    return null;
+            }
+            return null;
+        }
+
+        private IListData CreateListDataInstanceWithItemLuaTable(LuaTable itemData)
         {
             XLuaDataType firstDataType = itemData.Get<XLuaDataType>("type");
             switch (firstDataType)
@@ -209,8 +266,9 @@ namespace VVMUI.Script.XLua
                     }
                     break;
                 case XLuaDataType.List:
-                    //return new ListData<IListData>();
-                    return null;
+                    LuaTable list = itemData.Get<LuaTable>("value");
+                    LuaTable first = list.Get<int, LuaTable>(1);
+                    return CreateNestListDataInstanceWithItemValueLuaTable(first);
                 case XLuaDataType.Struct:
                     return new ListData<StructData>();
                 default:
@@ -267,15 +325,17 @@ namespace VVMUI.Script.XLua
                 case XLuaDataType.List:
                     LuaTable list = data.Get<LuaTable>("value");
                     LuaTable first = list.Get<int, LuaTable>(1);
-                    IListData listData = GenerateListDataWithItemLuaTable(first);
-                    list.ForEach<int, LuaTable>(delegate (int index, LuaTable item) {
+                    IListData listData = CreateListDataInstanceWithItemLuaTable(first);
+                    list.ForEach<int, LuaTable>(delegate (int index, LuaTable item)
+                    {
                         listData.AddItem(GenerateDataWithLuaTable(item));
                     });
                     return listData;
                 case XLuaDataType.Struct:
                     LuaTable strct = data.Get<LuaTable>("value");
                     StructData strctData = new StructData();
-                    strct.ForEach<string, LuaTable>(delegate (string key, LuaTable el) {
+                    strct.ForEach<string, LuaTable>(delegate (string key, LuaTable el)
+                    {
                         strctData.AddField(key, GenerateDataWithLuaTable(el));
                     });
                     return strctData;
@@ -283,6 +343,108 @@ namespace VVMUI.Script.XLua
                     return null;
             }
             return null;
+        }
+
+        private ICommand GenerateCommandWithLuaTable(LuaTable cmdLua)
+        {
+            XLuaCommandCanExecuteHandler commandCanExecute = cmdLua.Get<XLuaCommandCanExecuteHandler>("can_execute");
+            Func<object, bool> canExecuteDelegate = delegate (object parameter)
+            {
+                if (commandCanExecute == null)
+                {
+                    return true;
+                }
+                else
+                {
+                    return commandCanExecute.Invoke(vmTable, parameter);
+                }
+            };
+
+            ICommand command = null;
+            XLuaCommandType commandType = cmdLua.Get<XLuaCommandType>("type");
+            switch (commandType)
+            {
+                case XLuaCommandType.Void:
+                    XLuaCommandExecuteHandler commandExecute = cmdLua.Get<XLuaCommandExecuteHandler>("execute");
+                    command = new VoidCommand(
+                        canExecuteDelegate,
+                        delegate (object parameter)
+                        {
+                            if (commandExecute != null)
+                            {
+                                commandExecute.Invoke(vmTable, parameter);
+                            }
+                        }
+                    );
+                    break;
+                case XLuaCommandType.Bool:
+                    XLuaCommandExecuteHandler<bool> boolCommandExecute = cmdLua.Get<XLuaCommandExecuteHandler<bool>>("execute");
+                    command = new BoolCommand(
+                        canExecuteDelegate,
+                        delegate (bool v, object parameter)
+                        {
+                            if (boolCommandExecute != null)
+                            {
+                                boolCommandExecute.Invoke(vmTable, v, parameter);
+                            }
+                        }
+                    );
+                    break;
+                case XLuaCommandType.Float:
+                    XLuaCommandExecuteHandler<float> floatCommandExecute = cmdLua.Get<XLuaCommandExecuteHandler<float>>("execute");
+                    command = new FloatCommand(
+                        canExecuteDelegate,
+                        delegate (float v, object parameter)
+                        {
+                            if (floatCommandExecute != null)
+                            {
+                                floatCommandExecute.Invoke(vmTable, v, parameter);
+                            }
+                        }
+                    );
+                    break;
+                case XLuaCommandType.Int:
+                    XLuaCommandExecuteHandler<int> intCommandExecute = cmdLua.Get<XLuaCommandExecuteHandler<int>>("execute");
+                    command = new IntCommand(
+                        canExecuteDelegate,
+                        delegate (int v, object parameter)
+                        {
+                            if (intCommandExecute != null)
+                            {
+                                intCommandExecute.Invoke(vmTable, v, parameter);
+                            }
+                        }
+                    );
+                    break;
+                case XLuaCommandType.String:
+                    XLuaCommandExecuteHandler<string> stringCommandExecute = cmdLua.Get<XLuaCommandExecuteHandler<string>>("execute");
+                    command = new StringCommand(
+                        canExecuteDelegate,
+                        delegate (string v, object parameter)
+                        {
+                            if (stringCommandExecute != null)
+                            {
+                                stringCommandExecute.Invoke(vmTable, v, parameter);
+                            }
+                        }
+                    );
+                    break;
+                case XLuaCommandType.Vector2:
+                    XLuaCommandExecuteHandler<Vector2> vector2CommandExecute = cmdLua.Get<XLuaCommandExecuteHandler<Vector2>>("execute");
+                    command = new Vector2Command(
+                        canExecuteDelegate,
+                        delegate (Vector2 v, object parameter)
+                        {
+                            if (vector2CommandExecute != null)
+                            {
+                                vector2CommandExecute.Invoke(vmTable, v, parameter);
+                            }
+                        }
+                    );
+                    break;
+            }
+
+            return command;
         }
 
         protected override void Collect()
@@ -303,150 +465,7 @@ namespace VVMUI.Script.XLua
                 foreach (string k in keys)
                 {
                     LuaTable command = vmCommand.Get<LuaTable>(k);
-                    XLuaCommandType commandType = command.Get<XLuaCommandType>("type");
-                    XLuaCommandCanExecuteHandler commandCanExecute = command.Get<XLuaCommandCanExecuteHandler>("can_execute");
-
-                    switch (commandType)
-                    {
-                        case XLuaCommandType.Void:
-                            XLuaCommandExecuteHandler commandExecute = command.Get<XLuaCommandExecuteHandler>("execute");
-                            this.AddCommand(k, new VoidCommand(
-                                delegate (object parameter)
-                                {
-                                    if (commandCanExecute == null)
-                                    {
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        return commandCanExecute.Invoke(vmTable, parameter);
-                                    }
-                                },
-                                delegate (object parameter)
-                                {
-                                    if (commandExecute != null)
-                                    {
-                                        commandExecute.Invoke(vmTable, parameter);
-                                    }
-                                }
-                            ));
-                            break;
-                        case XLuaCommandType.Bool:
-                            XLuaCommandExecuteHandler<bool> boolCommandExecute = command.Get<XLuaCommandExecuteHandler<bool>>("execute");
-                            this.AddCommand(k, new BoolCommand(
-                                delegate (object parameter)
-                                {
-                                    if (commandCanExecute == null)
-                                    {
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        return commandCanExecute.Invoke(vmTable, parameter);
-                                    }
-                                },
-                                delegate (bool v, object parameter)
-                                {
-                                    if (boolCommandExecute != null)
-                                    {
-                                        boolCommandExecute.Invoke(vmTable, v, parameter);
-                                    }
-                                }
-                            ));
-                            break;
-                        case XLuaCommandType.Float:
-                            XLuaCommandExecuteHandler<float> floatCommandExecute = command.Get<XLuaCommandExecuteHandler<float>>("execute");
-                            this.AddCommand(k, new FloatCommand(
-                                delegate (object parameter)
-                                {
-                                    if (commandCanExecute == null)
-                                    {
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        return commandCanExecute.Invoke(vmTable, parameter);
-                                    }
-                                },
-                                delegate (float v, object parameter)
-                                {
-                                    if (floatCommandExecute != null)
-                                    {
-                                        floatCommandExecute.Invoke(vmTable, v, parameter);
-                                    }
-                                }
-                            ));
-                            break;
-                        case XLuaCommandType.Int:
-                            XLuaCommandExecuteHandler<int> intCommandExecute = command.Get<XLuaCommandExecuteHandler<int>>("execute");
-                            this.AddCommand(k, new IntCommand(
-                                delegate (object parameter)
-                                {
-                                    if (commandCanExecute == null)
-                                    {
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        return commandCanExecute.Invoke(vmTable, parameter);
-                                    }
-                                },
-                                delegate (int v, object parameter)
-                                {
-                                    if (intCommandExecute != null)
-                                    {
-                                        intCommandExecute.Invoke(vmTable, v, parameter);
-                                    }
-                                }
-                            ));
-                            break;
-                        case XLuaCommandType.String:
-                            XLuaCommandExecuteHandler<string> stringCommandExecute = command.Get<XLuaCommandExecuteHandler<string>>("execute");
-                            this.AddCommand(k, new StringCommand(
-                                delegate (object parameter)
-                                {
-                                    if (commandCanExecute == null)
-                                    {
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        return commandCanExecute.Invoke(vmTable, parameter);
-                                    }
-                                },
-                                delegate (string v, object parameter)
-                                {
-                                    if (stringCommandExecute != null)
-                                    {
-                                        stringCommandExecute.Invoke(vmTable, v, parameter);
-                                    }
-                                }
-                            ));
-                            break;
-                        case XLuaCommandType.Vector2:
-                            XLuaCommandExecuteHandler<Vector2> vector2CommandExecute = command.Get<XLuaCommandExecuteHandler<Vector2>>("execute");
-                            this.AddCommand(k, new Vector2Command(
-                                delegate (object parameter)
-                                {
-                                    if (commandCanExecute == null)
-                                    {
-                                        return true;
-                                    }
-                                    else
-                                    {
-                                        return commandCanExecute.Invoke(vmTable, parameter);
-                                    }
-                                },
-                                delegate (Vector2 v, object parameter)
-                                {
-                                    if (vector2CommandExecute != null)
-                                    {
-                                        vector2CommandExecute.Invoke(vmTable, v, parameter);
-                                    }
-                                }
-                            ));
-                            break;
-                    }
+                    this.AddCommand(k, GenerateCommandWithLuaTable(command));
                 }
             }
 

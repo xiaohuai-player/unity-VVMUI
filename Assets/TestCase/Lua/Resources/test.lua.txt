@@ -28,6 +28,10 @@ local data = {
 				d = "this is inner d"
 			}
 		}
+	},
+	test_nested_list = {
+		{ { key = "[0][0]", value = 0 }, { key = "{0}{1}", value = 1 } },
+		{ { key = "[1][0]", value = 2 }, { key = "{1}{1}", value = 3 } }
 	}
 }
 

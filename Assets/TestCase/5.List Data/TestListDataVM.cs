@@ -17,8 +17,9 @@ public class TestListDataVM : VMBehaviour
         public StringData TestString = new StringData("test struct string");
     }
 
-    public ListData<ListData<StringData>> innerList = new ListData<ListData<StringData>>() { 
-        new ListData<StringData>(){ new StringData("inner list item 0") }
+    public ListData<ListData<StringData>> nestedList = new ListData<ListData<StringData>>() { 
+        new ListData<StringData>(){ new StringData("nested list item 0.0"), new StringData("nested list item 0.1") },
+        new ListData<StringData>(){ new StringData("nested list item 1.0"), new StringData("nested list item 1.1") }
     };
     public ListData<StringData> testList = new ListData<StringData>() { new StringData("test item 0") };
     public ListData<TestStructData> testStrctList = new ListData<TestStructData>() { new TestStructData() };

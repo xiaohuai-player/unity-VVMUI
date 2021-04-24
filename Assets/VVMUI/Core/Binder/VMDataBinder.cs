@@ -112,7 +112,7 @@ namespace VVMUI.Core.Binder
             {
                 IData dstData = this.objVM.GetData(kv.Key);
                 IData srcData = this.sourceData[kv.Key];
-                if (dstData != null && srcData.GetType().IsAssignableFrom(dstData.GetType()))
+                if (dstData != null && srcData.GetType() == dstData.GetType())
                 {
                     DataChangedHandler handler = delegate (IData src)
                     {
