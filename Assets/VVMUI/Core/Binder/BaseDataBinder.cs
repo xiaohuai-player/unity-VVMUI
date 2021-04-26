@@ -164,7 +164,7 @@ namespace VVMUI.Core.Binder
                         }
                         else
                         {
-                            (this.Source as BoolData).Set(arg);
+                            (this.Source as BaseData<bool>).Set(arg);
                         }
                     });
                     (this.Component as Toggle).onValueChanged.AddListener((UnityAction<bool>)this.ValueChangedHandler);
@@ -180,7 +180,7 @@ namespace VVMUI.Core.Binder
                         }
                         else
                         {
-                            (this.Source as StringData).Set(arg);
+                            (this.Source as BaseData<string>).Set(arg);
                         }
                     });
                     (this.Component as InputField).onValueChanged.AddListener((UnityAction<string>)this.ValueChangedHandler);
@@ -196,7 +196,7 @@ namespace VVMUI.Core.Binder
                         }
                         else
                         {
-                            (this.Source as IntData).Set(arg);
+                            (this.Source as BaseData<int>).Set(arg);
                         }
                     });
                     (this.Component as Dropdown).onValueChanged.AddListener((UnityAction<int>)this.ValueChangedHandler);
@@ -212,7 +212,7 @@ namespace VVMUI.Core.Binder
                         }
                         else
                         {
-                            (this.Source as FloatData).Set(arg);
+                            (this.Source as BaseData<float>).Set(arg);
                         }
                     });
                     (this.Component as Slider).onValueChanged.AddListener((UnityAction<float>)this.ValueChangedHandler);
@@ -387,7 +387,15 @@ namespace VVMUI.Core.Binder
             for (int i = 0; i < BindItems.Count; i++)
             {
                 DataBinderItem item = BindItems[i];
-                item.Source = (IBaseData)item.Definer.GetData(vm);
+
+                IData source = item.Definer.GetData(vm);
+                if (source == null || source.GetDataType() != DataType.Base)
+                {
+                    Debugger.LogError("DataBinder", this.gameObject.name + " data is not base data.");
+                    continue;
+                }
+
+                item.Source = (IBaseData)source;
                 item.Converter = item.Definer.GetConverter(vm);
                 item.DoBind(vm, this.gameObject);
             }
@@ -400,7 +408,15 @@ namespace VVMUI.Core.Binder
             for (int i = 0; i < BindItems.Count; i++)
             {
                 DataBinderItem item = BindItems[i];
-                item.Source = (IBaseData)item.Definer.GetData(data);
+
+                IData source = item.Definer.GetData(data);
+                if (source == null || source.GetDataType() != DataType.Base)
+                {
+                    Debugger.LogError("DataBinder", this.gameObject.name + " data is not base data.");
+                    continue;
+                }
+
+                item.Source = (IBaseData)source;
                 item.Converter = item.Definer.GetConverter(vm);
                 item.DoBind(vm, this.gameObject);
             }

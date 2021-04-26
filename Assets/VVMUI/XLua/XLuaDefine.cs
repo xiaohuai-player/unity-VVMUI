@@ -1,5 +1,4 @@
 ﻿using XLua;
-using VVMUI.Core.Data;
 
 namespace VVMUI.Script.XLua
 {

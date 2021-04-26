@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using VVMUI.Core;
-using VVMUI.Core.Data;
-using VVMUI.Core.Command;
 using VVMUI.Core.Binder;
-using VVMUI.Core.Converter;
+using VVMUI.Core.Command;
+using VVMUI.Core.Data;
 using XLua;
 
 namespace VVMUI.Script.XLua
@@ -163,50 +161,50 @@ namespace VVMUI.Script.XLua
             }
         }
 
-        //TODO: 目前仅支持深度为 2 的 list
+        // 目前仅支持深度为 2 的 list
         private IListData CreateNestListDataInstanceWithItemValueLuaTable(LuaTable valueData)
         {
-            XLuaDataType firstDataType = valueData.Get<XLuaDataType>("type");
+            XLuaDataType firstDataType = valueData.Get<XLuaDataType>("__vm_type");
             switch (firstDataType)
             {
                 case XLuaDataType.Boolean:
-                    return new ListData<ListData<BoolData>>();
+                    return new ListData<ListData<BaseData<bool>>>();
                 case XLuaDataType.Float:
-                    return new ListData<ListData<FloatData>>();
+                    return new ListData<ListData<BaseData<float>>>();
                 case XLuaDataType.Int:
-                    return new ListData<ListData<IntData>>();
+                    return new ListData<ListData<BaseData<int>>>();
                 case XLuaDataType.String:
-                    return new ListData<ListData<StringData>>();
+                    return new ListData<ListData<BaseData<string>>>();
                 case XLuaDataType.UserData:
-                    object obj = valueData.Get<object>("value");
+                    object obj = valueData.Get<object>("__vm_value");
                     Type objType = obj.GetType();
                     if (typeof(Enum).IsAssignableFrom(objType))
                     {
-                        return new ListData<ListData<EnumData>>();
+                        return new ListData<ListData<BaseData<Enum>>>();
                     }
                     else if (typeof(Color).IsAssignableFrom(objType))
                     {
-                        return new ListData<ListData<ColorData>>();
+                        return new ListData<ListData<BaseData<Color>>>();
                     }
                     else if (typeof(Vector2).IsAssignableFrom(objType))
                     {
-                        return new ListData<ListData<Vector2Data>>();
+                        return new ListData<ListData<BaseData<Vector2>>>();
                     }
                     else if (typeof(Vector3).IsAssignableFrom(objType))
                     {
-                        return new ListData<ListData<Vector3Data>>();
+                        return new ListData<ListData<BaseData<Vector3>>>();
                     }
                     else if (typeof(Rect).IsAssignableFrom(objType))
                     {
-                        return new ListData<ListData<RectData>>();
+                        return new ListData<ListData<BaseData<Rect>>>();
                     }
                     else if (typeof(Sprite).IsAssignableFrom(objType))
                     {
-                        return new ListData<ListData<SpriteData>>();
+                        return new ListData<ListData<BaseData<Sprite>>>();
                     }
                     else if (typeof(Texture).IsAssignableFrom(objType))
                     {
-                        return new ListData<ListData<TextureData>>();
+                        return new ListData<ListData<BaseData<Texture>>>();
                     }
                     break;
                 case XLuaDataType.List:
@@ -222,51 +220,51 @@ namespace VVMUI.Script.XLua
 
         private IListData CreateListDataInstanceWithItemLuaTable(LuaTable itemData)
         {
-            XLuaDataType firstDataType = itemData.Get<XLuaDataType>("type");
+            XLuaDataType firstDataType = itemData.Get<XLuaDataType>("__vm_type");
             switch (firstDataType)
             {
                 case XLuaDataType.Boolean:
-                    return new ListData<BoolData>();
+                    return new ListData<BaseData<bool>>();
                 case XLuaDataType.Float:
-                    return new ListData<FloatData>();
+                    return new ListData<BaseData<float>>();
                 case XLuaDataType.Int:
-                    return new ListData<IntData>();
+                    return new ListData<BaseData<int>>();
                 case XLuaDataType.String:
-                    return new ListData<StringData>();
+                    return new ListData<BaseData<string>>();
                 case XLuaDataType.UserData:
-                    object obj = itemData.Get<object>("value");
+                    object obj = itemData.Get<object>("__vm_value");
                     Type objType = obj.GetType();
                     if (typeof(Enum).IsAssignableFrom(objType))
                     {
-                        return new ListData<EnumData>();
+                        return new ListData<BaseData<Enum>>();
                     }
                     else if (typeof(Color).IsAssignableFrom(objType))
                     {
-                        return new ListData<ColorData>();
+                        return new ListData<BaseData<Color>>();
                     }
                     else if (typeof(Vector2).IsAssignableFrom(objType))
                     {
-                        return new ListData<Vector2Data>();
+                        return new ListData<BaseData<Vector2>>();
                     }
                     else if (typeof(Vector3).IsAssignableFrom(objType))
                     {
-                        return new ListData<Vector3Data>();
+                        return new ListData<BaseData<Vector3>>();
                     }
                     else if (typeof(Rect).IsAssignableFrom(objType))
                     {
-                        return new ListData<RectData>();
+                        return new ListData<BaseData<Rect>>();
                     }
                     else if (typeof(Sprite).IsAssignableFrom(objType))
                     {
-                        return new ListData<SpriteData>();
+                        return new ListData<BaseData<Sprite>>();
                     }
                     else if (typeof(Texture).IsAssignableFrom(objType))
                     {
-                        return new ListData<TextureData>();
+                        return new ListData<BaseData<Texture>>();
                     }
                     break;
                 case XLuaDataType.List:
-                    LuaTable list = itemData.Get<LuaTable>("value");
+                    LuaTable list = itemData.Get<LuaTable>("__vm_value");
                     LuaTable first = list.Get<int, LuaTable>(1);
                     return CreateNestListDataInstanceWithItemValueLuaTable(first);
                 case XLuaDataType.Struct:
@@ -277,72 +275,71 @@ namespace VVMUI.Script.XLua
             return null;
         }
 
-        private IData GenerateDataWithLuaTable(LuaTable data)
+        private IData GenerateDataWithLuaTable(string k, LuaTable luaData)
         {
-            XLuaDataType dataType = data.Get<XLuaDataType>("type");
-            switch (dataType)
+            XLuaDataType luaDataType = luaData.Get<XLuaDataType>("__vm_type");
+            switch (luaDataType)
             {
                 case XLuaDataType.Boolean:
-                    return new BoolData(data.Get<bool>("value"));
+                    return new XLuaBaseData<bool>(luaData).VMData;
                 case XLuaDataType.Float:
-                    return new FloatData(data.Get<float>("value"));
+                    return new XLuaBaseData<float>(luaData).VMData;
                 case XLuaDataType.Int:
-                    return new IntData(data.Get<int>("value"));
+                    return new XLuaBaseData<int>(luaData).VMData;
                 case XLuaDataType.String:
-                    return new StringData(data.Get<string>("value"));
+                    return new XLuaBaseData<string>(luaData).VMData;
                 case XLuaDataType.UserData:
-                    object obj = data.Get<object>("value");
+                    object obj = luaData.Get<object>("__vm_value");
                     Type objType = obj.GetType();
                     if (typeof(Enum).IsAssignableFrom(objType))
                     {
-                        return new EnumData((Enum)obj);
+                        return new XLuaBaseData<Enum>(luaData).VMData;
                     }
                     else if (typeof(Color).IsAssignableFrom(objType))
                     {
-                        return new ColorData((Color)obj);
+                        return new XLuaBaseData<Color>(luaData).VMData;
                     }
                     else if (typeof(Vector2).IsAssignableFrom(objType))
                     {
-                        return new Vector2Data((Vector2)obj);
+                        return new XLuaBaseData<Vector2>(luaData).VMData;
                     }
                     else if (typeof(Vector3).IsAssignableFrom(objType))
                     {
-                        return new Vector3Data((Vector3)obj);
+                        return new XLuaBaseData<Vector3>(luaData).VMData;
                     }
                     else if (typeof(Rect).IsAssignableFrom(objType))
                     {
-                        return new RectData((Rect)obj);
+                        return new XLuaBaseData<Rect>(luaData).VMData;
                     }
                     else if (typeof(Sprite).IsAssignableFrom(objType))
                     {
-                        return new SpriteData((Sprite)obj);
+                        return new XLuaBaseData<Sprite>(luaData).VMData;
                     }
                     else if (typeof(Texture).IsAssignableFrom(objType))
                     {
-                        return new TextureData((Texture)obj);
+                        return new XLuaBaseData<Texture>(luaData).VMData;
                     }
-                    break;
+                    return null;
                 case XLuaDataType.List:
-                    LuaTable list = data.Get<LuaTable>("value");
+                    LuaTable list = luaData.Get<LuaTable>("__vm_value");
                     LuaTable first = list.Get<int, LuaTable>(1);
                     IListData listData = CreateListDataInstanceWithItemLuaTable(first);
                     list.ForEach<int, LuaTable>(delegate (int index, LuaTable item)
                     {
-                        listData.AddItem(GenerateDataWithLuaTable(item));
+                        listData.AddItem(GenerateDataWithLuaTable(index.ToString(), item));
                     });
                     return listData;
                 case XLuaDataType.Struct:
-                    LuaTable strct = data.Get<LuaTable>("value");
+                    LuaTable strct = luaData.Get<LuaTable>("__vm_value");
                     StructData strctData = new StructData();
                     strct.ForEach<string, LuaTable>(delegate (string key, LuaTable el)
                     {
-                        strctData.AddField(key, GenerateDataWithLuaTable(el));
+                        strctData.AddField(key, GenerateDataWithLuaTable(key, el));
                     });
                     return strctData;
                 default:
                     return null;
             }
-            return null;
         }
 
         private ICommand GenerateCommandWithLuaTable(LuaTable cmdLua)
@@ -455,7 +452,7 @@ namespace VVMUI.Script.XLua
                 foreach (string k in keys)
                 {
                     LuaTable data = vmData.Get<LuaTable>(k);
-                    this.AddData(k, GenerateDataWithLuaTable(data));
+                    this.AddData(k, GenerateDataWithLuaTable(k, data));
                 }
             }
 
@@ -479,8 +476,6 @@ namespace VVMUI.Script.XLua
 
         public override void EditorCollect()
         {
-            base.EditorCollect();
-
             Env = null;
             Initialized = false;
             Init(new LuaEnv());

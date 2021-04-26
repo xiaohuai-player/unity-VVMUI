@@ -1,0 +1,25 @@
+local data = {
+	test_string = "this is lua string",
+}
+
+local command = {
+	test_btn = {
+		type = XLuaCommandType.Void,
+		can_execute = function(vm, param)
+			return true
+		end,
+		execute = function(vm, param)
+			print("test_btn clicked", vm)
+			vm.data.test_string = "test_btn clicked"
+		end
+	}
+}
+
+local hook = {
+}
+
+return vm({
+	data = data,
+	command = command,
+	hook = hook
+})

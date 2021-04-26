@@ -31,14 +31,13 @@ namespace VVMUI.Core.Data
         void FastSetValue(object value);
     }
 
-    public abstract class BaseData<T> : IBaseData
+    public class BaseData<T> : IBaseData
     {
-        protected BaseData()
+        public BaseData()
         {
-
         }
 
-        protected BaseData(T value)
+        public BaseData(T value)
         {
             _value = value;
         }
@@ -50,6 +49,7 @@ namespace VVMUI.Core.Data
 
         public void InvokeValueChanged()
         {
+            Debug.Log("InvokeValueChanged " + _valueChangedHandlers.Count);
             for (int i = 0; i < _valueChangedHandlers.Count; i++)
             {
                 _valueChangedHandlers[i].Invoke(this);
@@ -58,11 +58,13 @@ namespace VVMUI.Core.Data
 
         public void AddValueChangedListener(DataChangedHandler handler)
         {
+            //Debug.Log("AddValueChangedListener ");
             _valueChangedHandlers.Add(handler);
         }
 
         public void RemoveValueChangedListener(DataChangedHandler handler)
         {
+            Debug.Log("RemoveValueChangedListener ");
             _valueChangedHandlers.Remove(handler);
         }
 
@@ -101,14 +103,14 @@ namespace VVMUI.Core.Data
         {
             if (!this.GetType().IsAssignableFrom(data.GetType()))
             {
-                Debug.Log("can not copy data with not the same type");
+                Debugger.LogError("BaseData", "can not copy data with not the same type");
                 return;
             }
 
             BaseData<T> d = (BaseData<T>)data;
             if (d == null)
             {
-                Debug.Log("can not copy data with not the same type");
+                Debugger.LogError("BaseData", "can not copy data with not the same type");
                 return;
             }
 

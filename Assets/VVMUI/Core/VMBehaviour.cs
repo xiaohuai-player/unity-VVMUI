@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Scripting;
 using VVMUI.Core.Binder;
 using VVMUI.Core.Command;
 using VVMUI.Core.Converter;

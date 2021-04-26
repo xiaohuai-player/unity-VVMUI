@@ -3,11 +3,37 @@ XLuaCommandType = CS.VVMUI.Script.XLua.XLuaCommandType
 
 vm = {}
 
+local function wrap_vm_data_table(t)
+	local raw_table = t
+	return setmetatable({}, {
+		__index = function(_, key)
+			print("__index", key)
+			if raw_table[key] == nil then
+				error("the given key "..key.." not exist")
+			end
+			return raw_table[key].__vm_get();
+		end,
+		__newindex = function(_, key, value)
+			if raw_table[key] == nil then
+				error("the given key "..key.." not exist")
+			end
+			return raw_table[key].__vm_set(value);
+		end
+	})
+end
+
 local function generate_vm_data(key, data)
 	local vm_data_type = nil
 	local vm_data_value = nil
-	local data_type = type(data)
+	local vm_getter_value = nil
+	local vm_getter = function() 
+		print("getter not defined")
+	end
+	local vm_setter = function(value) 
+		print("setter not defined")
+	end
 
+	local data_type = type(data)
 	if data_type == "number" then
 		if math.type(data) == "integer" then
 			vm_data_type = XLuaDataType.Int
@@ -30,12 +56,26 @@ local function generate_vm_data(key, data)
 
 	if vm_data_type == XLuaDataType.List then
 		vm_data_value = {}
+		vm_getter_value = wrap_vm_data_table(vm_data_value)
+		vm_getter = function()
+			return vm_getter_value
+		end
+		vm_setter = function(value)
+			error("you should not assign value to list")
+		end
 		for i, v in ipairs(data) do
 			local item = generate_vm_data("", v)
 			table.insert(vm_data_value, item)
 		end
 	elseif vm_data_type == XLuaDataType.Struct then
 		vm_data_value = {}
+		vm_getter_value = wrap_vm_data_table(vm_data_value)
+		vm_getter = function()
+			return vm_getter_value
+		end
+		vm_setter = function(value)
+			error("you should not assign value to list")
+		end
 		for k, v in pairs(data) do
 			vm_data_value[k] = generate_vm_data(k, v)
 		end
@@ -44,26 +84,32 @@ local function generate_vm_data(key, data)
 	end
 
 	return {
-		type = vm_data_type,
-		value = vm_data_value
+		__vm_type = vm_data_type,
+		__vm_value = vm_data_value,
+		__vm_set = vm_setter,
+		__vm_get = vm_getter
 	}
 end
 
-function vm.init(self, t)
-	vm_data = {}
+local function wrap_vm_data(vm_table, t)
+	local raw_vm_data = {}
+	vm_table["__vm_data"] = raw_vm_data
+
 	if t["data"] ~= nil and type(t["data"]) == "table" then
 		for k, v in pairs(t["data"]) do
-			obj = generate_vm_data(k, v)
-			if obj ~= nil then
-				vm_data[k] = obj
-			end
+			raw_vm_data[k] = generate_vm_data(k, v)
 		end
 	end
-	self["__vm_data"] = vm_data
 
+	vm_table["data"] = wrap_vm_data_table(vm_table["__vm_data"])
+
+	return vm_table
+end
+
+function vm.init(self, t)
+	wrap_vm_data(self, t)
 	self["__vm_command"] = t["command"]
 	self["__vm_hook"] = t["hook"]
-
 	return self
 end
 

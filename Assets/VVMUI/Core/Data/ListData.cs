@@ -236,14 +236,14 @@ namespace VVMUI.Core.Data
         {
             if (!this.GetType().IsAssignableFrom(data.GetType()))
             {
-                Debug.Log("can not copy data with not the same type");
+                Debugger.LogError("BaseData", "can not copy data with not the same type");
                 return;
             }
 
             ListData<T> list = (ListData<T>)data;
             if (list == null)
             {
-                Debug.Log("can not copy data with not the same type");
+                Debugger.LogError("BaseData", "can not copy data with not the same type");
                 return;
             }
 

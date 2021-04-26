@@ -4,7 +4,8 @@ local data = {
 	test_bool = true,
 	test_string = "this is lua string",
 	test_aag = "this is lua string",
-	test_color = CS.UnityEngine.Color(192, 100, 60),
+	test_color = CS.UnityEngine.Color(192 / 255, 100 / 255, 60 / 255),
+	test_vec2 = CS.UnityEngine.Vector2(155, 155),
 	test_base_list = { "aa", "bs", "cs", "dw", "eg" },
 	test_base_struct = {
 		name = "test struct name",
@@ -36,14 +37,21 @@ local data = {
 }
 
 local command = {
+	test_changePosition = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			vm.data.test_vec2 = CS.UnityEngine.Vector2(200, -200)
+		end
+	},
 	test_btn = {
 		type = XLuaCommandType.Void,
 		can_execute = function(vm, param)
 			return true
 		end,
 		execute = function(vm, param)
-			print("test_btn clicked")
-			vm.data.test_string = "test_btn clicked"
+			print("before", vm.data.test_base_list[1])
+			vm.data.test_base_list[1] = "test_btn clicked"
+			print("after", vm.data.test_base_list[1])
 		end
 	},
 	test_toggle = {
