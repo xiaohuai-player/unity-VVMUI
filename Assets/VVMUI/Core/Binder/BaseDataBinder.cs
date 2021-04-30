@@ -126,6 +126,7 @@ namespace VVMUI.Core.Binder
                     return;
                 }
 
+                // 数据单向绑定
                 this.SetValueHandler = delegate (IData source)
                 {
                     object value = this.Source.FastGetValue();
@@ -330,6 +331,7 @@ namespace VVMUI.Core.Binder
                 if (this.Source != null && this.SetValueHandler != null)
                 {
                     this.Source.RemoveValueChangedListener(this.SetValueHandler);
+                    this.SetValueHandler = null;
                 }
                 if (this.ValueChangedHandler != null)
                 {
@@ -350,6 +352,7 @@ namespace VVMUI.Core.Binder
                     {
                         (this.Component as Slider).onValueChanged.RemoveListener((UnityAction<float>)this.ValueChangedHandler);
                     }
+                    this.ValueChangedHandler = null;
                 }
             }
 

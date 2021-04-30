@@ -59,8 +59,15 @@ namespace VVMUI.Core.Binder
         protected override void OnValidate()
         {
             base.OnValidate();
-            GetComponents();
-            CalculatePageItemsCount();
+
+            this.GetComponents();
+
+            if (!this.IsOptimizeLayout())
+            {
+                return;
+            }
+
+            this.CalculatePageItemsCount();
         }
 #endif
 

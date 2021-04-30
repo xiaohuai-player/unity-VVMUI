@@ -1,0 +1,116 @@
+local data = {
+	test_base_list = { "-1" },
+	test_complex_list = {
+		{ index = 0, key = "0", value = "aaa" }
+	}
+}
+
+local command = {
+	btnSetSingle = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			vm.data.test_base_list[1] = "set by command"
+			vm.data.test_complex_list[1] = { value = "set by command" }
+
+			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
+		end
+	},
+	btnSetList = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			vm.data.test_base_list = { "set 1", "set 2" }
+			vm.data.test_complex_list = { 
+				{ index = 0, key = "0", value = "set complex 1" },
+				{ index = 1, key = "1", value = "set complex 2" }
+			}
+
+			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
+		end
+	},
+	btnInsert = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			vm.data.test_base_list.insert(math.random(#vm.data.test_base_list), tostring(math.random(0, 100)))
+
+			local newindex = math.random(0, 100);
+			vm.data.test_complex_list.insert(math.random(#vm.data.test_complex_list), { index = newindex, key = tostring(newindex), value = "insert new " })
+
+			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
+		end
+	},
+	btnAdd = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			vm.data.test_base_list.insert(tostring(math.random(0, 100)))
+			
+			local newindex = math.random(0, 100);
+			vm.data.test_complex_list.insert({ index = newindex, key = tostring(newindex), value = "add new " })
+
+			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
+		end
+	},
+	btnRemove = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			vm.data.test_base_list.remove(math.random(#vm.data.test_base_list))
+			vm.data.test_complex_list.remove(math.random(#vm.data.test_complex_list))
+
+			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
+		end
+	},
+	btnPop = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			vm.data.test_base_list.remove()
+			vm.data.test_complex_list.remove()
+
+			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
+		end
+	},
+	btnSort = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			vm.data.test_base_list.sort()
+			vm.data.test_complex_list.sort(function(e1, e2)
+				return e1.index < e2.index
+			end)
+
+			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
+		end
+	},
+	btnBaseItem = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, index)
+			print(index, vm.data.test_base_list[index + 1])
+		end
+	},
+	btnComplexItem = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, index)
+			print(index, vm.data.test_complex_list[index + 1].key)
+		end
+	}
+}
+
+local hook = {
+	before_active = function(vm)
+		local test_data = {}
+		for i = 1, 10, 1 do
+			table.insert(test_data, tostring(math.random(1000)))
+		end
+		vm.data.test_base_list = test_data
+
+		local test_complex_data = {}
+		for i = 1, 10, 1 do
+			local str = tostring(math.random(1000))
+			table.insert(test_complex_data, { index = i, key = str, value = "active" })
+		end
+		vm.data.test_complex_list = test_complex_data
+	end
+}
+
+return vm({
+	data = data,
+	command = command,
+	hook = hook
+})

@@ -1,0 +1,21 @@
+local data = {
+	testEnum = CS.UnityEngine.TextAnchor.MiddleCenter,
+	testString = "test",
+	testBool = false,
+	testAnimation = "animation1",
+	testAnimator = "state1",
+	strct = {
+		field = {
+			{  
+				dict = {
+					key = "key",
+					value = "value"
+				}
+			}
+		}
+	}
+}
+
+return vm({
+	data = data
+})

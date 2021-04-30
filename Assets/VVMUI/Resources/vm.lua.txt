@@ -3,113 +3,172 @@ XLuaCommandType = CS.VVMUI.Script.XLua.XLuaCommandType
 
 vm = {}
 
-local function wrap_vm_data_table(t)
+local function wrap_vm_data_table(t, metamethods)
 	local raw_table = t
-	return setmetatable({}, {
+	return setmetatable(metamethods, {
 		__index = function(_, key)
-			print("__index", key)
 			if raw_table[key] == nil then
 				error("the given key "..key.." not exist")
 			end
-			return raw_table[key].__vm_get();
+			return raw_table[key].__vm_get()
 		end,
 		__newindex = function(_, key, value)
 			if raw_table[key] == nil then
 				error("the given key "..key.." not exist")
 			end
-			return raw_table[key].__vm_set(value);
+			return raw_table[key].__vm_set(value)
+		end,
+		__len = function(_)
+			return #raw_table
 		end
 	})
 end
 
-local function generate_vm_data(key, data)
-	local vm_data_type = nil
-	local vm_data_value = nil
-	local vm_getter_value = nil
-	local vm_getter = function() 
-		print("getter not defined")
-	end
-	local vm_setter = function(value) 
-		print("setter not defined")
-	end
+local function generate_vm_data(data)
+	local vm_data_table = {
+		__vm_type = "data type not set",
+		__vm_value = data,
+		__vm_set = function() 
+			print("getter not defined")
+		end,
+		__vm_get = function() 
+			print("setter not defined")
+		end,
+		__vm_list_add = function() 
+			print("list.add not defined")
+		end,
+		__vm_list_insert = function() 
+			print("list.insert not defined")
+		end,
+		__vm_list_pop = function()
+			print("list.pop not defined")
+		end,
+		__vm_list_remove = function() 
+			print("list.remove not defined")
+		end,
+		__vm_list_reorder = function() 
+			print("list.reorder not defined")
+		end
+	}
 
+	-- 设置数据类型
 	local data_type = type(data)
 	if data_type == "number" then
 		if math.type(data) == "integer" then
-			vm_data_type = XLuaDataType.Int
+			vm_data_table.__vm_type = XLuaDataType.Int
 		elseif math.type(data) == "float" then
-			vm_data_type = XLuaDataType.Float
+			vm_data_table.__vm_type = XLuaDataType.Float
 		end
 	elseif data_type == "string" then
-		vm_data_type = XLuaDataType.String
+		vm_data_table.__vm_type = XLuaDataType.String
 	elseif data_type == "boolean" then
-		vm_data_type = XLuaDataType.Boolean
+		vm_data_table.__vm_type = XLuaDataType.Boolean
 	elseif data_type == "userdata" then
-		vm_data_type = XLuaDataType.UserData
+		vm_data_table.__vm_type = XLuaDataType.UserData
 	elseif data_type == "table" then
 		if #data > 0 then
-			vm_data_type = XLuaDataType.List
+			vm_data_table.__vm_type = XLuaDataType.List
 		else
-			vm_data_type = XLuaDataType.Struct
+			vm_data_table.__vm_type = XLuaDataType.Struct
 		end
 	end
-
-	if vm_data_type == XLuaDataType.List then
-		vm_data_value = {}
-		vm_getter_value = wrap_vm_data_table(vm_data_value)
-		vm_getter = function()
-			return vm_getter_value
-		end
-		vm_setter = function(value)
-			error("you should not assign value to list")
-		end
+	
+	if vm_data_table.__vm_type == XLuaDataType.List then
+		-- 原始数据
+		vm_data_table.__vm_value = {}
 		for i, v in ipairs(data) do
-			local item = generate_vm_data("", v)
-			table.insert(vm_data_value, item)
+			table.insert(vm_data_table.__vm_value, generate_vm_data(v))
 		end
-	elseif vm_data_type == XLuaDataType.Struct then
-		vm_data_value = {}
-		vm_getter_value = wrap_vm_data_table(vm_data_value)
-		vm_getter = function()
-			return vm_getter_value
+
+		-- 包装数据
+		local vm_data_wrapped = wrap_vm_data_table(vm_data_table.__vm_value, {
+			insert = function(pos, item)
+				if item == nil then
+					local vm_item = generate_vm_data(pos)
+					table.insert(vm_data_table.__vm_value, vm_item)
+					vm_data_table.__vm_list_add(vm_item)
+				else
+					local vm_item = generate_vm_data(item)
+					table.insert(vm_data_table.__vm_value, pos, vm_item)
+					vm_data_table.__vm_list_insert(pos, vm_item)
+				end
+			end,
+			remove = function(pos)
+				table.remove(vm_data_table.__vm_value, pos)
+				if pos == nil then
+					vm_data_table.__vm_list_pop()
+				else
+					vm_data_table.__vm_list_remove(pos)
+				end
+			end,
+			sort = function(comp)
+				local real_comp = function(e1, e2)
+					if comp == nil then
+						return e1.__vm_get() < e2.__vm_get()
+					else
+						return comp(e1.__vm_get(), e2.__vm_get())
+					end
+				end
+				table.sort(vm_data_table.__vm_value, real_comp)
+				vm_data_table.__vm_list_reorder();
+			end
+		})
+		vm_data_table.__vm_get = function()
+			return vm_data_wrapped
 		end
-		vm_setter = function(value)
-			error("you should not assign value to list")
+		vm_data_table.__vm_set = function(value)
+			if type(value) ~= "table" then
+				error("you should not assign a non-table value to list")
+			end
+
+			for i = 1, #vm_data_table.__vm_value do
+				vm_data_table.__vm_value[i] = nil
+			end
+			for i, v in ipairs(value) do
+				table.insert(vm_data_table.__vm_value, generate_vm_data(v))
+			end
+
+			vm_data_table.__vm_list_reorder();
 		end
+	elseif vm_data_table.__vm_type == XLuaDataType.Struct then
+		-- 原始数据
+		vm_data_table.__vm_value = {}
 		for k, v in pairs(data) do
-			vm_data_value[k] = generate_vm_data(k, v)
+			vm_data_table.__vm_value[k] = generate_vm_data(v)
+		end
+		
+		-- 包装数据
+		local vm_data_wrapped = wrap_vm_data_table(vm_data_table.__vm_value, {})
+		vm_data_table.__vm_get = function()
+			return vm_data_wrapped
+		end
+		vm_data_table.__vm_set = function(value)
+			if type(value) ~= "table" then
+				error("you should not assign a non-table value to struct")
+			end
+			for k, v in pairs(value) do
+				vm_data_wrapped[k] = v
+			end
 		end
 	else
-		vm_data_value = data
+		vm_data_table.__vm_value = data
 	end
 
-	return {
-		__vm_type = vm_data_type,
-		__vm_value = vm_data_value,
-		__vm_set = vm_setter,
-		__vm_get = vm_getter
-	}
-end
-
-local function wrap_vm_data(vm_table, t)
-	local raw_vm_data = {}
-	vm_table["__vm_data"] = raw_vm_data
-
-	if t["data"] ~= nil and type(t["data"]) == "table" then
-		for k, v in pairs(t["data"]) do
-			raw_vm_data[k] = generate_vm_data(k, v)
-		end
-	end
-
-	vm_table["data"] = wrap_vm_data_table(vm_table["__vm_data"])
-
-	return vm_table
+	return vm_data_table
 end
 
 function vm.init(self, t)
-	wrap_vm_data(self, t)
+	self["__vm_data"] = {}
+	if t["data"] ~= nil and type(t["data"]) == "table" then
+		for k, v in pairs(t["data"]) do
+			self["__vm_data"][k] = generate_vm_data(v)
+		end
+	end
+	self["data"] = wrap_vm_data_table(self["__vm_data"], {})
+
 	self["__vm_command"] = t["command"]
 	self["__vm_hook"] = t["hook"]
+
 	return self
 end
 

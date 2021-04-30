@@ -2,6 +2,11 @@
 
 <linker>
 
+	<assembly fullname="UnityEngine.TextRenderingModule">
+	    <type fullname="UnityEngine.TextAnchor" preserve="all"/>
+		
+	</assembly>
+
 	<assembly fullname="UnityEngine.CoreModule">
 	    <type fullname="UnityEngine.Color" preserve="all"/>
 		<type fullname="UnityEngine.Vector2" preserve="all"/>

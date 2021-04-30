@@ -50,6 +50,12 @@ namespace VVMUI.Core.Data
             get
             {
                 InitFields();
+
+                if (string.IsNullOrEmpty(key))
+                {
+                    return null;
+                }
+
                 IData v = null;
                 allData.TryGetValue(key, out v);
                 return v;
@@ -92,17 +98,6 @@ namespace VVMUI.Core.Data
         public void RemoveValueChangedListener(DataChangedHandler handler)
         {
             valueChangedHandlers.Remove(handler);
-        }
-
-        public object FastGetValue()
-        {
-            Debugger.LogError("StructData", "StructData should not call FastGetValue.");
-            return null;
-        }
-
-        public void FastSetValue(object value)
-        {
-            Debugger.LogError("StructData", "StructData should not call FastSetValue.");
         }
 
         public Type GetBindDataType()

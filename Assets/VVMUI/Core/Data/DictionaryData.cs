@@ -72,17 +72,6 @@ namespace VVMUI.Core.Data
             _valueChangedHandlers.Remove(handler);
         }
 
-        public object FastGetValue()
-        {
-            Debugger.LogError("DictionaryData", "DictionaryData should not call FastGetValue.");
-            return null;
-        }
-
-        public void FastSetValue(object value)
-        {
-            Debugger.LogError("DictionaryData", "DictionaryData should not call FastSetValue.");
-        }
-
         public new T this[string key]
         {
             get

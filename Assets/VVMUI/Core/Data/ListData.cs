@@ -1,17 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace VVMUI.Core.Data
 {
-    public interface IListData : IData
+    public interface IListData : IData, IList
     {
-        void AddItem(IData data);
-        IData GetAt(int index);
-        void ParseObject(object data, Action<object, object> onParseItem = null);
-        int Count { get; }
         int FocusIndex { get; set; }
+        bool DisableValueChangeHandler { get; set; }
+        IData GetAt(int index);
+        void AddItem(IData data);
+        bool RemoveItem(IData data);
+        void InsertItem(int index, IData data);
+        void ParseObject(object data, Action<object, object> onParseItem = null);
+
         event Action FocusIndexChanged;
     }
 
@@ -56,16 +58,7 @@ namespace VVMUI.Core.Data
 
         public event Action FocusIndexChanged;
 
-        public object FastGetValue()
-        {
-            Debugger.LogError("ListData", "ListData should not call FastGetValue.");
-            return null;
-        }
-
-        public void FastSetValue(object value)
-        {
-            Debugger.LogError("ListData", "ListData should not call FastSetValue.");
-        }
+        public bool DisableValueChangeHandler { get; set; }
 
         public Type GetBindDataType()
         {
@@ -81,6 +74,11 @@ namespace VVMUI.Core.Data
         private List<DataChangedHandler> _valueChangedHandlers = new List<DataChangedHandler>();
         public void InvokeValueChanged()
         {
+            if (DisableValueChangeHandler)
+            {
+                return;
+            }
+
             for (int i = 0; i < _valueChangedHandlers.Count; i++)
             {
                 _valueChangedHandlers[i].Invoke(this);
@@ -113,15 +111,15 @@ namespace VVMUI.Core.Data
             return this[index];
         }
 
-        public void AddItem(IData data)
-        {
-            this.Add((T)data);
-        }
-
         public new void Add(T item)
         {
             base.Add(item);
             InvokeValueChanged();
+        }
+
+        public void AddItem(IData data)
+        {
+            this.Add((T)data);
         }
 
         public new void AddRange(IEnumerable<T> collection)
@@ -142,6 +140,11 @@ namespace VVMUI.Core.Data
             InvokeValueChanged();
         }
 
+        public void InsertItem(int index, IData data)
+        {
+            this.Insert(index, (T)data);
+        }
+
         public new void InsertRange(int index, IEnumerable<T> collection)
         {
             base.InsertRange(index, collection);
@@ -156,6 +159,11 @@ namespace VVMUI.Core.Data
                 return true;
             }
             return false;
+        }
+
+        public bool RemoveItem(IData data)
+        {
+            return this.Remove((T)data);
         }
 
         public new int RemoveAll(Predicate<T> match)

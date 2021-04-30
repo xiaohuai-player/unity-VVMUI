@@ -22,6 +22,9 @@ namespace XLua.CSObjectWrap
         static void wrapInit0(LuaEnv luaenv, ObjectTranslator translator)
         {
         
+            translator.DelayWrapLoader(typeof(UnityEngine.TextAnchor), UnityEngineTextAnchorWrap.__Register);
+        
+        
             translator.DelayWrapLoader(typeof(UnityEngine.Color), UnityEngineColorWrap.__Register);
         
         
