@@ -1,0 +1,32 @@
+local data = {
+	testList = { "test item 0" },
+	testStrctList = { { TestString = "test struct string" } },
+	nestedList = {
+		{ "nested list item 0.0", "nested list item 0.1" },
+		{ "nested list item 1.0", "nested list item 1.1" }
+	}
+}
+
+local command = {
+	btnCmd = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			local list = {}
+			for i = 0, 200 do
+				table.insert(list, tostring(i))
+			end
+			vm.data.testList = list
+		end
+	},
+	itemBtnCmd = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			print("test ", param)
+		end
+	}
+}
+
+return vm({
+	data = data,
+	command = command
+})

@@ -1,0 +1,12 @@
+local data = {
+	astring = "a",
+	bstring = "b",
+	strct = {
+		astring = "a of prefab",
+		bstring = "b of prefab",
+	}
+}
+
+return vm({
+	data = data
+})

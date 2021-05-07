@@ -20,6 +20,7 @@
 	<assembly fullname="Assembly-CSharp">
 	    <type fullname="VVMUI.Script.XLua.XLuaDataType" preserve="all"/>
 		<type fullname="VVMUI.Script.XLua.XLuaCommandType" preserve="all"/>
+		<type fullname="VVMUI.Script.XLua.XLuaVMBehaviour" preserve="all"/>
 		
 	</assembly>
 

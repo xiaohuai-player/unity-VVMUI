@@ -1,0 +1,24 @@
+local data = {
+	test_data = ""
+}
+
+local command = {
+	testCmd = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			vm.data.test_data = "test cmd executed."
+		end
+	}
+}
+
+local hook = {
+	before_active = function(vm)
+		vm.data.test_data = "actived"
+	end
+}
+
+return vm({
+	data = data,
+	command = command,
+	hook = hook
+})

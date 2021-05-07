@@ -1,0 +1,13 @@
+local data = {
+	testStrct = {
+		TestString = "test string",
+		TestBool = false,
+		TestInnerStruct = {
+			TestInnerString = "test inner string"
+		}
+	}
+}
+
+return vm({
+	data = data
+})

@@ -1,0 +1,24 @@
+local sliderCmdEnable = false
+
+local command = {
+	btnCmd = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			sliderCmdEnable = true
+		end
+	},
+	sliderCmd = {
+		type = XLuaCommandType.Float,
+		can_execute = function(vm, param)
+			return sliderCmdEnable
+		end,
+		execute = function(vm, value, param)
+			print("slider", value)
+		end
+	}
+}
+
+return vm({
+	data = data,
+	command = command
+})

@@ -146,10 +146,13 @@ namespace VVMUI.Core.Binder
 
             public void DoUnBind()
             {
-                if (command != null && sourceEventType != null && sourceEventObj != null && sourceEventAction != null && canExecuteHandler != null)
+                if (command != null && sourceEventType != null && sourceEventObj != null && sourceEventAction != null)
                 {
                     command.RemoveListenerFromEvent(sourceEventObj, sourceEventAction);
-                    command.RemoveCanExecuteChangedListener(canExecuteHandler);
+                    if (canExecuteHandler != null)
+                    {
+                        command.RemoveCanExecuteChangedListener(canExecuteHandler);
+                    }
                 }
             }
         }

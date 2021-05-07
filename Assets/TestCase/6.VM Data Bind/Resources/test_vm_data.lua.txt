@@ -1,0 +1,26 @@
+local data = {
+	ParentStruct = {
+		astring = "a of parent",
+		bstring = "b of parent"
+	}
+}
+
+local command = {
+	btnA = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			vm.data.ParentStruct.astring = "a changed"
+		end
+	},
+	btnB = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, param)
+			vm.data.ParentStruct.bstring = "b changed"
+		end
+	}
+}
+
+return vm({
+	data = data,
+	command = command
+})

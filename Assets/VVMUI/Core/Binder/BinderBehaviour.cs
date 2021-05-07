@@ -27,18 +27,21 @@ namespace VVMUI.Core.Binder
 #if UNITY_EDITOR
         public void EditorBind()
         {
-            this.BindData = null;
-            this.BindVM = this.GetComponentInParent<VMBehaviour>(true);
-            if (this.BindVM != null)
+            if (!Application.isPlaying)
             {
-                this.BindVM.EditorCollect();
-                if (this.GetComponentInParent<ListTemplateBinder>(true) != null)
+                this.BindData = null;
+                this.BindVM = this.GetComponentInParent<VMBehaviour>(true);
+                if (this.BindVM != null)
                 {
-                    IData data = this.GetComponentInParent<ListTemplateBinder>(true).ItemSource.GetData(this.BindVM);
-                    IListData list = data as IListData;
-                    if (list != null && list.Count > 0)
+                    this.BindVM.EditorCollect();
+                    if (this.GetComponentInParent<ListTemplateBinder>(true) != null)
                     {
-                        this.BindData = list.GetAt(0);
+                        IData data = this.GetComponentInParent<ListTemplateBinder>(true).ItemSource.GetData(this.BindVM);
+                        IListData list = data as IListData;
+                        if (list != null && list.Count > 0)
+                        {
+                            this.BindData = list.GetAt(0);
+                        }
                     }
                 }
             }
@@ -72,10 +75,13 @@ namespace VVMUI.Core.Binder
 #if UNITY_EDITOR
         public void EditorBind()
         {
-            this.BindVM = this.GetComponentInParent<VMBehaviour>(true);
-            if (this.BindVM != null)
+            if (!Application.isPlaying)
             {
-                this.BindVM.EditorCollect();
+                this.BindVM = this.GetComponentInParent<VMBehaviour>(true);
+                if (this.BindVM != null)
+                {
+                    this.BindVM.EditorCollect();
+                }
             }
         }
 #endif

@@ -57,6 +57,7 @@ namespace VVMUI.Script.XLua
             }
 
             vmTable = (LuaTable)results[0];
+            vmTable.Set<string, XLuaVMBehaviour>("behaviour", this);
             vmData = vmTable.Get<LuaTable>("__vm_data");
             vmCommand = vmTable.Get<LuaTable>("__vm_command");
             vmHook = vmTable.Get<LuaTable>("__vm_hook");

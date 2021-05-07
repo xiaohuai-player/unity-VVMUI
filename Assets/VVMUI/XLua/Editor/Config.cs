@@ -21,7 +21,8 @@ namespace VVMUI.Script.XLua.Config
 
             // VVMUI
             typeof(XLuaDataType),
-            typeof(XLuaCommandType)
+            typeof(XLuaCommandType),
+            typeof(XLuaVMBehaviour)
         };
 
         [CSharpCallLua]

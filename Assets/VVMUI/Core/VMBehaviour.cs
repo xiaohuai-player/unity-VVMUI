@@ -143,6 +143,19 @@ namespace VVMUI.Core
             }
         }
 
+        protected void UnBind()
+        {
+            for (int i = 0; i < this.allDataBinders.Count; i++)
+            {
+                this.allDataBinders[i].UnBind();
+            }
+
+            for (int i = 0; i < this.allCommandBinders.Count; i++)
+            {
+                this.allCommandBinders[i].UnBind();
+            }
+        }
+
         public virtual void EditorCollect()
         {
             this.Collect();
@@ -206,6 +219,8 @@ namespace VVMUI.Core
             BeforeDestroy();
 
             base.OnDestroy();
+
+            UnBind();
 
             AfterDestroy();
         }

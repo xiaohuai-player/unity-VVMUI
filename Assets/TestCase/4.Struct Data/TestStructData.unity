@@ -340,10 +340,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 756425898}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4e56459ebbfe76419e3a0d5b630a789, type: 3}
+  m_Script: {fileID: 11500000, guid: f5f73e4a802631344bcb3aab853f47bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   BindRoot: {fileID: 756425898}
+  LuaPath: test_struct_data
 --- !u!1 &890630181
 GameObject:
   m_ObjectHideFlags: 0

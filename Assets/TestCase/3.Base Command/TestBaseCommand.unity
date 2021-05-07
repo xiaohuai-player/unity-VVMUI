@@ -348,6 +348,7 @@ MonoBehaviour:
   - Event: onClick
     Command: btnCmd
     Parameter: 
+  component: {fileID: 1230819075}
 --- !u!114 &1230819075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -452,10 +453,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1378968394}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdf701188b4311c4996ddd898b4c5327, type: 3}
+  m_Script: {fileID: 11500000, guid: f5f73e4a802631344bcb3aab853f47bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BindRoot: {fileID: 0}
+  BindRoot: {fileID: 1378968394}
+  LuaPath: test_base_command
 --- !u!114 &1378968396
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -816,6 +818,7 @@ MonoBehaviour:
   - Event: onValueChanged
     Command: sliderCmd
     Parameter: 
+  component: {fileID: 1840863234}
 --- !u!114 &1840863234
 MonoBehaviour:
   m_ObjectHideFlags: 0

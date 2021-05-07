@@ -49,6 +49,9 @@ namespace XLua.CSObjectWrap
             translator.DelayWrapLoader(typeof(VVMUI.Script.XLua.XLuaCommandType), VVMUIScriptXLuaXLuaCommandTypeWrap.__Register);
         
         
+            translator.DelayWrapLoader(typeof(VVMUI.Script.XLua.XLuaVMBehaviour), VVMUIScriptXLuaXLuaVMBehaviourWrap.__Register);
+        
+        
         
         }
         

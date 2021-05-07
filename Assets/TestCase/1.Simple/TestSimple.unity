@@ -292,12 +292,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 843803088}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a38e6ee8eb70164b85a7bc117586df5, type: 3}
+  m_Script: {fileID: 11500000, guid: f5f73e4a802631344bcb3aab853f47bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   BindRoot: {fileID: 843803088}
-  testData:
-    _value: 
+  LuaPath: test_simple
 --- !u!1 &1095468257
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,7 +449,7 @@ MonoBehaviour:
   BindItems:
   - Type: 0
     Definer:
-      Key: testData
+      Key: test_data
       Converter: 
       ConverterParameter: 
     Component: {fileID: 1437500186}
@@ -762,6 +761,7 @@ MonoBehaviour:
   - Event: onClick
     Command: testCmd
     Parameter: 
+  component: {fileID: 2097604672}
 --- !u!1 &2109401357
 GameObject:
   m_ObjectHideFlags: 0
