@@ -1577,7 +1577,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BindRoot: {fileID: 1306982763}
-  LuaPath: test_list_data
+  LuaPath: test_lua_list
 --- !u!114 &823327144
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -11,8 +11,6 @@ local command = {
 		execute = function(vm, param)
 			vm.data.test_base_list[1] = "set by command"
 			vm.data.test_complex_list[1] = { value = "set by command" }
-
-			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
 		end
 	},
 	btnSetList = {
@@ -23,8 +21,6 @@ local command = {
 				{ index = 0, key = "0", value = "set complex 1" },
 				{ index = 1, key = "1", value = "set complex 2" }
 			}
-
-			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
 		end
 	},
 	btnInsert = {
@@ -34,8 +30,6 @@ local command = {
 
 			local newindex = math.random(0, 100);
 			vm.data.test_complex_list.insert(math.random(#vm.data.test_complex_list), { index = newindex, key = tostring(newindex), value = "insert new " })
-
-			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
 		end
 	},
 	btnAdd = {
@@ -45,8 +39,6 @@ local command = {
 			
 			local newindex = math.random(0, 100);
 			vm.data.test_complex_list.insert({ index = newindex, key = tostring(newindex), value = "add new " })
-
-			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
 		end
 	},
 	btnRemove = {
@@ -54,8 +46,6 @@ local command = {
 		execute = function(vm, param)
 			vm.data.test_base_list.remove(math.random(#vm.data.test_base_list))
 			vm.data.test_complex_list.remove(math.random(#vm.data.test_complex_list))
-
-			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
 		end
 	},
 	btnPop = {
@@ -63,8 +53,6 @@ local command = {
 		execute = function(vm, param)
 			vm.data.test_base_list.remove()
 			vm.data.test_complex_list.remove()
-
-			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
 		end
 	},
 	btnSort = {
@@ -74,8 +62,6 @@ local command = {
 			vm.data.test_complex_list.sort(function(e1, e2)
 				return e1.index < e2.index
 			end)
-
-			print(vm.data.test_base_list[1], vm.data.test_complex_list[1].key)
 		end
 	},
 	btnBaseItem = {
@@ -102,8 +88,8 @@ local hook = {
 
 		local test_complex_data = {}
 		for i = 1, 10, 1 do
-			local str = tostring(math.random(1000))
-			table.insert(test_complex_data, { index = i, key = str, value = "active" })
+			local index = math.random(1000)
+			table.insert(test_complex_data, { index = index, key = tostring(index), value = "active" })
 		end
 		vm.data.test_complex_list = test_complex_data
 	end
