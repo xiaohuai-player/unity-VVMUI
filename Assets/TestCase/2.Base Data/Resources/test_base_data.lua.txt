@@ -1,5 +1,6 @@
 local data = {
 	testEnum = CS.UnityEngine.TextAnchor.MiddleCenter,
+	testColor = CS.UnityEngine.Color(0.6, 0.5, 0.2),
 	testString = "test",
 	testBool = false,
 	testAnimation = "animation1",

@@ -109,19 +109,13 @@ namespace VVMUI.Core.Data
 
         public void CopyFrom(IData data)
         {
-            if (!this.GetType().IsAssignableFrom(data.GetType()))
+            if (!typeof(DictionaryData<T>).IsAssignableFrom(data.GetType()))
             {
                 Debugger.LogError("BaseData", "can not copy data with not the same type");
                 return;
             }
 
             DictionaryData<T> dict = (DictionaryData<T>)data;
-            if (dict == null)
-            {
-                Debugger.LogError("BaseData", "can not copy data with not the same type");
-                return;
-            }
-
             this.Clear();
             foreach (KeyValuePair<string, T> kv in dict)
             {

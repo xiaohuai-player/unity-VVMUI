@@ -112,19 +112,13 @@ namespace VVMUI.Core.Data
 
         public void CopyFrom(IData data)
         {
-            if (!this.GetType().IsAssignableFrom(data.GetType()))
+            if (!typeof(StructData).IsAssignableFrom(data.GetType()))
             {
-                Debug.Log("can not copy data with not the same type");
+                Debugger.LogError("BaseData", "can not copy data with not the same type");
                 return;
             }
 
             StructData strct = (StructData)data;
-            if (strct == null)
-            {
-                Debug.Log("can not copy data with not the same type");
-                return;
-            }
-
             foreach (KeyValuePair<string, IData> kv in strct.Fields)
             {
                 if (this[kv.Key] != null)

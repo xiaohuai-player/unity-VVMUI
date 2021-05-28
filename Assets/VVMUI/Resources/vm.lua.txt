@@ -8,7 +8,7 @@ local function wrap_vm_data_table(t, metamethods)
 	return setmetatable(metamethods, {
 		__index = function(_, key)
 			if raw_table[key] == nil then
-				error("the given key "..key.." not exist")
+				return nil;
 			end
 			return raw_table[key].__vm_get()
 		end,

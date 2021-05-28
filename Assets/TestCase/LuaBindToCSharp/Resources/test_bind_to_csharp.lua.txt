@@ -1,0 +1,17 @@
+local data = {
+	strct = { TestString = "test from lua" }
+}
+
+local command = {
+}
+
+local hook = {
+	before_active = function(vm)
+	end
+}
+
+return vm({
+	data = data,
+	command = command,
+	hook = hook
+})

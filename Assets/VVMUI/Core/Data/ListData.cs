@@ -242,19 +242,13 @@ namespace VVMUI.Core.Data
 
         public void CopyFrom(IData data)
         {
-            if (!this.GetType().IsAssignableFrom(data.GetType()))
+            if (!typeof(ListData<T>).IsAssignableFrom(data.GetType()))
             {
                 Debugger.LogError("BaseData", "can not copy data with not the same type");
                 return;
             }
 
             ListData<T> list = (ListData<T>)data;
-            if (list == null)
-            {
-                Debugger.LogError("BaseData", "can not copy data with not the same type");
-                return;
-            }
-
             this.Clear();
 
             List<T> tmp = new List<T>();

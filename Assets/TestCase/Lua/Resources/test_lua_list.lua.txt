@@ -75,6 +75,28 @@ local command = {
 		execute = function(vm, index)
 			print(index, vm.data.test_complex_list[index + 1].key)
 		end
+	},
+	btnForeachGet = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, index)
+			for i, v in ipairs(vm.data.test_base_list) do
+				print("base", i, v)
+			end
+			for i, v in ipairs(vm.data.test_complex_list) do
+				print("complex", i, v.key, v.value)
+			end
+		end
+	},
+	btnForeachSet = {
+		type = XLuaCommandType.Void,
+		execute = function(vm, index)
+			for i, v in ipairs(vm.data.test_base_list) do
+				vm.data.test_base_list[i] = "foreach set "..tostring(v)
+			end
+			for i, v in ipairs(vm.data.test_complex_list) do
+				v.value = "foreach set "..tostring(v.key)
+			end
+		end
 	}
 }
 
